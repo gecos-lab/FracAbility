@@ -5,7 +5,7 @@ from vtkmodules.all import *
 import numpy as np
 import pyvista as pv
 
-from fracability.Representations import Representation
+import fracability.Representations as Rep
 
 from abc import ABC, abstractmethod
 
@@ -32,6 +32,7 @@ class BaseEntity(ABC):
 
         self.df = gdf
         self.old_df = None
+        self.vtk_obj = None
         self.process_df()
         self.save_copy()
 
@@ -47,20 +48,30 @@ class BaseEntity(ABC):
     def entity_df(self):
         return self.df
 
-    def get_output(self, entity_repr: Representation):
+    def get_vtk_output(self):
         """
         Get the output in the desired representation format (for example VTK)
         :param entity_repr: Representation class
         :return: The output depends on the passed representation class
         """
-        output = entity_repr.get_repr()
+        self.vtk_obj = Rep.vtk_rep(self.entity_df)
+        return self.vtk_obj
+
+    def get_network_output(self):
+        """
+        Get the output in the desired representation format (for example VTK)
+        :param entity_repr: Representation class
+        :return: The output depends on the passed representation class
+        """
+        output = Rep.networkx_rep(self.get_vtk_output())
         return output
 
-    def center_object(self, trans_center: np.array = None):
+    def center_object(self, trans_center: np.array = None, return_center = False):
         """
         Center the network. If the translation point is not
         given then the centroid of the network will coincide with the world origin.
         :param trans_center: Point to translate to
+        :param return_center: Flag to enable the return of the translation center
         :return:
         """
         self.save_copy() # create a backup copy
@@ -68,6 +79,8 @@ class BaseEntity(ABC):
             trans_center = np.array(self.df.dissolve().centroid[0].coords).flatten()
 
         self.df['geometry'] = self.df.translate(-trans_center[0], -trans_center[1])
+        if return_center:
+            return trans_center
 
     def save_copy(self):
         """
@@ -81,8 +94,7 @@ class Nodes(BaseEntity):
     Nodes class defines the nodes of a given fracture network
     """
 
-    def process_df(self):
-        ...
+    ...
 
 
 class Fractures(BaseEntity):
@@ -97,9 +109,12 @@ class Fractures(BaseEntity):
         if 'type' not in self.df.columns:
             self.df['type'] = 'fracture'
 
-        if 'U-nodes' not in self.df.columns:
-            self.df['U-nodes'] = 0
         self.save_copy()
+
+    def get_nodes(self) -> pv.PolyData:
+        points = pv.PolyData(self.get_vtk_output().points)
+        return points
+
 
 
 class Boundary(BaseEntity):
@@ -122,8 +137,6 @@ class Boundary(BaseEntity):
         if 'type' not in self.df.columns:
             self.df['type'] = 'boundary'
 
-        if 'U-nodes' not in self.df.columns:
-            self.df['U-nodes'] = 0
         self.save_copy()
 
 
@@ -141,7 +154,7 @@ class FractureNetwork(BaseEntity):
     def process_df(self):
         if self.df is None:
             self.df = geopandas.GeoDataFrame(pd.DataFrame(
-                {'type': [], 'U-nodes': [], 'geometry': []}))
+                {'type': [], 'geometry': []}))
 
     def add_fractures(self, fractures: Fractures):
         """
@@ -154,7 +167,7 @@ class FractureNetwork(BaseEntity):
         self.fractures = fractures
         self.df = geopandas.GeoDataFrame(pd.concat([self.df,
                                                     self.fractures.entity_df[
-                                                        ['geometry', 'type', 'U-nodes']]],
+                                                        ['geometry', 'type']]],
                                                    ignore_index=True))
         self.old_df = self.df.copy()
 
@@ -168,6 +181,6 @@ class FractureNetwork(BaseEntity):
         self.boundaries = boundaries
         self.df = geopandas.GeoDataFrame(pd.concat([self.df,
                                                     self.boundaries.entity_df[
-                                                        ['geometry', 'type', 'U-nodes']]],
+                                                        ['geometry', 'type']]],
                                                    ignore_index=True))
         self.old_df = self.df.copy()

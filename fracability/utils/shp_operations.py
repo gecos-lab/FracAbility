@@ -2,10 +2,10 @@ import geopandas
 import numpy
 import shapely.geometry as geom
 from shapely.affinity import scale
-from shapely.ops import split
+from shapely.ops import split,snap
+import matplotlib.pyplot as plt
 
-
-def int_node(line1, line2, idx_list):
+def int_node(line1, line2, idx_list=[None,None]):
     """
     Function used to add the intersection node to a line crossed or touched by a second line.
     This function works by extending of a given factor the start and end segment the line2 and then use shapely to:
@@ -33,10 +33,12 @@ def int_node(line1, line2, idx_list):
         split_lines2 = split(line2, line1)
         outcoords2 = [list(i.coords) for i in split_lines2.geoms]
 
-        new_line1 = geom.LineString([i for sublist in outcoords1 for i in sublist])
-        new_line2 = geom.LineString([i for sublist in outcoords2 for i in sublist])
+        new_line1 = geom.LineString([i for sublist in outcoords1 for i in sublist]).simplify(0)
+        new_line2 = geom.LineString([i for sublist in outcoords2 for i in sublist]).simplify(0)
+
         new_geom_dict[idx_list[0]] = new_line1
         new_geom_dict[idx_list[1]] = new_line2
+
     else:
         for counter in range(3):
             if len(line2.coords) == 2:
