@@ -88,6 +88,9 @@ class BaseEntity(ABC):
         """
         self.old_df = self.df.copy()
 
+    def get_nodes(self) -> pv.PolyData:
+        points = pv.PolyData(self.get_vtk_output().points)
+        return points
 
 class Nodes(BaseEntity):
     """
@@ -111,28 +114,23 @@ class Fractures(BaseEntity):
 
         self.save_copy()
 
-    def get_nodes(self) -> pv.PolyData:
-        points = pv.PolyData(self.get_vtk_output().points)
-        return points
-
-
 
 class Boundary(BaseEntity):
 
     def process_df(self):
 
-        boundaries = self.df.boundary  # boundaries must be provided as polygons
-
-        self.df['geometry'] = boundaries
-
-        n = self.df.shape[0]
-        for i, geometry in enumerate(boundaries):
-            if isinstance(geometry, geom.MultiLineString):
-                self.df.drop(index=i, inplace=True)
-
-                for line in geometry.geoms:
-                    self.df.loc[n, 'geometry'] = line
-                    n += 1
+        for index, boundary in enumerate(self.df['geometry']):
+            if isinstance(boundary, geom.Polygon):
+                self.df.loc[index, 'geometry'] = boundary.boundary
+        self.df = self.df.explode()
+        # n = self.df.shape[0]
+        # for i, geometry in enumerate(self.df):
+        #     if isinstance(geometry, geom.MultiLineString):
+        #         self.df.drop(index=i, inplace=True)
+        #
+        #         for line in geometry.geoms:
+        #             self.df.loc[n, 'geometry'] = line
+        #             n += 1
                 # print(bound_df)
         if 'type' not in self.df.columns:
             self.df['type'] = 'boundary'
@@ -145,16 +143,29 @@ class FractureNetwork(BaseEntity):
     The FractureNetwork class is the combination of the BaseEntities
     (Nodes, Fractures, Boundary)
     """
-    def __init__(self):
-        super().__init__()
+    def __init__(self, gdf: geopandas.GeoDataFrame=None):
+        super().__init__(gdf)
         self.fractures: Fractures = None
         self.boundaries: Boundary = None
         self.nodes: Nodes = None
+        self.process_df()
+        self.save_copy()
 
     def process_df(self):
         if self.df is None:
             self.df = geopandas.GeoDataFrame(pd.DataFrame(
                 {'type': [], 'geometry': []}))
+        else:
+            # print(self.df)
+            self.save_copy()
+            fractures = Fractures(self.df.loc[self.df['type'] == 'fracture'])
+            boundary = Boundary(self.df.loc[self.df['type'] == 'boundary'])
+            # nodes = Nodes(self.df.loc[self.df['type'] == 'nodes'])
+
+            self.fractures = fractures
+            self.boundaries = boundary
+
+            # self.nodes = nodes
 
     def add_fractures(self, fractures: Fractures):
         """
@@ -169,7 +180,7 @@ class FractureNetwork(BaseEntity):
                                                     self.fractures.entity_df[
                                                         ['geometry', 'type']]],
                                                    ignore_index=True))
-        self.old_df = self.df.copy()
+        self.save_copy()
 
     def add_boundaries(self, boundaries: Boundary):
         """
@@ -183,4 +194,7 @@ class FractureNetwork(BaseEntity):
                                                     self.boundaries.entity_df[
                                                         ['geometry', 'type']]],
                                                    ignore_index=True))
-        self.old_df = self.df.copy()
+        self.save_copy()
+
+
+

@@ -60,9 +60,12 @@ def networkx_rep(input_object: PolyData) -> networkx.Graph:
     lines = np.delete(lines,
                       np.arange(0, lines.size, 3))  # remove padding eg. [2 id1 id2 2 id3 id4 ...] -> remove the 2
 
+    test_types = np.array([{'type': t} for t in network['type']])
+    edges = np.c_[lines.reshape(-1, 2), test_types]
+
     network = nx.Graph()  # Create a networkx graph instance
 
-    network.add_edges_from(lines.reshape(-1, 2))  # Add the edges
+    network.add_edges_from(edges)  # Add the edges
 
     output_obj = network
     return output_obj
