@@ -1,20 +1,14 @@
-import networkx
-from fracability.Entities import FractureNetwork,Nodes
-from fracability.geometric_operations import connect_dots
+from fracability.Entities import FractureNetwork, Nodes
 
 
 def nodes_conn(obj: FractureNetwork, inplace=True):
-    """
-    Create an ordered list of number of connection per node. Each value in the list
-    represents the number of connection for the point n in the vtk dataset
-    :return:
-    """
+
     adj_dict = obj.network_object.adj
     frac_net = obj.vtk_object
 
     fracture_nodes = Nodes()
-    extr_nodes = frac_net.extract_points(frac_net['type'] == 'fracture', include_cells=False)
 
+    extr_nodes = frac_net.extract_points(frac_net.point_data['type'] == 'fracture', include_cells=False)
 
     class_list = []
 
@@ -53,6 +47,7 @@ def nodes_conn(obj: FractureNetwork, inplace=True):
     extr_nodes['class_id'] = class_list
 
     extr_nodes['class_names'] = class_names
+    extr_nodes = extr_nodes.extract_points(extr_nodes['class_id'] >= 0)
 
     fracture_nodes.vtk_object = extr_nodes
     obj.nodes = fracture_nodes

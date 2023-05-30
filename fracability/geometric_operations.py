@@ -1,27 +1,16 @@
-from abc import ABC, abstractmethod
-
-import geopandas
-import matplotlib.pyplot as plt
-
 from pyvista import PolyData
 import time
 
 from vtkmodules.vtkFiltersCore import vtkConnectivityFilter, vtkCleanPolyData, vtkAppendPolyData
 
-from fracability.Entities import Fractures, BaseEntity, FractureNetwork
+from fracability.Entities import BaseEntity
 from fracability.utils.shp_operations import int_node
 import numpy as np
 from copy import deepcopy
+from halo import Halo
 
 
 def center_object(obj: BaseEntity, trans_center: np.array = None, return_center=False, inplace: bool = True ):
-    """
-    Center the network. If the translation point is not
-    given then the centroid of the network will coincide with the world origin.
-    :param trans_center: Point to translate to
-    :param return_center: Flag to enable the return of the translation center
-    :return:
-    """
 
     df = obj.entity_df.copy()
 
@@ -41,14 +30,8 @@ def center_object(obj: BaseEntity, trans_center: np.array = None, return_center=
         return copy_obj
 
 
+@Halo(text='Calculating intersections', spinner='line', placement='right')
 def tidy_intersections(obj: BaseEntity, buffer=0.05, inplace: bool = True):
-    """
-        Tidy intersections of the fracture network (without the boundary).
-        For this function to properly work it is advised also to center the dataframe t
-        o avoid rounding errors. A buffer is applied to be sure that lines touch.
-        :param obj: Input object entity object
-        :param buffer: Buffer value applied to the network
-    """
 
     gdf = obj.entity_df.copy()
     df_buffer = gdf.buffer(buffer)
@@ -74,7 +57,6 @@ def tidy_intersections(obj: BaseEntity, buffer=0.05, inplace: bool = True):
 
     if inplace:
         obj.entity_df = gdf
-        obj.process_df()
     else:
         copy_obj = deepcopy(obj)
         copy_obj.entity_df = gdf
@@ -106,25 +88,30 @@ def connect_dots(obj: BaseEntity, inplace: bool = True):
 
 
 def calculate_seg_length(obj: BaseEntity, regions: [int] = None, inplace: bool = True):
+
     vtk_obj = obj.vtk_object
     connectivity = vtkConnectivityFilter()
     connectivity.AddInputData(vtk_obj)
     if regions is None:
         regions = set(vtk_obj['RegionId'])
     appender = vtkAppendPolyData()
+    lengths = []
     for region in regions:
         connectivity.SetExtractionModeToSpecifiedRegions()
         connectivity.InitializeSpecifiedRegionList()
         connectivity.AddSpecifiedRegion(region)
         connectivity.Update()
         extr_obj = PolyData(connectivity.GetOutput())
-        extr_obj.field_data['segment_length'] = np.sum(extr_obj.compute_arc_length()['arc_length'])
+        lengths.append(np.sum(extr_obj.compute_arc_length()['arc_length']))
         appender.AddInputData(extr_obj)
     appender.Update()
+    vtk_obj = PolyData(appender.GetOutput())
+    vtk_obj.field_data['segment_length'] = lengths
+
     if inplace:
-        obj.vtk_object = PolyData(appender.GetOutput())
+        obj.vtk_object = vtk_obj
     else:
         copy_obj = deepcopy(obj)
-        copy_obj.vtk_object = PolyData(appender.GetOutput())
+        copy_obj.vtk_object = vtk_obj
         return copy_obj
 

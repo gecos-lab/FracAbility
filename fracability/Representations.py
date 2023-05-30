@@ -21,6 +21,7 @@ def vtk_rep(input_df: geopandas.GeoDataFrame) -> PolyData:
         # offset = np.round(points[0][0])
         pv_obj = lines_from_points(points)  # Create the corresponding vtk line with the given points
         pv_obj.cell_data['type'] = [l_type] * pv_obj.GetNumberOfCells()
+        pv_obj.point_data['type'] = [l_type] * pv_obj.GetNumberOfPoints()
         # line.plot()
 
         appender.AddInputData(pv_obj)  # Add the new object
