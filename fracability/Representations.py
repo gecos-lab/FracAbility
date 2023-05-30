@@ -7,12 +7,13 @@ from shapely.geometry import LineString, Point
 from vtkmodules.vtkFiltersCore import vtkAppendPolyData, vtkConnectivityFilter, vtkCleanPolyData, vtkAppendArcLength
 from abc import ABC, abstractmethod
 import networkx as nx
+from vtkmodules.vtkFiltersGeometry import vtkGeometryFilter
 
 
 def vtk_rep(input_df: geopandas.GeoDataFrame) -> PolyData:
     appender = vtkAppendPolyData()
 
-    for geom, l_type in zip(input_df['geometry'], input_df['type']):  # For each geometry in the df
+    for index, geom, l_type in zip(input_df.index, input_df['geometry'], input_df['type']):  # For each geometry in the df
 
         x, y = geom.coords.xy  # get xy as an array
         z = np.zeros_like(x)  # create a zeros z array with the same dim of the x (or y)
@@ -22,19 +23,17 @@ def vtk_rep(input_df: geopandas.GeoDataFrame) -> PolyData:
         pv_obj = lines_from_points(points)  # Create the corresponding vtk line with the given points
         pv_obj.cell_data['type'] = [l_type] * pv_obj.GetNumberOfCells()
         pv_obj.point_data['type'] = [l_type] * pv_obj.GetNumberOfPoints()
+        pv_obj.point_data['RegionId'] = [index] * pv_obj.GetNumberOfPoints()
+
         # line.plot()
 
         appender.AddInputData(pv_obj)  # Add the new object
 
-    # Set the RegionId of each line
-    connectivity = vtkConnectivityFilter()
+    geometry_filter = vtkGeometryFilter()
+    geometry_filter.SetInputConnection(appender.GetOutputPort())
+    geometry_filter.Update()
 
-    connectivity.AddInputConnection(appender.GetOutputPort())
-    connectivity.SetExtractionModeToAllRegions()
-    connectivity.ColorRegionsOn()
-    connectivity.Update()
-
-    output_obj = PolyData(connectivity.GetOutput())
+    output_obj = PolyData(geometry_filter.GetOutput())
 
     return output_obj
 

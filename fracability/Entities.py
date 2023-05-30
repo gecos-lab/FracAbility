@@ -80,6 +80,7 @@ class Nodes(BaseEntity):
     def process_vtk(self):
         pass
 
+
 class Fractures(BaseEntity):
 
     def process_df(self):
@@ -88,6 +89,8 @@ class Fractures(BaseEntity):
 
         if 'type' not in df.columns:
             df['type'] = 'fracture'
+        if 'censored' not in df.columns:
+            df['censored'] = 0
 
     def process_vtk(self):
         pass
@@ -179,8 +182,8 @@ class FractureNetwork(BaseEntity):
 
     def process_vtk(self):
         frac_net_vtk = self.vtk_object
-        frac_vtk = frac_net_vtk.extract_points(frac_net_vtk.point_data['type'] == 'fracture', include_cells=True)
-        bound_vtk = frac_net_vtk.extract_points(frac_net_vtk.point_data['type'] == 'boundary', include_cells=True)
+        frac_vtk = frac_net_vtk.extract_points(frac_net_vtk.point_data['type'] == 'fracture', include_cells=True,adjacent_cells=False)
+        bound_vtk = frac_net_vtk.extract_points(frac_net_vtk.point_data['type'] == 'boundary', include_cells=True,adjacent_cells=False)
 
         geometry_filter = vtkGeometryFilter()
         geometry_filter.SetInputData(frac_vtk)

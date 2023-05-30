@@ -5,13 +5,13 @@ import pyvista as pv
 
 
 from fracability import Entities
-from fracability.geometric_operations import center_object, tidy_intersections
+from fracability.geometric_operations import center_object, tidy_intersections,calculate_seg_length
 from fracability.clean_operations import clean_dup_points, connect_dots
 from fracability.topology_operations import nodes_conn, find_backbone
 
 n_path = 'fracability/datasets/Fracture_network.shp'
 b_path = 'fracability/datasets/Interpretation_boundary_laghettoSalza.shp'
-# n_path = 'fracability/datasets/frac_pesce.shp'
+# n_path = 'fracability/datasets/frac_pesce_nolen.shp'
 # b_path = 'fracability/datasets/grid_pesce.shp'
 
 # n_path = '/home/gabriele/STORAGE/projects/Ntwrk/Betta_01_Fracture_mapping/Fracture_network_tot.shp'
@@ -45,11 +45,15 @@ backbone = find_backbone(fracture_net)
 
 #
 nodes_conn(fracture_net)
+
+calculate_seg_length(fracture_net)
+
+print(fracture_net.entity_df)
 #
 #
 nodes = fracture_net.nodes.vtk_object
 #
-# nodes.set_active_scalars('class_id')
+nodes.set_active_scalars('class_id')
 
 plotter = pv.Plotter()
 

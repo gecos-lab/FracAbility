@@ -65,30 +65,30 @@ def tidy_intersections(obj: BaseEntity, buffer=0.05, inplace: bool = True):
 
 def calculate_seg_length(obj: BaseEntity, regions: [int] = None, inplace: bool = True):
 
-    vtk_obj = obj.vtk_object
-    connectivity = vtkConnectivityFilter()
-    connectivity.AddInputData(vtk_obj)
-    if regions is None:
-        regions = set(vtk_obj['RegionId'])
-    appender = vtkAppendPolyData()
-    lengths = []
-    for region in regions:
-        connectivity.SetExtractionModeToSpecifiedRegions()
-        connectivity.InitializeSpecifiedRegionList()
-        connectivity.AddSpecifiedRegion(region)
-        connectivity.Update()
-        extr_obj = PolyData(connectivity.GetOutput())
-        lengths.append(np.sum(extr_obj.compute_arc_length()['arc_length']))
-        appender.AddInputData(extr_obj)
-    appender.Update()
-    vtk_obj = PolyData(appender.GetOutput())
-    vtk_obj.field_data['segment_length'] = lengths
+    df = obj.entity_df.copy()
+
+    lengths = df.length
+
+    df.loc[:, 'length'] = lengths
+
+    # connectivity = vtkConnectivityFilter()
+    # connectivity.AddInputData(vtk_obj)
+    # if regions is None:
+    #     regions = set(vtk_obj['RegionId'])
+    # lengths = []
+    # for region in regions:
+    #     connectivity.SetExtractionModeToSpecifiedRegions()
+    #     connectivity.InitializeSpecifiedRegionList()
+    #     connectivity.AddSpecifiedRegion(region)
+    #     connectivity.Update()
+    #     extr_obj = PolyData(connectivity.GetOutput())
+    #     lengths.append(np.sum(extr_obj.compute_arc_length()['arc_length']))
 
     if inplace:
-        obj.vtk_object = vtk_obj
+        obj.entity_df = df
     else:
         copy_obj = deepcopy(obj)
-        copy_obj.vtk_object = vtk_obj
+        copy_obj.entity_df = df
         return copy_obj
 
 
