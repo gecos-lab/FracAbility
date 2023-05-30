@@ -4,24 +4,20 @@ import pandas
 import numpy as np
 from pyvista import PolyData, lines_from_points
 from shapely.geometry import LineString, Point
-from vtkmodules.vtkFiltersCore import vtkAppendPolyData, vtkConnectivityFilter, vtkCleanPolyData
+from vtkmodules.vtkFiltersCore import vtkAppendPolyData, vtkConnectivityFilter, vtkCleanPolyData, vtkAppendArcLength
 from abc import ABC, abstractmethod
 import networkx as nx
 
 
 def vtk_rep(input_df: geopandas.GeoDataFrame) -> PolyData:
     appender = vtkAppendPolyData()
-    p = 100000  # Scaling factor needed for the vtk functions to work properly
 
-    network = input_df.loc[input_df['type'] != 'node']
-
-    for geom, l_type in zip(network['geometry'], network['type']):  # For each geometry in the df
+    for geom, l_type in zip(input_df['geometry'], input_df['type']):  # For each geometry in the df
 
         x, y = geom.coords.xy  # get xy as an array
         z = np.zeros_like(x)  # create a zeros z array with the same dim of the x (or y)
 
         points = np.stack((x, y, z), axis=1)  # Stack the coordinates to a [n,3] shaped array
-        points *= p  # Multiply the coordinates with the factor
         # offset = np.round(points[0][0])
         pv_obj = lines_from_points(points)  # Create the corresponding vtk line with the given points
         pv_obj.cell_data['type'] = [l_type] * pv_obj.GetNumberOfCells()
@@ -35,19 +31,9 @@ def vtk_rep(input_df: geopandas.GeoDataFrame) -> PolyData:
     connectivity.AddInputConnection(appender.GetOutputPort())
     connectivity.SetExtractionModeToAllRegions()
     connectivity.ColorRegionsOn()
+    connectivity.Update()
 
-    # Fuse overlapping points
-    clean = vtkCleanPolyData()
-    clean.AddInputConnection(connectivity.GetOutputPort())
-    clean.ToleranceIsAbsoluteOn()
-    clean.SetAbsoluteTolerance(1)
-    clean.ConvertLinesToPointsOff()
-    clean.ConvertPolysToLinesOff()
-    clean.ConvertStripsToPolysOff()
-    clean.Update()
-
-    output_obj = PolyData(clean.GetOutput())
-    output_obj.points /= p
+    output_obj = PolyData(connectivity.GetOutput())
 
     return output_obj
 
