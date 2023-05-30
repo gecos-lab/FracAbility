@@ -1,4 +1,8 @@
+from vtkmodules.vtkFiltersCore import vtkConnectivityFilter
+
 from fracability.Entities import FractureNetwork, Nodes
+
+from pyvista import PolyData
 
 
 def nodes_conn(obj: FractureNetwork, inplace=True):
@@ -52,3 +56,17 @@ def nodes_conn(obj: FractureNetwork, inplace=True):
     fracture_nodes.vtk_object = extr_nodes
     obj.nodes = fracture_nodes
 
+
+def find_backbone(obj: FractureNetwork) -> PolyData:
+
+    fractures = obj.fractures.vtk_object
+
+    connectivity = vtkConnectivityFilter()
+
+    connectivity.AddInputData(fractures)
+    connectivity.SetExtractionModeToLargestRegion()
+    connectivity.Update()
+
+    backbone = PolyData(connectivity.GetOutput())
+
+    return backbone

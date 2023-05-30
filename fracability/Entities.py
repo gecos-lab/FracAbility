@@ -3,6 +3,7 @@ import pandas as pd
 from shapely.geometry import MultiLineString,Polygon
 from pyvista import PolyData
 from networkx import Graph
+from vtkmodules.vtkFiltersGeometry import vtkGeometryFilter
 
 import fracability.Representations as Rep
 from abc import ABC, abstractmethod
@@ -30,6 +31,9 @@ class BaseEntity(ABC):
     def process_df(self):
         pass
 
+    @abstractmethod
+    def process_vtk(self):
+        pass
     @property
     def entity_df(self):
         return self._df
@@ -51,6 +55,7 @@ class BaseEntity(ABC):
     @vtk_object.setter
     def vtk_object(self, obj: PolyData):
         self._vtk_obj = obj
+        self.process_vtk()
 
     @property
     def network_object(self):
@@ -72,6 +77,8 @@ class Nodes(BaseEntity):
         if 'type' not in df.columns:
             df['type'] = 'node'
 
+    def process_vtk(self):
+        pass
 
 class Fractures(BaseEntity):
 
@@ -81,6 +88,9 @@ class Fractures(BaseEntity):
 
         if 'type' not in df.columns:
             df['type'] = 'fracture'
+
+    def process_vtk(self):
+        pass
 
 
 class Boundary(BaseEntity):
@@ -119,6 +129,8 @@ class Boundary(BaseEntity):
         if 'type' not in df.columns:
             df['type'] = 'boundary'
 
+    def process_vtk(self):
+        pass
 
 
 class FractureNetwork(BaseEntity):
@@ -165,6 +177,22 @@ class FractureNetwork(BaseEntity):
 
         # self.nodes = nodes
 
+    def process_vtk(self):
+        frac_net_vtk = self.vtk_object
+        frac_vtk = frac_net_vtk.extract_points(frac_net_vtk.point_data['type'] == 'fracture', include_cells=True)
+        bound_vtk = frac_net_vtk.extract_points(frac_net_vtk.point_data['type'] == 'boundary', include_cells=True)
+
+        geometry_filter = vtkGeometryFilter()
+        geometry_filter.SetInputData(frac_vtk)
+        geometry_filter.Update()
+        self.fractures.vtk_object = PolyData(geometry_filter.GetOutput())
+        geometry_filter.SetInputData(bound_vtk)
+        geometry_filter.Modified()
+        geometry_filter.Update()
+        self.boundaries.vtk_object = PolyData(geometry_filter.GetOutput())
+
+        # node_vtk = frac_net.extract_points(frac_net.point_data['type'] == 'nodes', include_cells=True)
+
     def add_fractures(self, fractures: Fractures):
 
         if self.entity_df is None:
@@ -206,5 +234,3 @@ class FractureNetwork(BaseEntity):
             )
         self.boundaries = nodes
         self.entity_df = df
-
-
