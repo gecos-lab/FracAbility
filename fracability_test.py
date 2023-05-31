@@ -48,7 +48,6 @@ nodes_conn(fracture_net)
 
 calculate_seg_length(fracture_net)
 
-print(fracture_net.entity_df)
 #
 #
 nodes = fracture_net.nodes.vtk_object

@@ -91,4 +91,3 @@ def calculate_seg_length(obj: BaseEntity, regions: [int] = None, inplace: bool =
         copy_obj.entity_df = df
         return copy_obj
 
-
