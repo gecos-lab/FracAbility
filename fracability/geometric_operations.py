@@ -10,7 +10,30 @@ from copy import deepcopy
 from halo import Halo
 
 
-def center_object(obj: BaseEntity, trans_center: np.array = None, return_center=False, inplace: bool = True ):
+def center_object(obj: BaseEntity, trans_center: np.array = None, return_center: bool =False, inplace: bool = True):
+    """
+    Translate the center of the Entity object to a given point. If no trans_center is specified then the object
+    will be moved to the origin (0,0,0).
+
+    Parameters
+    ----------
+    obj: Boundary, Fractures, FractureNetwork
+        A fracability entity object
+    trans_center: array
+        Point to which translate the object
+    return_center: bool
+        Bool flag to specify to return the translation center
+    inplace: bool
+        Bool flag to specify if the operation overwrites the entity or creates a new instance
+
+    Returns
+    ----------
+    trans_center: array
+        Point of translation. If trans_center is not specified in the output then this will return the center of
+        the object
+    copy_obj: object
+        Copy of the modified input object (preserves the original input)
+    """
 
     df = obj.entity_df.copy()
 
@@ -23,7 +46,7 @@ def center_object(obj: BaseEntity, trans_center: np.array = None, return_center=
 
     if inplace:
         obj.entity_df = df
-        obj.process_df()
+        obj._process_df()
     else:
         copy_obj = deepcopy(obj)
         copy_obj.entity_df = df

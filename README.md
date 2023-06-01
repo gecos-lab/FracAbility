@@ -1,5 +1,5 @@
 
-![logo](./docs/images/icon3.png)
+![logo](./docs/images/logo.png)
 
 
 **FracAbility** is a Python toolbox that can be used to objectively analyze fracture networks. This package provides tools to define the topology of fracture networks and to statistically analyze fracture length distributions taking into consideration right censoring effects ([survival analysis](https://en.wikipedia.org/wiki/Survival_analysis)). 

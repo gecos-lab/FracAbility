@@ -10,7 +10,6 @@ from abc import ABC, abstractmethod
 
 
 class BaseEntity(ABC):
-
     """
     Abstract class for Fracture network entities:
 
@@ -24,8 +23,10 @@ class BaseEntity(ABC):
         """
         Init the entity. If a geopandas dataframe is specified then it is
         set as the source entity df.
+
         :param gdf: Geopandas dataframe
         """
+
         self._df = None
         self._vtk_obj = None
         self._network_obj = None
@@ -33,48 +34,65 @@ class BaseEntity(ABC):
             self.entity_df = gdf
 
     @abstractmethod
-    def process_df(self):
+    def _process_df(self):
         """
         Each entity process the input dataframe in different ways
         (for example boundaries vs. fractures).
         Use this method to define the pipeline used to parse the dataframe
         :return:
         """
+
         pass
 
     @abstractmethod
-    def process_vtk(self):
+    def _process_vtk(self):
         """
         Each entity process the vtk objects in different ways (for example frac net vs fractures).
         Use this method to define the pipeline for the vtk objects
-        :return:
         """
+
         pass
+
     @property
     def entity_df(self) -> GeoDataFrame:
         """
-        Each entity is based on a geopandas dataframe. This returns the entity_df.
-        :return: A geopandas dataframe
+        Each entity is based on a geopandas dataframe. This property returns or sets
+        the entity_df of the given entity.
+
+        :getter: Returns the GeoDataFrame
+        :setter: Sets the GeoDataFrame
+        :type: GeoDataFrame
+
+        Notes
+        -------
+        When set the dataframe is modified to conform to the assigned entity structure.
         """
+
         return self._df
 
     @entity_df.setter
     def entity_df(self, gdf: GeoDataFrame):
-        """
-        Each entity is based on a geopandas dataframe. This method sets and then processes
-        the entity_df using the process_df() abstract method.
-        :param gdf: The dataframe to set
-        """
+
         self._df = gdf
-        self.process_df()
+        self._process_df()
 
     @property
     def vtk_object(self) -> PolyData:
         """
         Each entity can be represented with a vtk object.
-        This returns the object build on the fly using the entity_df.
-        :return: A geopandas dataframe
+        This returns a Pyvista PolyData object representing the entity_df.
+
+        :getter: Returns a Pyvista PolyData object
+        :setter: Sets a generic Pyvista DataSet
+        :type: pyvista PolyData
+
+        Notes
+        -------
+        When the get method is applied the PolyData is build **on the fly** using the entity_df as a source.
+
+        When set the DataSet is **cast to a PolyData**.
         """
+
         if self._vtk_obj is None:
             obj = Rep.vtk_rep(self.entity_df)
             return obj
@@ -83,25 +101,29 @@ class BaseEntity(ABC):
 
     @vtk_object.setter
     def vtk_object(self, obj: DataSet):
-        """
-        Each entity can be represented with a vtk object.
-        This sets the vtk object forcing it as a vtkPolyData .
-        :param obj: vtkDataSet object
-        """
+
         geometry_filter = vtkGeometryFilter()
         geometry_filter.SetInputData(obj)
         geometry_filter.Update()
 
         self._vtk_obj = PolyData(geometry_filter.GetOutput())
-        self.process_vtk()
+        self._process_vtk()
 
     @property
-    def network_object(self):
+    def network_object(self) -> Graph:
         """
         Each entity can be represented with a networkx graph.
-        This returns the network object build on the fly
-        using the vtk object (and so the df).
+        This returns the network object using the vtk object (and so the df).
+
+        :getter: Returns a networkx Graph object
+        :setter: Sets a Graph object
+        :type: pyvista Graph
+
+        Notes
+        -------
+        When the get method is applied the Graph is build **on the fly** using the object and so the entity_df.
         """
+
         obj = Rep.networkx_rep(self.vtk_object)
         return obj
 
@@ -110,18 +132,17 @@ class BaseEntity(ABC):
         """
         Each entity can be represented with a networkx Graph object.
         This sets the graph object.
-        :param obj: Graph object
         """
+
         self._network_obj = obj
 
 
 class Nodes(BaseEntity):
-
     """
     Node base entity, represents all the nodes in the network.
     """
 
-    def process_df(self):
+    def _process_df(self):
         """
         Each entity process the input dataframe in different ways
         Nodes modify the entity_df only to add the type column (if not
@@ -133,7 +154,7 @@ class Nodes(BaseEntity):
         if 'type' not in df.columns:
             df['type'] = 'node'
 
-    def process_vtk(self):
+    def _process_vtk(self):
         pass
 
 
@@ -142,7 +163,7 @@ class Fractures(BaseEntity):
     Base entity for fractures
     """
 
-    def process_df(self):
+    def _process_df(self):
         """
         Each entity process the input dataframe in different ways
         Fractures modify the entity_df by adding the 'type' and
@@ -150,6 +171,7 @@ class Fractures(BaseEntity):
         is a bool column that identifies if the fracture is censored (1) or
         not (0)
         """
+
         df = self.entity_df
 
         if 'type' not in df.columns:
@@ -157,7 +179,7 @@ class Fractures(BaseEntity):
         if 'censored' not in df.columns:
             df['censored'] = 0
 
-    def process_vtk(self):
+    def _process_vtk(self):
         pass
 
 
@@ -166,13 +188,14 @@ class Boundary(BaseEntity):
     Base entity for boundaries
     """
 
-    def process_df(self):
+    def _process_df(self):
         """
         Each entity process the input dataframe in different ways.
         Boundaries modify the entity_df by converting Polygons in Linestrings
         to (using the boundary method) and MultiLinestrings to LineStrings.
         A 'type' column is added if missing.
         """
+
         df = self.entity_df
 
         geom_list = []
@@ -206,19 +229,20 @@ class Boundary(BaseEntity):
         if 'type' not in df.columns:
             df['type'] = 'boundary'
 
-    def process_vtk(self):
+    def _process_vtk(self):
         pass
 
 
 class FractureNetwork(BaseEntity):
-
     """
     Fracture network base entity. Fracture networks are defined by one or
     more:
 
-    1. Fracture base entities
-    2. Boundary base entities
-    3. Nodes base entities
+        + Fracture base entities
+
+        + Boundary base entities
+
+        + Nodes base entities
 
     All the data is represented in the entity_df and the different objects
     are defined by the 'type' column.
@@ -226,12 +250,13 @@ class FractureNetwork(BaseEntity):
     FractureNetwork objects can be created in two ways depending on how
     the dataset is structured.
 
-    1. If fractures and boundaries and nodes are saved in different shp files
-    then use the add_fracture,add_boundary and add_nodes methods on an empty
-    FractureNetwork object.
-    2. If fractures and boundaries and nodes are saved in a single shp the
-    geopandas dataframe can be directly fed when instantiating the class.
-    In this case a type column must be set to indicate of which type the geometries are
+        1. If fractures and boundaries and nodes are saved in different shp files
+        then use the add_fracture,add_boundary and add_nodes methods on an empty
+        FractureNetwork object.
+
+        2. If fractures and boundaries and nodes are saved in a single shp the
+        geopandas dataframe can be directly fed when instantiating the class.
+        In this case a type column must be set to indicate of which type the geometries are
 
     """
 
@@ -248,57 +273,74 @@ class FractureNetwork(BaseEntity):
     def fractures(self) -> Fractures:
         """
         Retrieve the fracture objects
+
         :return: A fracture object
         """
+
         return self._fractures
 
     @fractures.setter
     def fractures(self, frac_obj: Fractures):
         """
         Set the fracture objects
-        :param frac_obj: Fracture object to be set
+
+        :param frac_obj:  Fracture object to be set
         """
+
         self._fractures = frac_obj
 
     @property
     def boundaries(self) -> Boundary:
         """
         Retrieve the Boundary object
+
         :return: The boundary object
         """
+
         return self._boundaries
 
     @boundaries.setter
     def boundaries(self, bound_obj: Boundary):
         """
         Set the boundary objects
+
         :param bound_obj: Boundary object
         """
+
         self._boundaries = bound_obj
 
     @property
     def nodes(self) -> Nodes:
         """
         Retrieve the nodes of the FractureNetwork
+
         :return: Nodes of the fracture network
         """
+
         return self._nodes
 
     @nodes.setter
     def nodes(self, nodes_obj: Nodes):
         """
         Set the nodes of the FractureNetwork
+
         :param nodes_obj: Nodes to be set
         """
+
         self._nodes = nodes_obj
 
-    def process_df(self):
+    def _process_df(self):
         """
-        Each entity process the input dataframe in different ways.
         FractureNetworks modify the entity_df by extracting the different types
         (fractures, boundaries, nodes). After that, the appropriate base entities
         are created and set.
+
+        Notes
+        -----
+        This is an internal method that is called when a df is set.
+
         """
+
         df = self.entity_df
         fractures = Fractures(df.loc[df['type'] == 'fracture'])
         boundary = Boundary(df.loc[df['type'] == 'boundary'])
@@ -307,14 +349,17 @@ class FractureNetwork(BaseEntity):
         self.boundaries = boundary
         # self.nodes = nodes
 
-    def process_vtk(self):
+    def _process_vtk(self):
         """
-        Each entity processes an input vtkobject in different ways.
-        FractureNetworks modify the vtkobject by extracting the different types
-        (fractures, boundaries, nodes). After that, the appropriate vtkobject is
+        FractureNetworks modify the vtkObject by extracting the different types
+        (fractures, boundaries, nodes). After that, the appropriate vtkObject is
         set to the corresponding entity
-        :return:
+
+        Notes
+        -----
+        This is an internal method that is called when a vtk is set.
         """
+
         frac_net_vtk = self.vtk_object
         frac_vtk = frac_net_vtk.extract_points(frac_net_vtk.point_data['type'] == 'fracture', include_cells=True,adjacent_cells=False)
         bound_vtk = frac_net_vtk.extract_points(frac_net_vtk.point_data['type'] == 'boundary', include_cells=True,adjacent_cells=False)
@@ -324,10 +369,12 @@ class FractureNetwork(BaseEntity):
 
         # node_vtk = frac_net.extract_points(frac_net.point_data['type'] == 'nodes', include_cells=True)
 
-    def add_fractures(self, fractures: Fractures):
+    def add_fractures(self, fractures: Fractures, name: str = None):
         """
         Method used to add fractures to the FractureNetwork
+
         :param fractures: Fracture object
+        :param name: Name of the fractures added (for example set_1). By default is None
         """
 
         # If the FractureNetwork df is empty use this as the start.
@@ -348,6 +395,7 @@ class FractureNetwork(BaseEntity):
     def add_boundaries(self, boundaries: Boundary):
         """
         Method used to add boundaries to the FractureNetwork
+
         :param boundaries: Boundaries object
         """
 
@@ -369,6 +417,7 @@ class FractureNetwork(BaseEntity):
     def add_nodes(self, nodes: Nodes):
         """
         Method used to add nodes to the FractureNetwork
+
         :param nodes: Nodes object
         """
 
