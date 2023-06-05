@@ -5,9 +5,9 @@ import pyvista as pv
 
 
 from fracability import Entities
-from fracability.geometric_operations import center_object, tidy_intersections,calculate_seg_length
-from fracability.clean_operations import connect_dots
-from fracability.topology_operations import nodes_conn, find_backbone
+from fracability.operations.Geometry import center_object, tidy_intersections,calculate_seg_length
+from fracability.operations.Cleaners import connect_dots
+from fracability.operations.Topology import nodes_conn, find_backbone
 
 # n_path = 'fracability/datasets/Fracture_network.shp'
 # b_path = 'fracability/datasets/Interpretation_boundary_laghettoSalza.shp'
