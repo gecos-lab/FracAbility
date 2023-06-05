@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="125.67509mm"
+   height="31.123117mm"
+   viewBox="0 0 125.67509 31.123117"
+   version="1.1"
+   id="svg1308"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   sodipodi:docname="logo_small.svg"
+   inkscape:export-filename="/home/gabriele/STORAGE/Progetti/github/FracAbility/docs/images/logo_small.png"
+   inkscape:export-xdpi="200"
+   inkscape:export-ydpi="200"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1310"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="false"
+     fit-margin-top="2"
+     fit-margin-left="2"
+     fit-margin-right="2"
+     fit-margin-bottom="2"
+     inkscape:zoom="1.3373025"
+     inkscape:cx="129.73878"
+     inkscape:cy="120.7655"
+     inkscape:window-width="1920"
+     inkscape:window-height="1003"
+     inkscape:window-x="0"
+     inkscape:window-y="40"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g2217" />
+  <defs
+     id="defs1305">
+    <inkscape:path-effect
+       effect="bspline"
+       id="path-effect217823"
+       is_visible="true"
+       lpeversion="1"
+       weight="33.333333"
+       steps="2"
+       helper_size="0"
+       apply_no_weight="true"
+       apply_with_weight="true"
+       only_selected="false" />
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-27.068691,-78.569091)">
+    <g
+       id="g2217"
+       style="stroke-width:1.5;stroke-miterlimit:4;stroke-dasharray:none">
+      <rect
+         style="fill:#ffffff;fill-opacity:1;stroke:#ff0000;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         id="rect1706"
+         width="120.86709"
+         height="26.315117"
+         x="29.472691"
+         y="80.443924"
+         ry="4.1315494" />
+      <g
+         id="g1996"
+         style="stroke-width:1.5;stroke-miterlimit:4;stroke-dasharray:none">
+        <path
+           style="fill:none;stroke:#000000;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           d="m 68.715281,94.884831 c 9.750819,0 19.501374,0 29.251664,0"
+           id="path217821"
+           inkscape:path-effect="#path-effect217823"
+           inkscape:original-d="m 68.715281,94.884831 c 9.750819,2.65e-4 19.501374,2.65e-4 29.251664,0"
+           sodipodi:nodetypes="cc" />
+        <circle
+           style="fill:#ffdd23;fill-opacity:1;stroke:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+           id="path7597-0-6-6-6-1-9"
+           cx="88.518723"
+           cy="73.450134"
+           r="6.8650689"
+           transform="rotate(15.596807)" />
+        <circle
+           style="fill:#009b01;fill-opacity:1;stroke:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+           id="path7597-0-6-6-6-1-9-3"
+           cx="120.37373"
+           cy="65.224373"
+           r="6.8650689"
+           transform="rotate(15.596807)" />
+        <text
+           xml:space="preserve"
+           style="font-size:17.6389px;line-height:1.15;font-family:'TeX Gyre Termes';-inkscape-font-specification:'TeX Gyre Termes';text-align:end;text-anchor:end;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           x="147.34097"
+           y="99.940575"
+           id="text5966"><tspan
+             sodipodi:role="line"
+             x="147.34097"
+             y="99.940575"
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17.6389px;font-family:sans-serif;-inkscape-font-specification:sans-serif;text-align:end;text-anchor:end;fill:#000000;fill-opacity:1;stroke-width:1.5;stroke-miterlimit:4;stroke-dasharray:none"
+             id="tspan12644">ability</tspan></text>
+        <text
+           xml:space="preserve"
+           style="font-size:40px;line-height:1.15;font-family:'TeX Gyre Termes';-inkscape-font-specification:'TeX Gyre Termes';white-space:pre;inline-size:953.963;fill:#000000;fill-opacity:1;stroke:none;stroke-width:5.66929;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           x="-134.07755"
+           y="659.36127"
+           id="text5966-0"
+           transform="matrix(0.26458333,0,0,0.26458333,68.471711,-70.539349)"><tspan
+             x="-134.07755"
+             y="659.36127"
+             id="tspan43589"><tspan
+               style="font-family:sans-serif;-inkscape-font-specification:sans-serif"
+               id="tspan43587"> </tspan></tspan></text>
+        <text
+           xml:space="preserve"
+           style="font-size:17.6389px;line-height:1.15;font-family:'TeX Gyre Termes';-inkscape-font-specification:'TeX Gyre Termes';stroke:#000000;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           x="33.076733"
+           y="99.602638"
+           id="text195142"><tspan
+             sodipodi:role="line"
+             id="tspan195140"
+             x="33.076733"
+             y="99.602638"
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17.6389px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.5;stroke-miterlimit:4;stroke-dasharray:none">Frac</tspan></text>
+      </g>
+    </g>
+  </g>
+</svg>
