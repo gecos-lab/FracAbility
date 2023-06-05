@@ -30,7 +30,7 @@ def nodes_conn(obj: FractureNetwork, inplace=True):
 
     n_nodes = fractures_vtk.n_points
     for node in fractures_vtk['vtkOriginalPointIds']:  # For each node of the fractures:
-        print(f'Classifying node {node} of {n_nodes} ', end='\r')
+        # print(f'Classifying node {node} of {n_nodes} ', end='\r')
 
         n_edges = len(adj_dict[node].keys())  # Calculate number of connected nodes
 

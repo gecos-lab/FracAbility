@@ -1,5 +1,6 @@
 import reliability as rel
 from reliability.Other_functions import histogram
+from reliability.Utils import generate_X_array
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -13,18 +14,13 @@ cens_data = data.loc[data['U-nodes'] == 1, 'length'].values
 test_data = data['length'].values
 
 
-fitter = rel.Fitters.Fit_Everything(failures=test_data,
-                                  show_probability_plot=False,
-                                  print_results=False,
-                                  show_histogram_plot=False,
-                                  downsample_scatterplot=False,
-                                  show_PP_plot=False,
-                                  show_best_distribution_probability_plot=False)
+fitter = rel.Fitters.Fit_Lognormal_2P(failures=uncens_data, right_censored=cens_data,
+                                      show_probability_plot=False, print_results=False)
 
 
-best = fitter.best_distribution
-print(fitter.results)
-
-test = rel.Reliability_testing.KStest(best, test_data)
+dist = fitter.distribution
+CDF = dist.PDF(show_plot=False, xmax=20)
+x = generate_X_array(dist)
+# print(CDF)
+plt.plot(x, CDF)
 plt.show()
-
