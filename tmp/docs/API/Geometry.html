@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>API Reference &#8212; FracAbility 0.1.0 documentation</title>
+    <title>Geometric Operations &#8212; FracAbility 0.1.0 documentation</title>
   
   
   
@@ -19,32 +19,32 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
-<link href="_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
-<link href="_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
 
   
-  <link href="_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" href="_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
-<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/doctools.js"></script>
-    <script src="_static/sphinx_highlight.js"></script>
-    <script src="_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'API reference';</script>
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Entities" href="API/Entities.html" />
-    <link rel="prev" title="Recommended resources" href="Recommended%20resources.html" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'API/Geometry';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="center_object" href="Geometry/center_object.html" />
+    <link rel="prev" title="Fractures" href="Entities/Fractures.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -72,7 +72,7 @@
     <div class="search-button__overlay"></div>
     <div class="search-button__search-container">
 <form class="bd-search d-flex align-items-center"
-      action="search.html"
+      action="../search.html"
       method="get">
   <i class="fa-solid fa-magnifying-glass"></i>
   <input type="search"
@@ -110,7 +110,7 @@
         <div class="sidebar-primary-item">
   
 
-<a class="navbar-brand logo" href="index.html">
+<a class="navbar-brand logo" href="../index.html">
   
   
   
@@ -118,8 +118,8 @@
     
     
     
-    <img src="_static/logo_small.png" class="logo__image only-light" alt="Logo image"/>
-    <script>document.write(`<img src="_static/logo_small.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
+    <img src="../_static/logo_small.png" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="../_static/logo_small.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
   
   
 </a></div>
@@ -127,25 +127,25 @@
     <div class="bd-toc-item navbar-nav active">
         <p aria-level="2" class="caption" role="heading"><span class="caption-text">Quickstart &amp; Intro</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="Quickstart.html">Quickstart for FracAbility</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Introduction%20to%20fracture%20network%20analysis.html">Introduction to fracture network analysis</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Recommended%20resources.html">Recommended resources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Quickstart.html">Quickstart for FracAbility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Introduction%20to%20fracture%20network%20analysis.html">Introduction to fracture network analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Recommended%20resources.html">Recommended resources</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">API reference</span></p>
 <ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">API Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l2 has-children"><a class="reference internal" href="API/Entities.html">Entities</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="API/Entities/Boundaries.html">Boundaries</a></li>
-<li class="toctree-l3"><a class="reference internal" href="API/Entities/FractureNetwork.html">Fracture Networks</a></li>
-<li class="toctree-l3"><a class="reference internal" href="API/Entities/Fractures.html">Fractures</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../API%20reference.html">API Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2 has-children"><a class="reference internal" href="Entities.html">Entities</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="Entities/Boundaries.html">Boundaries</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Entities/FractureNetwork.html">Fracture Networks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Entities/Fractures.html">Fractures</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="API/Geometry.html">Geometric Operations</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="API/Geometry/center_object.html">center_object</a></li>
+<li class="toctree-l2 current active has-children"><a class="current reference internal" href="#">Geometric Operations</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="Geometry/center_object.html">center_object</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="API/Statistic.html">Statistic Operations</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="API/Statistic/NetworkFitter.html">NetworkFitter</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="Statistic.html">Statistic Operations</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="Statistic/NetworkFitter.html">NetworkFitter</a></li>
 </ul>
 </li>
 </ul>
@@ -204,7 +204,7 @@
       
       
       
-      <li><a href="_sources/API reference.rst" target="_blank"
+      <li><a href="../_sources/API/Geometry.rst" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -284,7 +284,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>API Reference</h1>
+    <h1>Geometric Operations</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -298,26 +298,13 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <img alt="_images/logo.png" src="_images/logo.png" />
+  <img alt="../_images/logo.png" src="../_images/logo.png" />
 <hr class="docutils" />
-<section id="api-reference">
-<h1>API Reference<a class="headerlink" href="#api-reference" title="Permalink to this heading">#</a></h1>
+<section id="geometric-operations">
+<h1>Geometric Operations<a class="headerlink" href="#geometric-operations" title="Permalink to this heading">#</a></h1>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="API/Entities.html">Entities</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="API/Entities/Boundaries.html">Boundaries</a></li>
-<li class="toctree-l2"><a class="reference internal" href="API/Entities/FractureNetwork.html">Fracture Networks</a></li>
-<li class="toctree-l2"><a class="reference internal" href="API/Entities/Fractures.html">Fractures</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="API/Geometry.html">Geometric Operations</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="API/Geometry/center_object.html">center_object</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="API/Statistic.html">Statistic Operations</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="API/Statistic/NetworkFitter.html">NetworkFitter</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="Geometry/center_object.html">center_object</a></li>
 </ul>
 </div>
 </section>
@@ -335,20 +322,20 @@ document.write(`
     <div class="footer-article-item"><!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
-       href="Recommended%20resources.html"
+       href="Entities/Fractures.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Recommended resources</p>
+        <p class="prev-next-title">Fractures</p>
       </div>
     </a>
     <a class="right-next"
-       href="API/Entities.html"
+       href="Geometry/center_object.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Entities</p>
+        <p class="prev-next-title">center_object</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -404,8 +391,8 @@ By Gabriele Benedetti
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
-<script src="_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+  <script src="../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
 
   <footer class="bd-footer">
   </footer>

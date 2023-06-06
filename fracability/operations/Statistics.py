@@ -24,6 +24,14 @@ class AbstractStatistics(ABC):
 
     @property
     def lengths(self):
+
+        """
+        This property returns or sets the list of non-censored length data of the fracture network
+
+        :getter: Return the list of non-censored data
+        :setter: Set the list of non-censored data
+        """
+
         return self._complete_lengths
 
     @lengths.setter
@@ -32,13 +40,39 @@ class AbstractStatistics(ABC):
 
     @property
     def censored_lengths(self):
+
+        """
+        This property returns or sets the list of censored length data of the fracture network
+
+        :getter: Return the list of censored data
+        :setter: Set the list of censored data
+        :return:
+        """
+
         return self._censored_lengths
 
     @censored_lengths.setter
     def censored_lengths(self, censored_length_list: list = []):
         self._censored_lengths = censored_length_list
 
+    @property
+    def fitter_list(self) -> list:
+
+        """
+        With the reliability package different fitters can be used. This property returns the list of
+        available fitters.
+
+        :return: A list of names of available fitters
+        """
+
+        return [i for i in dir(Fitters) if 'Fit_' in i]
+
     def _data_adapter(self):
+
+        """
+        Internal method used by the different Statistic classes to parse the entity_df of the input objects
+        and separate censored form non censored data
+        """
 
         entity_df = self._obj.entity_df
         self._complete_lengths = entity_df.loc[entity_df['censored'] == 0, 'length'].values
@@ -46,6 +80,10 @@ class AbstractStatistics(ABC):
 
 
 class NetworkFitter(AbstractStatistics):
+
+    """
+    Class used to fit a Fracture or Fracture network object
+    """
 
     # Add bool do not consider censoring
     # add bool to plot pdf,cdf ,sf with no censoring
@@ -56,11 +94,16 @@ class NetworkFitter(AbstractStatistics):
         self._fitter = None
 
     @property
-    def fitter_list(self) -> list:
-        return [i for i in dir(Fitters) if 'Fit_' in i]
-
-    @property
     def fitter(self):
+
+        """
+        With the reliability package different fitters can be used. This property returns or sets
+        a given fitter.
+        :getter: Returns the set reliability fitter
+        :setter: Sets the type of reliability fitter
+        :return:
+        """
+
         return self._fitter
 
     @fitter.setter
@@ -68,6 +111,12 @@ class NetworkFitter(AbstractStatistics):
         self._fitter = reliability_fitter
 
     def fit(self, fitter_name: str = ''):
+
+        """
+        Fit the data of the entity_df using one of the fitters available in reliability
+        :param fitter_name: Name of the fitter
+        :return:
+        """
 
         if fitter_name in self.fitter_list:
             rel_fitter = getattr(Fitters, fitter_name)
@@ -77,16 +126,30 @@ class NetworkFitter(AbstractStatistics):
             print(f'The fitter {fitter_name} is not available')
 
     def get_fit_parameters(self) -> DataFrame:
+
+        """
+        Get the parameters of the computed fit. This method returns a pandas dataframe summarizing the
+        parameters of the chosen fit
+        :return: Pandas DataFrame
+        """
         return self.fitter.results
 
     def summary_plot(self, x_min: float = 0.0, x_max: float = None, res: int = 1000):
+
         """
-        Plot all the functions.
-        :param x_min:
-        :param x_max:
-        :param res:
-        :return:
+        Summarize PDF, CDF and SF functions and display mean, std, var, median, mode, 5th and 95th percentile all
+        in a single plot.
+        A range of values and the resolution can be defined with the x_min, x_max and res parameters.
+
+        Parameters
+        -------
+        x_min: Lower value of the range. By default is set to 0
+
+        x_max: Higher value of the range. If None the maximum length of the dataset is used. None by default
+
+        res: Point resolution between x_min and x_max. By default is set to 1000
         """
+
         if x_max is None:
             x_max = max(self._obj.entity_df['length'])*10
 
@@ -129,13 +192,23 @@ class NetworkFitter(AbstractStatistics):
         plt.show()
 
     def plot_function(self, func_name: str, x_min: float = 0.0, x_max: float = None, res: int = 1000):
+        
         """
-        Plot a specific function
-        :param x_min:
-        :param x_max:
-        :param res:
-        :param func_name:
-        :return:
+        Plot PDF, CDF or SF functions in a range of x values and with a given resolution.
+
+        Parameters
+        -------
+        func_name: Name of the function to plot. Use the fitter_list method to display the available methods.
+
+        x_min: Lower value of the range. By default it is set to 0
+
+        x_max: Higher value of the range. If None the maximum length of the dataset is used. None by default
+
+        res: Point resolution between x_min and x_max. By default is set to 1000
+
+        Notes
+        -------
+        Each plot is created in a separate figure with the name associated to the given funtion
         """
 
         if x_max is None:
@@ -154,7 +227,22 @@ class NetworkFitter(AbstractStatistics):
         plt.grid(True)
         plt.show()
 
-    def plot_kde(self, x_min: float = 0.0, x_max: float = None, res: int = 1000,):
+    def plot_kde(self, n_bins: int = 25, x_min: float = 0.0, x_max: float = None, res: int = 1000):
+
+        """
+        Plot the Kernel Density Estimation PDF function togather with the data histogram
+
+        Parameters
+        -------
+        n_bins: Number of histogram bins
+
+        x_min: Lower value of the range. By default is set to 0
+
+        x_max: Higher value of the range. If None the maximum length of the dataset is used. None by default
+
+        res: Point resolution between x_min and x_max. By default is set to 1000
+
+        """
 
         data = self._lengths
 
@@ -163,7 +251,6 @@ class NetworkFitter(AbstractStatistics):
 
         x_vals = np.linspace(x_min, x_max, res)
 
-        # print(data)
         pdf_kde = gaussian_kde(data).evaluate(x_vals)
 
         fig = plt.figure(num='Gaussian KDE estimation')
@@ -177,6 +264,7 @@ class NetworkFitter(AbstractStatistics):
         plt.show()
 
 
-
-
-
+class NetworkTester(AbstractStatistics):
+    """
+    Class used to test and define the best fitter using Kolmogorov-Smirnov test.
+    """

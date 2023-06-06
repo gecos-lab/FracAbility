@@ -2,10 +2,10 @@
 
 -------------------------------------
 
-Geometric Operations
+Statistic Operations
 ----------------------
 .. toctree::
     :maxdepth: 1
     :glob:
 
-    geometric_operations/*
+    Statistic/*

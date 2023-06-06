@@ -268,9 +268,7 @@ document.write(`
   </button>
 `);
 </script>
-<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="fa-solid fa-list"></span>
-</label>
+
 </div></div>
       
     </div>
@@ -286,14 +284,6 @@ document.write(`
     <div id="print-main-content">
         <div id="jb-print-toc">
             
-            <div>
-                <h2> Contents </h2>
-            </div>
-            <nav aria-label="Page">
-                <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#fracability.geometric_operations.center_object"><code class="docutils literal notranslate"><span class="pre">center_object</span></code></a></li>
-</ul>
-            </nav>
         </div>
     </div>
 </div>
@@ -307,31 +297,6 @@ document.write(`
 <hr class="docutils" />
 <section id="center-object">
 <h1>center_object<a class="headerlink" href="#center-object" title="Permalink to this heading">#</a></h1>
-<dl class="py class">
-<dt class="sig sig-object py" id="fracability.geometric_operations.center_object">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fracability.geometric_operations.</span></span><span class="sig-name descname"><span class="pre">center_object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">BaseEntity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trans_center</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">array</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_center</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fracability.geometric_operations.center_object" title="Permalink to this definition">#</a></dt>
-<dd><p>Translate the center of the Entity object to a given point. If no trans_center is specified then the object
-will be moved to the origin (0,0,0).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>obj</strong> (<em>Boundary, Fractures, FractureNetwork</em>) – A fracability entity object</p></li>
-<li><p><strong>trans_center</strong> (<em>array</em>) – Point to which translate the object</p></li>
-<li><p><strong>return_center</strong> (<em>bool</em>) – Bool flag to specify to return the translation center</p></li>
-<li><p><strong>inplace</strong> (<em>bool</em>) – Bool flag to specify if the operation overwrites the entity or creates a new instance</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><ul class="simple">
-<li><p><strong>trans_center</strong> (<em>array</em>) – Point of translation. If trans_center is not specified in the output then this will return the center of
-the object</p></li>
-<li><p><strong>copy_obj</strong> (<em>object</em>) – Copy of the modified input object (preserves the original input)</p></li>
-</ul>
-</p>
-</dd>
-</dl>
-</dd></dl>
-
 </section>
 
 
@@ -364,20 +329,6 @@ the object</p></li>
             </div>
             
             
-              
-                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
-
-  <div class="sidebar-secondary-item">
-  <div class="page-toc tocsection onthispage">
-    <i class="fa-solid fa-list"></i> Contents
-  </div>
-  <nav class="bd-toc-nav page-toc">
-    <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#fracability.geometric_operations.center_object"><code class="docutils literal notranslate"><span class="pre">center_object</span></code></a></li>
-</ul>
-  </nav></div>
-
-</div></div>
               
             
           </div>

@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>Fractures &#8212; FracAbility 0.1.0 documentation</title>
+    <title>center_object &#8212; FracAbility 0.1.0 documentation</title>
   
   
   
@@ -40,11 +40,11 @@
     <script src="../../_static/doctools.js"></script>
     <script src="../../_static/sphinx_highlight.js"></script>
     <script src="../../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'API/Entities/Fractures';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'API/Geometry/center_object';</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Geometric Operations" href="../Geometry.html" />
-    <link rel="prev" title="Fracture Networks" href="FractureNetwork.html" />
+    <link rel="next" title="Statistic Operations" href="../Statistic.html" />
+    <link rel="prev" title="Geometric Operations" href="../Geometry.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -134,14 +134,14 @@
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">API reference</span></p>
 <ul class="current nav bd-sidenav">
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="../../API%20reference.html">API Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
-<li class="toctree-l2 current active has-children"><a class="reference internal" href="../Entities.html">Entities</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="Boundaries.html">Boundaries</a></li>
-<li class="toctree-l3"><a class="reference internal" href="FractureNetwork.html">Fracture Networks</a></li>
-<li class="toctree-l3 current active"><a class="current reference internal" href="#">Fractures</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../Entities.html">Entities</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../Entities/Boundaries.html">Boundaries</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../Entities/FractureNetwork.html">Fracture Networks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../Entities/Fractures.html">Fractures</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../Geometry.html">Geometric Operations</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../Geometry/center_object.html">center_object</a></li>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="../Geometry.html">Geometric Operations</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">center_object</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../Statistic.html">Statistic Operations</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -204,7 +204,7 @@
       
       
       
-      <li><a href="../../_sources/API/Entities/Fractures.rst" target="_blank"
+      <li><a href="../../_sources/API/Geometry/center_object.rst" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -286,7 +286,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Fractures</h1>
+    <h1>center_object</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -296,12 +296,7 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#fracability.Entities.Fractures"><code class="docutils literal notranslate"><span class="pre">Fractures</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fracability.Entities.Fractures.entity_df"><code class="docutils literal notranslate"><span class="pre">Fractures.entity_df</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fracability.Entities.Fractures.network_object"><code class="docutils literal notranslate"><span class="pre">Fractures.network_object</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fracability.Entities.Fractures.vtk_object"><code class="docutils literal notranslate"><span class="pre">Fractures.vtk_object</span></code></a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#fracability.operations.Geometry.center_object"><code class="docutils literal notranslate"><span class="pre">center_object</span></code></a></li>
 </ul>
             </nav>
         </div>
@@ -315,73 +310,31 @@ document.write(`
                   
   <img alt="../../_images/logo.png" src="../../_images/logo.png" />
 <hr class="docutils" />
-<section id="fractures">
-<h1>Fractures<a class="headerlink" href="#fractures" title="Permalink to this heading">#</a></h1>
+<section id="center-object">
+<h1>center_object<a class="headerlink" href="#center-object" title="Permalink to this heading">#</a></h1>
 <dl class="py class">
-<dt class="sig sig-object py" id="fracability.Entities.Fractures">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fracability.Entities.</span></span><span class="sig-name descname"><span class="pre">Fractures</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gdf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">GeoDataFrame</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fracability.Entities.Fractures" title="Permalink to this definition">#</a></dt>
-<dd><p>Base entity for fractures</p>
-<dl class="py property">
-<dt class="sig sig-object py" id="fracability.Entities.Fractures.entity_df">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">entity_df</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">GeoDataFrame</span></em><a class="headerlink" href="#fracability.Entities.Fractures.entity_df" title="Permalink to this definition">#</a></dt>
-<dd><p>Each entity is based on a geopandas dataframe. This property returns or sets
-the entity_df of the given entity.</p>
+<dt class="sig sig-object py" id="fracability.operations.Geometry.center_object">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fracability.operations.Geometry.</span></span><span class="sig-name descname"><span class="pre">center_object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">BaseEntity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trans_center</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">array</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_center</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fracability.operations.Geometry.center_object" title="Permalink to this definition">#</a></dt>
+<dd><p>Translate the center of the Entity object to a given point. If no trans_center is specified then the object
+will be moved to the origin (0,0,0).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Getter<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Returns the GeoDataFrame</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obj</strong> (<em>Boundary, Fractures, FractureNetwork</em>) – A fracability entity object</p></li>
+<li><p><strong>trans_center</strong> (<em>array</em>) – Point to which translate the object</p></li>
+<li><p><strong>return_center</strong> (<em>bool</em>) – Bool flag to specify to return the translation center</p></li>
+<li><p><strong>inplace</strong> (<em>bool</em>) – Bool flag to specify if the operation overwrites the entity or creates a new instance</p></li>
+</ul>
 </dd>
-<dt class="field-even">Setter<span class="colon">:</span></dt>
-<dd class="field-even"><p>Sets the GeoDataFrame</p>
-</dd>
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>GeoDataFrame</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>trans_center</strong> (<em>array</em>) – Point of translation. If trans_center is not specified in the output then this will return the center of
+the object</p></li>
+<li><p><strong>copy_obj</strong> (<em>object</em>) – Copy of the modified input object (preserves the original input)</p></li>
+</ul>
+</p>
 </dd>
 </dl>
-<p class="rubric">Notes</p>
-<p>When set the dataframe is modified to conform to the assigned entity structure.</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="fracability.Entities.Fractures.network_object">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">network_object</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Graph</span></em><a class="headerlink" href="#fracability.Entities.Fractures.network_object" title="Permalink to this definition">#</a></dt>
-<dd><p>Each entity can be represented with a networkx graph.
-This returns the network object using the vtk object (and so the df).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Getter<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Returns a networkx Graph object</p>
-</dd>
-<dt class="field-even">Setter<span class="colon">:</span></dt>
-<dd class="field-even"><p>Sets a Graph object</p>
-</dd>
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>pyvista Graph</p>
-</dd>
-</dl>
-<p class="rubric">Notes</p>
-<p>When the get method is applied the Graph is build <strong>on the fly</strong> using the object and so the entity_df.</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="fracability.Entities.Fractures.vtk_object">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">vtk_object</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">PolyData</span></em><a class="headerlink" href="#fracability.Entities.Fractures.vtk_object" title="Permalink to this definition">#</a></dt>
-<dd><p>Each entity can be represented with a vtk object.
-This returns a Pyvista PolyData object representing the entity_df.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Getter<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Returns a Pyvista PolyData object</p>
-</dd>
-<dt class="field-even">Setter<span class="colon">:</span></dt>
-<dd class="field-even"><p>Sets a generic Pyvista DataSet</p>
-</dd>
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>pyvista PolyData</p>
-</dd>
-</dl>
-<p class="rubric">Notes</p>
-<p>When the get method is applied the PolyData is build <strong>on the fly</strong> using the entity_df as a source.</p>
-<p>When set the DataSet is <strong>cast to a PolyData</strong>.</p>
-</dd></dl>
-
 </dd></dl>
 
 </section>
@@ -399,20 +352,20 @@ This returns a Pyvista PolyData object representing the entity_df.</p>
     <div class="footer-article-item"><!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
-       href="FractureNetwork.html"
+       href="../Geometry.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Fracture Networks</p>
+        <p class="prev-next-title">Geometric Operations</p>
       </div>
     </a>
     <a class="right-next"
-       href="../Geometry.html"
+       href="../Statistic.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Geometric Operations</p>
+        <p class="prev-next-title">Statistic Operations</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -434,12 +387,7 @@ This returns a Pyvista PolyData object representing the entity_df.</p>
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#fracability.Entities.Fractures"><code class="docutils literal notranslate"><span class="pre">Fractures</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fracability.Entities.Fractures.entity_df"><code class="docutils literal notranslate"><span class="pre">Fractures.entity_df</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fracability.Entities.Fractures.network_object"><code class="docutils literal notranslate"><span class="pre">Fractures.network_object</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fracability.Entities.Fractures.vtk_object"><code class="docutils literal notranslate"><span class="pre">Fractures.vtk_object</span></code></a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#fracability.operations.Geometry.center_object"><code class="docutils literal notranslate"><span class="pre">center_object</span></code></a></li>
 </ul>
   </nav></div>
 

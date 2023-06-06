@@ -2,9 +2,9 @@
 
 -------------------------------------
 
-center_object
+NetworkFitter
 ------------------
-.. autoclass:: fracability.geometric_operations.center_object
+.. autoclass:: fracability.operations.Statistics.NetworkFitter
     :members:
     :inherited-members:
     :undoc-members:

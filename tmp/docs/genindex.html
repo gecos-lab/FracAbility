@@ -137,8 +137,12 @@
 <li class="toctree-l3"><a class="reference internal" href="API/Entities/Fractures.html">Fractures</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="API/geometric_operations.html">Geometric Operations</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="API/geometric_operations/center_object.html">center_object</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="API/Geometry.html">Geometric Operations</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="API/Geometry/center_object.html">center_object</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="API/Statistic.html">Statistic Operations</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="API/Statistic/NetworkFitter.html">NetworkFitter</a></li>
 </ul>
 </li>
 </ul>
@@ -252,7 +256,11 @@ document.write(`
  | <a href="#C"><strong>C</strong></a>
  | <a href="#E"><strong>E</strong></a>
  | <a href="#F"><strong>F</strong></a>
+ | <a href="#G"><strong>G</strong></a>
+ | <a href="#L"><strong>L</strong></a>
  | <a href="#N"><strong>N</strong></a>
+ | <a href="#P"><strong>P</strong></a>
+ | <a href="#S"><strong>S</strong></a>
  | <a href="#V"><strong>V</strong></a>
  
 </div>
@@ -285,7 +293,11 @@ document.write(`
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="API/geometric_operations/center_object.html#fracability.geometric_operations.center_object">center_object (class in fracability.geometric_operations)</a>
+      <li><a href="API/Statistic/NetworkFitter.html#fracability.operations.Statistics.NetworkFitter.censored_lengths">censored_lengths (fracability.operations.Statistics.NetworkFitter property)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="API/Geometry/center_object.html#fracability.operations.Geometry.center_object">center_object (class in fracability.operations.Geometry)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -307,13 +319,35 @@ document.write(`
 <h2 id="F">F</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="API/Entities/FractureNetwork.html#fracability.Entities.FractureNetwork">FractureNetwork (class in fracability.Entities)</a>
+      <li><a href="API/Statistic/NetworkFitter.html#fracability.operations.Statistics.NetworkFitter.fit">fit() (fracability.operations.Statistics.NetworkFitter method)</a>
+</li>
+      <li><a href="API/Statistic/NetworkFitter.html#fracability.operations.Statistics.NetworkFitter.fitter">fitter (fracability.operations.Statistics.NetworkFitter property)</a>
+</li>
+      <li><a href="API/Statistic/NetworkFitter.html#fracability.operations.Statistics.NetworkFitter.fitter_list">fitter_list (fracability.operations.Statistics.NetworkFitter property)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="API/Entities/FractureNetwork.html#fracability.Entities.FractureNetwork">FractureNetwork (class in fracability.Entities)</a>
+</li>
       <li><a href="API/Entities/Fractures.html#fracability.Entities.Fractures">Fractures (class in fracability.Entities)</a>
 </li>
       <li><a href="API/Entities/FractureNetwork.html#fracability.Entities.FractureNetwork.fractures">fractures (fracability.Entities.FractureNetwork property)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="G">G</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="API/Statistic/NetworkFitter.html#fracability.operations.Statistics.NetworkFitter.get_fit_parameters">get_fit_parameters() (fracability.operations.Statistics.NetworkFitter method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="L">L</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="API/Statistic/NetworkFitter.html#fracability.operations.Statistics.NetworkFitter.lengths">lengths (fracability.operations.Statistics.NetworkFitter property)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -331,7 +365,29 @@ document.write(`
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="API/Statistic/NetworkFitter.html#fracability.operations.Statistics.NetworkFitter">NetworkFitter (class in fracability.operations.Statistics)</a>
+</li>
       <li><a href="API/Entities/FractureNetwork.html#fracability.Entities.FractureNetwork.nodes">nodes (fracability.Entities.FractureNetwork property)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="P">P</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="API/Statistic/NetworkFitter.html#fracability.operations.Statistics.NetworkFitter.plot_function">plot_function() (fracability.operations.Statistics.NetworkFitter method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="API/Statistic/NetworkFitter.html#fracability.operations.Statistics.NetworkFitter.plot_kde">plot_kde() (fracability.operations.Statistics.NetworkFitter method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="S">S</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="API/Statistic/NetworkFitter.html#fracability.operations.Statistics.NetworkFitter.summary_plot">summary_plot() (fracability.operations.Statistics.NetworkFitter method)</a>
 </li>
   </ul></td>
 </tr></table>
