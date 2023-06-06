@@ -14,13 +14,6 @@ cens_data = data.loc[data['U-nodes'] == 1, 'length'].values
 test_data = data['length'].values
 
 
-fitter = rel.Fitters.Fit_Lognormal_2P(failures=uncens_data, right_censored=cens_data,
-                                      show_probability_plot=False, print_results=False)
+fitter = rel.Fitters.Fit_Everything(failures=uncens_data, right_censored=cens_data)
 
-
-dist = fitter.distribution
-CDF = dist.PDF(show_plot=False, xmax=20)
-x = generate_X_array(dist)
-# print(CDF)
-plt.plot(x, CDF)
-plt.show()
+print(fitter.best_distribution_name)
