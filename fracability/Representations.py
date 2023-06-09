@@ -20,10 +20,17 @@ def vtk_rep(input_df: geopandas.GeoDataFrame) -> PolyData:
 
         points = np.stack((x, y, z), axis=1)  # Stack the coordinates to a [n,3] shaped array
         # offset = np.round(points[0][0])
-        pv_obj = lines_from_points(points)  # Create the corresponding vtk line with the given points
-        pv_obj.cell_data['type'] = [l_type] * pv_obj.GetNumberOfCells()
-        pv_obj.point_data['type'] = [l_type] * pv_obj.GetNumberOfPoints()
-        pv_obj.point_data['RegionId'] = [index] * pv_obj.GetNumberOfPoints()
+        if isinstance(geom, Point):
+            node_type = input_df.loc[index, 'node_type']
+            pv_obj = PolyData(points)
+            pv_obj['type'] = [l_type]
+            pv_obj['node_type'] = [node_type]
+        else:
+            pv_obj = lines_from_points(points)  # Create the corresponding vtk line with the given points
+            pv_obj.cell_data['type'] = [l_type] * pv_obj.GetNumberOfCells()
+            pv_obj.point_data['type'] = [l_type] * pv_obj.GetNumberOfPoints()
+
+        pv_obj['RegionId'] = [index] * pv_obj.GetNumberOfPoints()
 
         # line.plot()
 

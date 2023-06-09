@@ -7,6 +7,7 @@ from abc import ABC, abstractmethod
 from fracability.Entities import BaseEntity
 from pandas import DataFrame
 from scipy.stats import gaussian_kde
+import scipy.stats as ss
 import seaborn as sns
 from copy import deepcopy
 
@@ -29,10 +30,18 @@ class AbstractStatistics(ABC):
 
     @property
     def lengths(self):
+
+        """
+        This property returns or sets the complete list of length data for the fracture network
+
+        :getter: Return the complete list of lengths
+        :setter: Set the complete list of lengths
+        """
+
         return self._lengths
 
     @lengths.setter
-    def lengths(self,length_list: list = None):
+    def lengths(self, length_list: list = None):
         self._lengths = length_list
 
     @property
@@ -135,7 +144,7 @@ class NetworkFitter(AbstractStatistics):
     def dist(self, distribution=None):
         self._distribution = distribution
 
-    def fit(self, fitter_name: str = ''):
+    def fit(self, fitter_name: str = '',censored_data: bool =True):
 
         """
         Fit the data of the entity_df using one of the fitters available in reliability
@@ -145,8 +154,11 @@ class NetworkFitter(AbstractStatistics):
 
         if fitter_name in self.fitter_list:
             fitter = getattr(Fitters, fitter_name)
-            rel_fitter = fitter(failures=self.complete_lengths, right_censored=self.censored_lengths,
-                                show_probability_plot=False, print_results=False)
+            if censored_data:
+                rel_fitter = fitter(failures=self.complete_lengths, right_censored=self.censored_lengths,
+                                    show_probability_plot=False, print_results=False)
+            else:
+                rel_fitter = fitter(failures=self.lengths, show_probability_plot=False, print_results=False)
 
             self.fitter = rel_fitter
             self.dist = rel_fitter.distribution
@@ -296,12 +308,18 @@ class NetworkFitter(AbstractStatistics):
         func = getattr(self.dist, func_name) # get the specific function (PDF, CDF, SF)
         y_vals = func(xvals=x_vals, show_plot=False)
 
+
         fig = plt.figure(num=func_name)
-        plt.plot(x_vals, y_vals)
+        plt.plot(x_vals, y_vals, 'b-', label='Theoretical cdf')
+
+        if func_name == 'CDF':
+            xval, ecdf = statistics.ecdf(self.complete_lengths,self.censored_lengths)
+            plt.step(xval, ecdf, 'r-', label='Empirical cdf')
         plt.title(func_name)
         plt.xlabel('Length [m]')
         plt.ylabel('Function response')
         plt.grid(True)
+        plt.legend()
         plt.show()
 
     def plot_kde(self, n_bins: int = 25, x_min: float = 0.0, x_max: float = None, res: int = 1000):
@@ -351,22 +369,27 @@ class NetworkFitter(AbstractStatistics):
         for dist in test_list:
 
             self.fit(dist)
-            dist = self.dist
+            fit_dist = self.dist
             data = self.lengths
 
-            test = reliability.Reliability_testing.KStest(distribution=dist,
-                                                          data=data, print_results=False,
-                                                          show_plot=False)
-
-            self.test_parameters = {'Result': test.hypothesis,
-                                    'crit_val': test.KS_critical_value,
-                                    'KS_stat': test.KS_statistic
-                                    }
-
-            if test.hypothesis == 'ACCEPT':
-                self.accepted_fit.append(deepcopy(self))
-            else:
-                self.rejected_fit.append(deepcopy(self))
+            cdf = fit_dist.CDF(show_plot=False)
+            test = ss.kstest(data, ss.lognorm.cdf,args = (fit_dist))
+            print(f'{dist}: {test}')
+            # reliability.Reliability_testing.KStest(distribution=fit_dist,
+            #                                               data=data, print_results=True,
+            #                                               show_plot=True)
+            #
+            # plt.show()
+            #
+            # self.test_parameters = {'Result': test.hypothesis,
+            #                         'crit_val': test.KS_critical_value,
+            #                         'KS_stat': test.KS_statistic
+            #                         }
+            #
+            # if test.hypothesis == 'ACCEPT':
+            #     self.accepted_fit.append(deepcopy(self))
+            # else:
+            #     self.rejected_fit.append(deepcopy(self))
 
 
 

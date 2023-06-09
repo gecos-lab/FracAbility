@@ -153,6 +153,8 @@ class Nodes(BaseEntity):
 
         if 'type' not in df.columns:
             df['type'] = 'node'
+        if 'node_type' not in df.columns:
+            df['node_type'] = -9999
 
     def _process_vtk(self):
         pass
@@ -344,10 +346,10 @@ class FractureNetwork(BaseEntity):
         df = self.entity_df
         fractures = Fractures(df.loc[df['type'] == 'fracture'])
         boundary = Boundary(df.loc[df['type'] == 'boundary'])
-        # nodes = Nodes(df.loc[df['type'] == 'nodes'])
+        nodes = Nodes(df.loc[df['type'] == 'node'])
         self.fractures = fractures
         self.boundaries = boundary
-        # self.nodes = nodes
+        self.nodes = nodes
 
     def _process_vtk(self):
         """
@@ -370,6 +372,7 @@ class FractureNetwork(BaseEntity):
         # node_vtk = frac_net.extract_points(frac_net.point_data['type'] == 'nodes', include_cells=True)
 
     def add_fractures(self, fractures: Fractures, name: str = None):
+
         """
         Method used to add fractures to the FractureNetwork
 
@@ -430,7 +433,7 @@ class FractureNetwork(BaseEntity):
             df = GeoDataFrame(
                 pd.concat(
                     [self.entity_df,
-                     nodes.entity_df[['type', 'geometry']]],
+                     nodes.entity_df[['type', 'node_type', 'geometry']]],
                     ignore_index=True)
             )
         self.nodes = nodes
