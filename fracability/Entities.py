@@ -1,3 +1,10 @@
+"""
+In general, it would be good to give the possibility to trat separately sets of fractures/different types of nodes/
+boundary and then everything together to consider the network as a compostion of single entities and not as a single
+entity.
+
+"""
+
 from geopandas import GeoDataFrame
 import pandas as pd
 from shapely.geometry import MultiLineString, Polygon

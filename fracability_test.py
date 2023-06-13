@@ -67,74 +67,14 @@ nodes.set_active_scalars('node_type')
 #
 fitter = NetworkFitter(fracture_net)
 
-data = ss.CensoredData(uncensored=fitter.complete_lengths, right=fitter.censored_lengths)
+# fitter.fit('lognorm')
+# fitter.fit('norm')
+# fitter.fit('weibull_min')
+# fitter.fit('exponnorm')
 
-ecdf = ss.ecdf(data).cdf
+# print(fitter.fit_records)
 
-fitt_list = ['lognorm',
-        'norm',
-        'expon',
-        'gamma',
-        'burr12',
-        'logistic']
-# data = fitter.lengths
+best_fit = fitter.find_best_distribution()
 
-for fitter_name in fitt_list:
+print(best_fit)
 
-    distr = getattr(ss, fitter_name)
-
-    if fitter_name == 'normal' or fitter_name == 'logistic':
-        params = distr.fit(data)
-    else:
-        params = distr.fit(data, floc=0)
-
-    if len(params) == 2:
-        a, b = params
-        x = np.linspace(distr.ppf(0.05, a, b),
-                        distr.ppf(0.995, a, b), 1000)
-        cdf = distr.cdf(ecdf.quantiles, a, b)
-
-    elif len(params) == 3:
-        a, b, c = params
-        x = np.linspace(distr.ppf(0.05, a, b, c),
-                        distr.ppf(0.995, a, b, c), 1000)
-        cdf = distr.cdf(ecdf.quantiles, a, b, c)
-
-    test = ss.kstest(ecdf.probabilities, cdf)
-    print(f'{fitter_name}: {test}')
-
-# s = params[0]
-
-
-# print(x)
-#
-# pdf = ss.gamma.pdf(x, s=params[0], loc=params[1], scale=params[2])
-#
-# cdf = ss.gamma.cdf(ecdf.quantiles, s=params[0], loc=params[1], scale=params[2])
-#
-
-# # print(ecdf)
-#
-# plt.step(ecdf.quantiles, ecdf.probabilities,'r')
-# plt.plot(ecdf.quantiles, cdf,'b')
-#
-#
-# plt.show()
-
-# reliability.Reliability_testing.KStest(distribution=dist, data=fracture_net.entity_df['length'].values)
-
-# print(fitter.accepted_fit)
-# print(fitter.rejected_fit)
-#
-# for acc_fit in fitter.accepted_fit:
-#     acc_fit.plot_function('CDF', x_max=4)
-#
-# for rej_fit in fitter.rejected_fit:
-#     rej_fit.plot_function('CDF', x_max=4)
-
-# fitter.fit('Fit_Lognormal_2P')
-# print(fitter.get_fit_parameters())
-# fitter.summary_plot(x_max=20)
-# fitter.plot_function('PDF', x_max=25)
-# fitter.fitter.distribution.plot('PDF')
-# fitter.plot_kde()
