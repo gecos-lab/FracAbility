@@ -13,14 +13,14 @@ from fracability.operations.Cleaners import connect_dots
 from fracability.operations.Topology import nodes_conn
 from fracability.operations.Statistics import NetworkFitter
 
-# n_path = 'fracability/datasets/frac_pesce.shp'
-# b_path = 'fracability/datasets/grid_pesce.shp'
+n_path = 'fracability/datasets/frac_pesce.shp'
+b_path = 'fracability/datasets/grid_pesce.shp'
 #
 # n1_path = '/home/gabriele/STORAGE/Unibro/Libri-e-dispense/Magistrale/Tesi/pz_pers/test_reti/attachments/Set_1.shp'
 # n2_path = '/home/gabriele/STORAGE/Unibro/Libri-e-dispense/Magistrale/Tesi/pz_pers/test_reti/attachments/Set_2.shp'
 #
-n_path = 'fracability/datasets/Fracture_network.shp'
-b_path = 'fracability/datasets/Interpretation_boundary_laghettoSalza.shp'
+# n_path = 'fracability/datasets/Fracture_network.shp'
+# b_path = 'fracability/datasets/Interpretation_boundary_laghettoSalza.shp'
 
 
 fracs = gpd.read_file(n_path)
@@ -53,28 +53,28 @@ connect_dots(fracture_net)
 # backbone = find_backbone(fracture_net)
 
 nodes_conn(fracture_net)
-
-nodes = fracture_net.nodes.vtk_object
-
-nodes.set_active_scalars('node_type')
-
-
-# plotter = pv.Plotter()
 #
-# plotter.add_mesh(fracture_net.vtk_object, color='white')
-# plotter.add_mesh(nodes, render_points_as_spheres=True, point_size=8)
-# plotter.show()
+# nodes = fracture_net.nodes.vtk_object
 #
-fitter = NetworkFitter(fracture_net)
-
-# fitter.fit('lognorm')
-# fitter.fit('norm')
-# fitter.fit('weibull_min')
-# fitter.fit('exponnorm')
-
-# print(fitter.fit_records)
-
-best_fit = fitter.find_best_distribution()
-
-print(best_fit)
+# nodes.set_active_scalars('node_type')
+#
+#
+# # plotter = pv.Plotter()
+# #
+# # plotter.add_mesh(fracture_net.vtk_object, color='white')
+# # plotter.add_mesh(nodes, render_points_as_spheres=True, point_size=8)
+# # plotter.show()
+# #
+# fitter = NetworkFitter(fracture_net)
+#
+# # fitter.fit('lognorm')
+# # fitter.fit('norm')
+# # fitter.fit('weibull_min')
+# # fitter.fit('exponnorm')
+#
+# # print(fitter.fit_records)
+#
+# best_fit = fitter.find_best_distribution()
+#
+# print(best_fit)
 

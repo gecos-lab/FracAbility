@@ -10,7 +10,7 @@ from copy import deepcopy
 from halo import Halo
 
 
-def center_object(obj: BaseEntity, trans_center: np.array = None, return_center: bool =False, inplace: bool = True):
+def center_object(obj: BaseEntity, trans_center: np.array = None, return_center: bool = False, inplace: bool = True):
     """
     Translate the center of the Entity object to a given point. If no trans_center is specified then the object
     will be moved to the origin (0,0,0).
@@ -46,7 +46,6 @@ def center_object(obj: BaseEntity, trans_center: np.array = None, return_center:
 
     if inplace:
         obj.entity_df = df
-        obj._process_df()
     else:
         copy_obj = deepcopy(obj)
         copy_obj.entity_df = df

@@ -40,16 +40,16 @@ class BaseEntity(ABC):
         if gdf is not None:
             self.entity_df = gdf
 
-    @abstractmethod
-    def _process_df(self):
-        """
-        Each entity process the input dataframe in different ways
-        (for example boundaries vs. fractures).
-        Use this method to define the pipeline used to parse the dataframe
-        :return:
-        """
-
-        pass
+    # @abstractmethod
+    # def _process_df(self):
+    #     """
+    #     Each entity process the input dataframe in different ways
+    #     (for example boundaries vs. fractures).
+    #     Use this method to define the pipeline used to parse the dataframe
+    #     :return:
+    #     """
+    #
+    #     pass
 
     @abstractmethod
     def _process_vtk(self):
@@ -79,9 +79,7 @@ class BaseEntity(ABC):
 
     @entity_df.setter
     def entity_df(self, gdf: GeoDataFrame):
-
-        self._df = gdf
-        self._process_df()
+        pass
 
     @property
     def vtk_object(self) -> PolyData:
@@ -149,21 +147,24 @@ class Nodes(BaseEntity):
     Node base entity, represents all the nodes in the network.
     """
 
-    def _process_df(self):
+    @BaseEntity.entity_df.setter
+    def entity_df(self, gdf: GeoDataFrame):
         """
         Each entity process the input dataframe in different ways
         Nodes modify the entity_df only to add the type column (if not
         already present)
         """
 
-        df = self.entity_df
+        self._df = gdf
 
-        if 'type' not in df.columns:
-            df['type'] = 'node'
-        if 'node_type' not in df.columns:
-            df['node_type'] = -9999
+        if 'type' not in self._df.columns:
+            self._df['type'] = 'node'
+        if 'node_type' not in self._df.columns:
+            self._df['node_type'] = -9999
 
     def _process_vtk(self):
+        print(self.vtk_object)
+        print(self.entity_df)
         pass
 
 
@@ -172,7 +173,8 @@ class Fractures(BaseEntity):
     Base entity for fractures
     """
 
-    def _process_df(self):
+    @BaseEntity.entity_df.setter
+    def entity_df(self, gdf: GeoDataFrame):
         """
         Each entity process the input dataframe in different ways
         Fractures modify the entity_df by adding the 'type' and
@@ -181,12 +183,12 @@ class Fractures(BaseEntity):
         not (0)
         """
 
-        df = self.entity_df
+        self._df = gdf
 
-        if 'type' not in df.columns:
-            df['type'] = 'fracture'
-        if 'censored' not in df.columns:
-            df['censored'] = 0
+        if 'type' not in self._df.columns:
+            self._df['type'] = 'fracture'
+        if 'censored' not in self._df.columns:
+            self._df['censored'] = 0
 
     def _process_vtk(self):
         pass
@@ -197,7 +199,8 @@ class Boundary(BaseEntity):
     Base entity for boundaries
     """
 
-    def _process_df(self):
+    @BaseEntity.entity_df.setter
+    def entity_df(self, gdf: GeoDataFrame):
         """
         Each entity process the input dataframe in different ways.
         Boundaries modify the entity_df by converting Polygons in Linestrings
@@ -205,7 +208,7 @@ class Boundary(BaseEntity):
         A 'type' column is added if missing.
         """
 
-        df = self.entity_df
+        self._df = gdf
 
         geom_list = []
         # boundaries = df.boundary
@@ -218,7 +221,7 @@ class Boundary(BaseEntity):
         # This is to suppress the SettingWithCopyWarning (we are not working on a copy)
         pd.options.mode.chained_assignment = None
 
-        for index, line in enumerate(df.loc[:, 'geometry']):
+        for index, line in enumerate(self._df.loc[:, 'geometry']):
             if isinstance(line, Polygon):
                 bound = line.boundary
                 if isinstance(bound, MultiLineString):
@@ -230,13 +233,13 @@ class Boundary(BaseEntity):
                 geom_list.append(line)
 
         for index, value in enumerate(geom_list):
-            df.loc[index, 'geometry'] = value
+            self._df.loc[index, 'geometry'] = value
 
         # When PZero moves to shapely 2.0 remove the lines between the comments
         # and uncomment the two lines above
 
-        if 'type' not in df.columns:
-            df['type'] = 'boundary'
+        if 'type' not in self._df.columns:
+            self._df['type'] = 'boundary'
 
     def _process_vtk(self):
         pass
@@ -338,7 +341,8 @@ class FractureNetwork(BaseEntity):
 
         self._nodes = nodes_obj
 
-    def _process_df(self):
+    @BaseEntity.entity_df.setter
+    def entity_df(self, gdf: GeoDataFrame):
         """
         FractureNetworks modify the entity_df by extracting the different types
         (fractures, boundaries, nodes). After that, the appropriate base entities
@@ -350,10 +354,10 @@ class FractureNetwork(BaseEntity):
 
         """
 
-        df = self.entity_df
-        fractures = Fractures(df.loc[df['type'] == 'fracture'])
-        boundary = Boundary(df.loc[df['type'] == 'boundary'])
-        nodes = Nodes(df.loc[df['type'] == 'node'])
+        self._df = gdf
+        fractures = Fractures(self._df.loc[self._df['type'] == 'fracture'])
+        boundary = Boundary(self._df.loc[self._df['type'] == 'boundary'])
+        nodes = Nodes(self._df.loc[self._df['type'] == 'node'])
         self.fractures = fractures
         self.boundaries = boundary
         self.nodes = nodes
@@ -370,8 +374,8 @@ class FractureNetwork(BaseEntity):
         """
 
         frac_net_vtk = self.vtk_object
-        frac_vtk = frac_net_vtk.extract_points(frac_net_vtk.point_data['type'] == 'fracture', include_cells=True,adjacent_cells=False)
-        bound_vtk = frac_net_vtk.extract_points(frac_net_vtk.point_data['type'] == 'boundary', include_cells=True,adjacent_cells=False)
+        frac_vtk = frac_net_vtk.extract_cells(frac_net_vtk.cell_data['type'] == 'fracture')
+        bound_vtk = frac_net_vtk.extract_cells(frac_net_vtk.cell_data['type'] == 'boundary')
 
         self.fractures.vtk_object = frac_vtk
         self.boundaries.vtk_object = bound_vtk
