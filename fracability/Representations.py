@@ -3,11 +3,10 @@
 
 import geopandas
 import networkx
-import pandas
 import numpy as np
 from pyvista import PolyData, lines_from_points
-from shapely.geometry import LineString, Point
-from vtkmodules.vtkFiltersCore import vtkAppendPolyData, vtkConnectivityFilter, vtkCleanPolyData, vtkAppendArcLength
+from shapely.geometry import Point
+from vtkmodules.vtkFiltersCore import vtkAppendPolyData
 from abc import ABC, abstractmethod
 import networkx as nx
 from vtkmodules.vtkFiltersGeometry import vtkGeometryFilter
@@ -15,8 +14,25 @@ from vtkmodules.vtkFiltersGeometry import vtkGeometryFilter
 from fracability.operations.Cleaners import connect_dots
 
 
+def point_vtk_rep(input_df: geopandas.GeoDataFrame) -> PolyData:
+    ...
+
+
+def fractures_vtk_rep(input_df: geopandas.GeoDataFrame) -> PolyData:
+    ...
+
+
+def boundaries_vtk_rep(input_df: geopandas.GeoDataFrame) -> PolyData:
+    ...
+
+
+def fracture_network_rep(input_df: geopandas.GeoDataFrame) -> PolyData:
+    ...
+
+
 def vtk_rep(input_df: geopandas.GeoDataFrame) -> PolyData:
     appender = vtkAppendPolyData()
+    print(input_df)
 
     for index, geom, l_type in zip(input_df.index, input_df['geometry'], input_df['type']):  # For each geometry in the df
 

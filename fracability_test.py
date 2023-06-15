@@ -51,12 +51,13 @@ tidy_intersections(fracture_net)
 
 
 nodes = nodes_conn(fracture_net)
+print('ciao')
 # print(fracture_net.entity_df)
 #
 # nodes = fracture_net.nodes.vtk_object
 
 nodes.vtk_object.set_active_scalars('node_type')
-
+print('ciao')
 
 plotter = pv.Plotter()
 
@@ -64,6 +65,7 @@ plotter = pv.Plotter()
 plotter.add_mesh(fracture_net.vtk_object, color='white')
 
 plotter.add_mesh(nodes.vtk_object, render_points_as_spheres=True, point_size=8)
+print('ciao')
 # plotter.add_mesh(fractures.vtk_object.points, render_points_as_spheres=True, point_size=8)
 plotter.show()
 #

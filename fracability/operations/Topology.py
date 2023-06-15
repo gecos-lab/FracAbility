@@ -5,7 +5,7 @@ from vtkmodules.vtkFiltersCore import vtkConnectivityFilter
 
 from fracability.Entities import BaseEntity, FractureNetwork, Nodes
 
-from shapely.geometry import Point
+from shapely.geometry import Point, MultiPoint
 from geopandas import GeoDataFrame
 from pyvista import PolyData
 import numpy as np
@@ -15,6 +15,8 @@ def nodes_conn(obj: BaseEntity, inplace=True):
 
     network = obj.network_object
     vtk_obj = obj.vtk_object
+
+    frac_idx = np.where(vtk_obj.point_data['type'] == 'fracture')[0]
 
     class_list = []
 
@@ -28,14 +30,10 @@ def nodes_conn(obj: BaseEntity, inplace=True):
         -9999: 'Nan'
     }
 
-    if isinstance(obj, FractureNetwork):
-        fractures_vtk = obj.fractures.vtk_object
-        nodes_id = obj.vtk_object.cell_id(fractures_vtk.points)
-        print(nodes_id)
-    n_nodes = vtk_obj.n_points
+    # n_nodes = vtk_obj.n_points
     node_geometry = []
-    for node in range(n_nodes):  # For each node of the fractures:
-        # print(f'Classifying node {node} of {n_nodes} ', end='\r')
+    for node in frac_idx:  # For each node of the fractures:
+        print(f'Classifying node {node} of {len(frac_idx)} ', end='\r')
 
         n_edges = network.degree[node]  # Calculate number of connected nodes
 
@@ -56,12 +54,14 @@ def nodes_conn(obj: BaseEntity, inplace=True):
         class_list.append(n_edges)  # Append the value (number of connected nodes)
 
     node_geometry = np.array(node_geometry)
+
     class_list = np.array(class_list)
 
     indexes = np.where(class_list >= 0)
 
     node_geometry = node_geometry[indexes]
     class_list = class_list[indexes]
+
 
     # class_names = [class_dict[i] for i in class_list]
 
