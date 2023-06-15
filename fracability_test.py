@@ -9,9 +9,9 @@ import scipy.stats as ss
 
 from fracability import Entities
 from fracability.operations.Geometry import center_object, tidy_intersections
-from fracability.operations.Cleaners import connect_dots
 from fracability.operations.Topology import nodes_conn
 from fracability.operations.Statistics import NetworkFitter
+
 
 n_path = 'fracability/datasets/frac_pesce.shp'
 b_path = 'fracability/datasets/grid_pesce.shp'
@@ -38,33 +38,36 @@ boundaries = Entities.Boundary(bound_gpd)
 
 fracture_net = Entities.FractureNetwork()
 
-fracture_net.add_fractures(fractures)
 
+fracture_net.add_fractures(fractures)
 fracture_net.add_boundaries(boundaries)
+# print(fracture_net.vtk_object.plot())
 
 
 center_object(fracture_net)
 
 
 tidy_intersections(fracture_net)
-connect_dots(fracture_net)
 
 
-# backbone = find_backbone(fracture_net)
-
-nodes_conn(fracture_net)
+nodes = nodes_conn(fracture_net)
+# print(fracture_net.entity_df)
 #
 # nodes = fracture_net.nodes.vtk_object
+
+nodes.vtk_object.set_active_scalars('node_type')
+
+
+plotter = pv.Plotter()
+
+# plotter.add_mesh(fracture_net.boundaries.vtk_object, color='red')
+plotter.add_mesh(fracture_net.vtk_object, color='white')
+
+plotter.add_mesh(nodes.vtk_object, render_points_as_spheres=True, point_size=8)
+# plotter.add_mesh(fractures.vtk_object.points, render_points_as_spheres=True, point_size=8)
+plotter.show()
 #
-# nodes.set_active_scalars('node_type')
-#
-#
-# # plotter = pv.Plotter()
-# #
-# # plotter.add_mesh(fracture_net.vtk_object, color='white')
-# # plotter.add_mesh(nodes, render_points_as_spheres=True, point_size=8)
-# # plotter.show()
-# #
+
 # fitter = NetworkFitter(fracture_net)
 #
 # # fitter.fit('lognorm')

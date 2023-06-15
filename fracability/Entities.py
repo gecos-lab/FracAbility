@@ -7,7 +7,7 @@ entity.
 
 from geopandas import GeoDataFrame
 import pandas as pd
-from shapely.geometry import MultiLineString, Polygon
+from shapely.geometry import MultiLineString, Polygon, LineString
 from pyvista import PolyData, DataSet
 from networkx import Graph
 from vtkmodules.vtkFiltersGeometry import vtkGeometryFilter
@@ -51,7 +51,6 @@ class BaseEntity(ABC):
     #
     #     pass
 
-    @abstractmethod
     def _process_vtk(self):
         """
         Each entity process the vtk objects in different ways (for example frac net vs fractures).
@@ -184,14 +183,19 @@ class Fractures(BaseEntity):
         """
 
         self._df = gdf
+        self._df.reset_index(inplace=True, drop=True)
 
         if 'type' not in self._df.columns:
             self._df['type'] = 'fracture'
         if 'censored' not in self._df.columns:
             self._df['censored'] = 0
 
-    def _process_vtk(self):
-        pass
+    @BaseEntity.vtk_object.setter
+    def vtk_object(self, obj: DataSet):
+
+        for region in set(obj['RegionId']):
+            region = obj.extract_points(obj['RegionId'] == region)
+            self.entity_df.loc[self.entity_df['id'] == region, 'geometry'] = LineString(region.points)
 
 
 class Boundary(BaseEntity):
@@ -209,6 +213,8 @@ class Boundary(BaseEntity):
         """
 
         self._df = gdf
+        self._df.reset_index(inplace=True, drop=True)
+
 
         geom_list = []
         # boundaries = df.boundary
@@ -234,15 +240,18 @@ class Boundary(BaseEntity):
 
         for index, value in enumerate(geom_list):
             self._df.loc[index, 'geometry'] = value
-
         # When PZero moves to shapely 2.0 remove the lines between the comments
         # and uncomment the two lines above
 
         if 'type' not in self._df.columns:
             self._df['type'] = 'boundary'
 
-    def _process_vtk(self):
-        pass
+    @BaseEntity.vtk_object.setter
+    def vtk_object(self, obj: DataSet):
+
+        for region in set(obj['RegionId']):
+            region = obj.extract_points(obj['RegionId'] == region)
+            self.entity_df.loc[self.entity_df['id'] == region, 'geometry'] = LineString(region.points)
 
 
 class FractureNetwork(BaseEntity):
@@ -341,7 +350,35 @@ class FractureNetwork(BaseEntity):
 
         self._nodes = nodes_obj
 
-    @BaseEntity.entity_df.setter
+    @property
+    def entity_df(self) -> GeoDataFrame:
+        """
+        Each entity is based on a geopandas dataframe. This property returns or sets
+        the entity_df of the given entity.
+
+        :getter: Returns the GeoDataFrame
+        :setter: Sets the GeoDataFrame
+        :type: GeoDataFrame
+
+        Notes
+        -------
+        When set the dataframe is modified to conform to the assigned entity structure.
+        """
+
+        fractures_df = self.fractures.entity_df
+        boundaries_df = self.boundaries.entity_df
+
+        if self.nodes is not None:
+            nodes_df = self.nodes.entity_df
+            df = pd.concat([nodes_df, fractures_df, boundaries_df], ignore_index=True)
+        else:
+            df = pd.concat([fractures_df, boundaries_df], ignore_index=True)
+
+        df['id'] = df.index
+
+        return df
+
+    @entity_df.setter
     def entity_df(self, gdf: GeoDataFrame):
         """
         FractureNetworks modify the entity_df by extracting the different types
@@ -354,15 +391,19 @@ class FractureNetwork(BaseEntity):
 
         """
 
-        self._df = gdf
-        fractures = Fractures(self._df.loc[self._df['type'] == 'fracture'])
-        boundary = Boundary(self._df.loc[self._df['type'] == 'boundary'])
-        nodes = Nodes(self._df.loc[self._df['type'] == 'node'])
+        # self._df = gdf
+        nodes = Nodes(gdf.loc[gdf['type'] == 'node'])
+        fractures = Fractures(gdf.loc[gdf['type'] == 'fracture'])
+        boundary = Boundary(gdf.loc[gdf['type'] == 'boundary'])
+
+        self.nodes = nodes
         self.fractures = fractures
         self.boundaries = boundary
-        self.nodes = nodes
 
-    def _process_vtk(self):
+        # print(self.boundaries.entity_df)
+
+    @BaseEntity.vtk_object.setter
+    def vtk_object(self, obj: DataSet):
         """
         FractureNetworks modify the vtkObject by extracting the different types
         (fractures, boundaries, nodes). After that, the appropriate vtkObject is
@@ -373,9 +414,8 @@ class FractureNetwork(BaseEntity):
         This is an internal method that is called when a vtk is set.
         """
 
-        frac_net_vtk = self.vtk_object
-        frac_vtk = frac_net_vtk.extract_cells(frac_net_vtk.cell_data['type'] == 'fracture')
-        bound_vtk = frac_net_vtk.extract_cells(frac_net_vtk.cell_data['type'] == 'boundary')
+        frac_vtk = obj.extract_cells(obj.cell_data['type'] == 'fracture')
+        bound_vtk = obj.extract_cells(obj.cell_data['type'] == 'boundary')
 
         self.fractures.vtk_object = frac_vtk
         self.boundaries.vtk_object = bound_vtk
@@ -391,20 +431,7 @@ class FractureNetwork(BaseEntity):
         :param name: Name of the fractures added (for example set_1). By default is None
         """
 
-        # If the FractureNetwork df is empty use this as the start.
-        # If not then append the Fracture base entity df information to the
-        # existing df
-        if self.entity_df is None:
-            df = fractures.entity_df
-        else:
-            df = GeoDataFrame(
-                    pd.concat(
-                        [self.entity_df, fractures.entity_df[['type', 'geometry']]],
-                        ignore_index=True)
-            )
-
         self.fractures = fractures
-        self.entity_df = df
 
     def add_boundaries(self, boundaries: Boundary):
         """
@@ -413,20 +440,7 @@ class FractureNetwork(BaseEntity):
         :param boundaries: Boundaries object
         """
 
-        # If the FractureNetwork df is empty use this as the start.
-        # If not then append the Boundary base entity df information to the
-        # existing df
-        if self.entity_df is None:
-            df = boundaries.entity_df
-        else:
-            df = GeoDataFrame(
-                pd.concat(
-                    [self.entity_df,
-                     boundaries.entity_df[['type', 'geometry']]],
-                    ignore_index=True)
-            )
         self.boundaries = boundaries
-        self.entity_df = df
 
     def add_nodes(self, nodes: Nodes):
         """
@@ -438,14 +452,5 @@ class FractureNetwork(BaseEntity):
         # If the FractureNetwork df is empty use this as the start.
         # If not then append the Nodes base entity df information to the
         # existing df
-        if self.entity_df is None:
-            df = nodes.entity_df
-        else:
-            df = GeoDataFrame(
-                pd.concat(
-                    [self.entity_df,
-                     nodes.entity_df[['type', 'node_type', 'geometry']]],
-                    ignore_index=True)
-            )
+
         self.nodes = nodes
-        self.entity_df = df

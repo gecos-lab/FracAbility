@@ -3,7 +3,7 @@ from copy import deepcopy
 from matplotlib import pyplot as plt
 from vtkmodules.vtkFiltersCore import vtkConnectivityFilter
 
-from fracability.Entities import FractureNetwork, Nodes
+from fracability.Entities import BaseEntity, FractureNetwork, Nodes
 
 from shapely.geometry import Point
 from geopandas import GeoDataFrame
@@ -11,14 +11,10 @@ from pyvista import PolyData
 import numpy as np
 
 
-def nodes_conn(obj: FractureNetwork, inplace=True):
+def nodes_conn(obj: BaseEntity, inplace=True):
 
-    frac_net = obj
-    frac_net_df = frac_net.entity_df.copy()
-    frac_net_vtk = frac_net.vtk_object
-    fractures = frac_net.fractures
-    fractures_vtk = fractures.vtk_object
-    adj_dict = obj.network_object.adj
+    network = obj.network_object
+    vtk_obj = obj.vtk_object
 
     class_list = []
 
@@ -32,23 +28,27 @@ def nodes_conn(obj: FractureNetwork, inplace=True):
         -9999: 'Nan'
     }
 
-    n_nodes = fractures_vtk.n_points
+    if isinstance(obj, FractureNetwork):
+        fractures_vtk = obj.fractures.vtk_object
+        nodes_id = obj.vtk_object.cell_id(fractures_vtk.points)
+        print(nodes_id)
+    n_nodes = vtk_obj.n_points
     node_geometry = []
-    for node in fractures_vtk['vtkOriginalPointIds']:  # For each node of the fractures:
+    for node in range(n_nodes):  # For each node of the fractures:
         # print(f'Classifying node {node} of {n_nodes} ', end='\r')
 
-        n_edges = len(adj_dict[node].keys())  # Calculate number of connected nodes
+        n_edges = network.degree[node]  # Calculate number of connected nodes
 
-        point = Point(fractures_vtk.points[node])
+        point = Point(vtk_obj.points[node])
 
         if n_edges == 2:  # Remove internal and V nodes
             n_edges = -9999
         elif n_edges == 3:  # Discriminate Y and U nodes
-            cells = frac_net_vtk.extract_points(node)
+            cells = vtk_obj.extract_points(node)
             if 'boundary' in cells.cell_data['type']:
                 n_edges = 5
-                index = frac_net_vtk['RegionId'][node]
-                frac_net_df.loc[index, 'censored'] = 1
+                index = vtk_obj['RegionId'][node]
+                obj.entity_df.loc[index, 'censored'] = 1
         elif n_edges > 4:
             n_edges = -9999
 
@@ -70,17 +70,11 @@ def nodes_conn(obj: FractureNetwork, inplace=True):
     # fractures_vtk['class_names'] = class_names
     # extr_nodes = fractures_vtk.extract_points(fractures_vtk['class_id'] >= 0, include_cells=False)
 
-    entity_df = GeoDataFrame({'type': 'node', 'node_type': class_list, 'geometry': node_geometry},crs=frac_net_df.crs)
+    entity_df = GeoDataFrame({'type': 'node', 'node_type': class_list, 'geometry': node_geometry},
+                             crs=obj.entity_df.crs)
     fracture_nodes = Nodes(entity_df)
 
-    if inplace:
-        obj.entity_df = frac_net_df
-        obj.add_nodes(fracture_nodes)
-    else:
-        copy_obj = deepcopy(obj)
-        copy_obj.entity_df = frac_net_df
-        copy_obj.add_nodes(fracture_nodes)
-        return copy_obj
+    return fracture_nodes
 
 
 def find_backbone(obj: FractureNetwork) -> PolyData:

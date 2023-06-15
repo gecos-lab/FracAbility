@@ -12,6 +12,8 @@ from abc import ABC, abstractmethod
 import networkx as nx
 from vtkmodules.vtkFiltersGeometry import vtkGeometryFilter
 
+from fracability.operations.Cleaners import connect_dots
+
 
 def vtk_rep(input_df: geopandas.GeoDataFrame) -> PolyData:
     appender = vtkAppendPolyData()
@@ -44,8 +46,9 @@ def vtk_rep(input_df: geopandas.GeoDataFrame) -> PolyData:
     geometry_filter.Update()
 
     output_obj = PolyData(geometry_filter.GetOutput())
+    conn_obj = connect_dots(output_obj)
 
-    return output_obj
+    return conn_obj
 
 
 def networkx_rep(input_object: PolyData) -> networkx.Graph:
