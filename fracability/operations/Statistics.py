@@ -13,8 +13,6 @@ from copy import deepcopy
 
 from fracability.utils import statistics
 
-sns.set_theme()
-
 
 class AbstractStatistics(ABC):
 
@@ -87,6 +85,10 @@ class AbstractStatistics(ABC):
     def ecdf(self):
         return ss.ecdf(self._data)
 
+    @property
+    def function_list(self):
+        return self._function_list
+
 
 class NetworkFitter(AbstractStatistics):
 
@@ -104,7 +106,7 @@ class NetworkFitter(AbstractStatistics):
         self._distribution = None
         self._accepted_fit: list = []
         self._rejected_fit: list = []
-        self._fit_dataframe: DataFrame = DataFrame(columns=['name', 'AICc', 'BIC', 'log_likelyhood', 'distribution', 'params'])
+        self._fit_dataframe: DataFrame = DataFrame(columns=['name', 'AICc', 'BIC', 'log_likelihood', 'distribution', 'params'])
 
     @property
     def dist(self):

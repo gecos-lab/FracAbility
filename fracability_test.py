@@ -7,7 +7,8 @@ import pyvista as pv
 from fracability import Entities
 from fracability.operations.Geometry import center_object, tidy_intersections
 from fracability.operations.Topology import nodes_conn
-import fracability.Representations as rep
+import fracability.Plotters as plotters
+
 from fracability.operations.Statistics import NetworkFitter
 
 
@@ -50,33 +51,9 @@ tidy_intersections(fracture_net)
 
 nodes = nodes_conn(fracture_net)
 
-# print(fracture_net.entity_df)
-#
-# nodes = fracture_net.nodes.vtk_object
+print(nodes.node_count)
 
-nodes.vtk_object.set_active_scalars('node_type')
+fracture_net.add_nodes(nodes)
 
-plotter = pv.Plotter()
-
-# plotter.add_mesh(fracture_net.boundaries.vtk_object, color='red')
-plotter.add_mesh(fracture_net.vtk_object, color='white')
-
-plotter.add_mesh(nodes.vtk_object, render_points_as_spheres=True, point_size=8)
-# print('ciao')
-# plotter.add_mesh(fractures.vtk_object.points, render_points_as_spheres=True, point_size=8)
-plotter.show()
-#
-
-# fitter = NetworkFitter(fracture_net)
-#
-# # fitter.fit('lognorm')
-# # fitter.fit('norm')
-# # fitter.fit('weibull_min')
-# # fitter.fit('exponnorm')
-#
-# # print(fitter.fit_records)
-#
-# best_fit = fitter.find_best_distribution()
-#
-# print(best_fit)
+plotters.matplot_ternary(fracture_net)
 

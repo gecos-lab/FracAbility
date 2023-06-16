@@ -13,8 +13,9 @@ import numpy as np
 
 def nodes_conn(obj: BaseEntity, inplace=True):
 
-    network = obj.network_object
+    network_obj = obj.network_object
     vtk_obj = obj.vtk_object
+    entity_df_obj = obj.entity_df
 
     frac_idx = np.where(vtk_obj.point_data['type'] == 'fracture')[0]
 
@@ -33,9 +34,9 @@ def nodes_conn(obj: BaseEntity, inplace=True):
     # n_nodes = vtk_obj.n_points
     node_geometry = []
     for node in frac_idx:  # For each node of the fractures:
-        print(f'Classifying node {node} of {len(frac_idx)} ', end='\r')
+        # print(f'Classifying node {node} of {len(frac_idx)} ', end='\r')
 
-        n_edges = network.degree[node]  # Calculate number of connected nodes
+        n_edges = network_obj.degree[node]  # Calculate number of connected nodes
 
         point = Point(vtk_obj.points[node])
 
@@ -46,12 +47,14 @@ def nodes_conn(obj: BaseEntity, inplace=True):
             if 'boundary' in cells.cell_data['type']:
                 n_edges = 5
                 index = vtk_obj['RegionId'][node]
-                obj.entity_df.loc[index, 'censored'] = 1
+                entity_df_obj.loc[index, 'censored'] = 1
         elif n_edges > 4:
             n_edges = -9999
 
         node_geometry.append(point)
         class_list.append(n_edges)  # Append the value (number of connected nodes)
+
+    obj.entity_df = entity_df_obj
 
     node_geometry = np.array(node_geometry)
 
@@ -61,14 +64,6 @@ def nodes_conn(obj: BaseEntity, inplace=True):
 
     node_geometry = node_geometry[indexes]
     class_list = class_list[indexes]
-
-
-    # class_names = [class_dict[i] for i in class_list]
-
-    # fractures_vtk['class_id'] = class_list
-    #
-    # fractures_vtk['class_names'] = class_names
-    # extr_nodes = fractures_vtk.extract_points(fractures_vtk['class_id'] >= 0, include_cells=False)
 
     entity_df = GeoDataFrame({'type': 'node', 'node_type': class_list, 'geometry': node_geometry},
                              crs=obj.entity_df.crs)

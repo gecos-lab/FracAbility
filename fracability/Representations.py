@@ -5,9 +5,9 @@ import geopandas
 import networkx
 import numpy as np
 from pyvista import PolyData, lines_from_points
-from shapely.geometry import Point
+
 from vtkmodules.vtkFiltersCore import vtkAppendPolyData
-from abc import ABC, abstractmethod
+
 import networkx as nx
 from vtkmodules.vtkFiltersGeometry import vtkGeometryFilter
 
@@ -85,36 +85,6 @@ def fracture_network_rep(input_df: geopandas.GeoDataFrame) -> PolyData:
     return conn_obj
 
 
-# def vtk_rep(input_df: geopandas.GeoDataFrame) -> PolyData:
-#     appender = vtkAppendPolyData()
-#
-#     for index, geom, l_type in zip(input_df.index, input_df['geometry'], input_df['type']):  # For each geometry in the df
-#
-#         x, y = geom.coords.xy  # get xy as an array
-#         z = np.zeros_like(x)  # create a zeros z array with the same dim of the x (or y)
-#
-#         points = np.stack((x, y, z), axis=1)  # Stack the coordinates to a [n,3] shaped array
-#         # offset = np.round(points[0][0])
-#         pv_obj = lines_from_points(points)  # Create the corresponding vtk line with the given points
-#         pv_obj.cell_data['type'] = [l_type] * pv_obj.GetNumberOfCells()
-#         pv_obj.point_data['type'] = [l_type] * pv_obj.GetNumberOfPoints()
-#
-#         pv_obj['RegionId'] = [index] * pv_obj.GetNumberOfPoints()
-#
-#         # line.plot()
-#
-#         appender.AddInputData(pv_obj)  # Add the new object
-#
-#     geometry_filter = vtkGeometryFilter()
-#     geometry_filter.SetInputConnection(appender.GetOutputPort())
-#     geometry_filter.Update()
-#
-#     output_obj = PolyData(geometry_filter.GetOutput())
-#     conn_obj = connect_dots(output_obj)
-#
-#     return conn_obj
-
-
 def networkx_rep(input_object: PolyData) -> networkx.Graph:
 
     network = input_object
@@ -132,38 +102,5 @@ def networkx_rep(input_object: PolyData) -> networkx.Graph:
 
     output_obj = network
     return output_obj
-
-
-
-
-
-    # def plot(self):
-    #     """
-    #     Method used to plot the networkx graph
-    #     :return:
-    #     """
-    #
-    #     nx.draw(self.output_obj)
-    #     plt.show()
-
-
-# class GPDRepr(Representation):
-#     """
-#     Get the Geopandas dataframe representation of a vtk object
-#     """
-#     def set_input(self,repr_obj: BaseEntity):
-#
-#     def get_output(self, repr_obj: PolyData) -> geopandas.GeoDataFrame:
-#
-#         gdf = geopandas.GeoDataFrame(pandas.DataFrame(
-#             {'type': [], 'U-nodes': [], 'geometry': []}))
-#
-#         ids = set(repr_obj['RegionId'])
-#         for i, idx in enumerate(ids):
-#             extr = repr_obj.extract_points(repr_obj['RegionId'] == idx)
-#             points = extr.points
-#             line = LineString(points)
-#             extr_type = list(set(extr['type']))[0]
-
 
 
