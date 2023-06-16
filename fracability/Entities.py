@@ -7,7 +7,7 @@ entity.
 
 from geopandas import GeoDataFrame
 import pandas as pd
-from shapely.geometry import MultiLineString, Polygon, LineString
+from shapely.geometry import MultiLineString, Polygon, LineString, Point
 from pyvista import PolyData, DataSet
 from networkx import Graph
 from vtkmodules.vtkFiltersGeometry import vtkGeometryFilter
@@ -80,7 +80,7 @@ class BaseEntity(ABC):
     def entity_df(self, gdf: GeoDataFrame):
         pass
 
-    @property
+    @abstractmethod
     def vtk_object(self) -> PolyData:
         """
         Each entity can be represented with a vtk object.
@@ -96,22 +96,7 @@ class BaseEntity(ABC):
 
         When set the DataSet is **cast to a PolyData**.
         """
-
-        if self._vtk_obj is None:
-            obj = Rep.vtk_rep(self.entity_df)
-            return obj
-        else:
-            return self._vtk_obj
-
-    @vtk_object.setter
-    def vtk_object(self, obj: DataSet):
-
-        geometry_filter = vtkGeometryFilter()
-        geometry_filter.SetInputData(obj)
-        geometry_filter.Update()
-
-        self._vtk_obj = PolyData(geometry_filter.GetOutput())
-        self._process_vtk()
+        pass
 
     @property
     def network_object(self) -> Graph:
@@ -145,6 +130,18 @@ class Nodes(BaseEntity):
     """
     Node base entity, represents all the nodes in the network.
     """
+    @property
+    def vtk_object(self) -> PolyData:
+
+        df = self.entity_df
+        vtk_obj = Rep.point_vtk_rep(df)
+        return vtk_obj
+
+    @vtk_object.setter
+    def vtk_object(self, obj: DataSet):
+
+        for index, point in enumerate(obj.points):
+            self.entity_df.loc[self.entity_df['id'] == index, 'geometry'] = Point(point)
 
     @BaseEntity.entity_df.setter
     def entity_df(self, gdf: GeoDataFrame):
@@ -172,6 +169,21 @@ class Fractures(BaseEntity):
     Base entity for fractures
     """
 
+    @property
+    def vtk_object(self):
+        df = self.entity_df
+        vtk_obj = Rep.point_vtk_rep(df)
+        return vtk_obj
+
+    @vtk_object.setter
+    def vtk_object(self, obj: DataSet):
+
+        for region in set(obj['RegionId']):
+            region = obj.extract_points(obj['RegionId'] == region)
+            self.entity_df.loc[self.entity_df['id'] == region, 'geometry'] = LineString(region.points)
+
+
+
     @BaseEntity.entity_df.setter
     def entity_df(self, gdf: GeoDataFrame):
         """
@@ -190,18 +202,24 @@ class Fractures(BaseEntity):
         if 'censored' not in self._df.columns:
             self._df['censored'] = 0
 
-    @BaseEntity.vtk_object.setter
-    def vtk_object(self, obj: DataSet):
-
-        for region in set(obj['RegionId']):
-            region = obj.extract_points(obj['RegionId'] == region)
-            self.entity_df.loc[self.entity_df['id'] == region, 'geometry'] = LineString(region.points)
-
 
 class Boundary(BaseEntity):
     """
     Base entity for boundaries
     """
+
+    @property
+    def vtk_object(self):
+        df = self.entity_df
+        vtk_obj = Rep.point_vtk_rep(df)
+        return vtk_obj
+
+    @vtk_object.setter
+    def vtk_object(self, obj: DataSet):
+
+        for region in set(obj['RegionId']):
+            region = obj.extract_points(obj['RegionId'] == region)
+            self.entity_df.loc[self.entity_df['id'] == region, 'geometry'] = LineString(region.points)
 
     @BaseEntity.entity_df.setter
     def entity_df(self, gdf: GeoDataFrame):
@@ -245,13 +263,6 @@ class Boundary(BaseEntity):
 
         if 'type' not in self._df.columns:
             self._df['type'] = 'boundary'
-
-    @BaseEntity.vtk_object.setter
-    def vtk_object(self, obj: DataSet):
-
-        for region in set(obj['RegionId']):
-            region = obj.extract_points(obj['RegionId'] == region)
-            self.entity_df.loc[self.entity_df['id'] == region, 'geometry'] = LineString(region.points)
 
 
 class FractureNetwork(BaseEntity):
@@ -402,7 +413,13 @@ class FractureNetwork(BaseEntity):
 
         # print(self.boundaries.entity_df)
 
-    @BaseEntity.vtk_object.setter
+    @property
+    def vtk_object(self):
+        df = self.entity_df
+        vtk_obj = Rep.fracture_network_rep(df)
+        return vtk_obj
+
+    @vtk_object.setter
     def vtk_object(self, obj: DataSet):
         """
         FractureNetworks modify the vtkObject by extracting the different types
@@ -416,11 +433,11 @@ class FractureNetwork(BaseEntity):
 
         frac_vtk = obj.extract_cells(obj.cell_data['type'] == 'fracture')
         bound_vtk = obj.extract_cells(obj.cell_data['type'] == 'boundary')
+        node_vtk = obj.extract_points(obj.point_data['type'] == 'nodes', include_cells=False)
 
         self.fractures.vtk_object = frac_vtk
         self.boundaries.vtk_object = bound_vtk
-
-        # node_vtk = frac_net.extract_points(frac_net.point_data['type'] == 'nodes', include_cells=True)
+        self.nodes.vtk_object = node_vtk
 
     def add_fractures(self, fractures: Fractures, name: str = None):
 

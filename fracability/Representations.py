@@ -15,41 +15,32 @@ from fracability.operations.Cleaners import connect_dots
 
 
 def point_vtk_rep(input_df: geopandas.GeoDataFrame) -> PolyData:
-    ...
+
+    points = np.array([point.coords for point in input_df.geometry]).reshape(-1, 3)
+    types = input_df['type'].values
+    node_types = input_df['node_type'].values
+
+    points_vtk = PolyData(points)
+    points_vtk['type'] = types
+    points_vtk['node_type'] = node_types
+
+    return points_vtk
 
 
-def fractures_vtk_rep(input_df: geopandas.GeoDataFrame) -> PolyData:
-    ...
-
-
-def boundaries_vtk_rep(input_df: geopandas.GeoDataFrame) -> PolyData:
-    ...
-
-
-def fracture_network_rep(input_df: geopandas.GeoDataFrame) -> PolyData:
-    ...
-
-
-def vtk_rep(input_df: geopandas.GeoDataFrame) -> PolyData:
+def frac_bound_vtk_rep(input_df: geopandas.GeoDataFrame) -> PolyData:
     appender = vtkAppendPolyData()
-    print(input_df)
 
-    for index, geom, l_type in zip(input_df.index, input_df['geometry'], input_df['type']):  # For each geometry in the df
+    for index, geom, l_type in zip(input_df.index, input_df['geometry'],
+                                   input_df['type']):  # For each geometry in the df
 
         x, y = geom.coords.xy  # get xy as an array
         z = np.zeros_like(x)  # create a zeros z array with the same dim of the x (or y)
 
         points = np.stack((x, y, z), axis=1)  # Stack the coordinates to a [n,3] shaped array
         # offset = np.round(points[0][0])
-        if isinstance(geom, Point):
-            node_type = input_df.loc[index, 'node_type']
-            pv_obj = PolyData(points)
-            pv_obj['type'] = [l_type]
-            pv_obj['node_type'] = [node_type]
-        else:
-            pv_obj = lines_from_points(points)  # Create the corresponding vtk line with the given points
-            pv_obj.cell_data['type'] = [l_type] * pv_obj.GetNumberOfCells()
-            pv_obj.point_data['type'] = [l_type] * pv_obj.GetNumberOfPoints()
+        pv_obj = lines_from_points(points)  # Create the corresponding vtk line with the given points
+        pv_obj.cell_data['type'] = [l_type] * pv_obj.GetNumberOfCells()
+        pv_obj.point_data['type'] = [l_type] * pv_obj.GetNumberOfPoints()
 
         pv_obj['RegionId'] = [index] * pv_obj.GetNumberOfPoints()
 
@@ -65,6 +56,63 @@ def vtk_rep(input_df: geopandas.GeoDataFrame) -> PolyData:
     conn_obj = connect_dots(output_obj)
 
     return conn_obj
+
+
+def fracture_network_rep(input_df: geopandas.GeoDataFrame) -> PolyData:
+    nodes_df = input_df.loc[input_df['type'] == 'node']
+    fractures_df = input_df.loc[input_df['type'] == 'fracture']
+    boundaries_df = input_df.loc[input_df['type'] == 'boundary']
+
+    nodes_vtk = point_vtk_rep(nodes_df)
+    fractures_vtk = frac_bound_vtk_rep(fractures_df)
+    boundaries_vtk = frac_bound_vtk_rep(boundaries_df)
+
+    appender = vtkAppendPolyData()
+
+    appender.AddInputData(nodes_vtk)
+    appender.AddInputData(fractures_vtk)
+    appender.AddInputData(boundaries_vtk)
+
+    appender.Update()
+
+    geometry_filter = vtkGeometryFilter()
+    geometry_filter.SetInputConnection(appender.GetOutputPort())
+    geometry_filter.Update()
+
+    output_obj = PolyData(geometry_filter.GetOutput())
+    conn_obj = connect_dots(output_obj)
+
+    return conn_obj
+
+
+# def vtk_rep(input_df: geopandas.GeoDataFrame) -> PolyData:
+#     appender = vtkAppendPolyData()
+#
+#     for index, geom, l_type in zip(input_df.index, input_df['geometry'], input_df['type']):  # For each geometry in the df
+#
+#         x, y = geom.coords.xy  # get xy as an array
+#         z = np.zeros_like(x)  # create a zeros z array with the same dim of the x (or y)
+#
+#         points = np.stack((x, y, z), axis=1)  # Stack the coordinates to a [n,3] shaped array
+#         # offset = np.round(points[0][0])
+#         pv_obj = lines_from_points(points)  # Create the corresponding vtk line with the given points
+#         pv_obj.cell_data['type'] = [l_type] * pv_obj.GetNumberOfCells()
+#         pv_obj.point_data['type'] = [l_type] * pv_obj.GetNumberOfPoints()
+#
+#         pv_obj['RegionId'] = [index] * pv_obj.GetNumberOfPoints()
+#
+#         # line.plot()
+#
+#         appender.AddInputData(pv_obj)  # Add the new object
+#
+#     geometry_filter = vtkGeometryFilter()
+#     geometry_filter.SetInputConnection(appender.GetOutputPort())
+#     geometry_filter.Update()
+#
+#     output_obj = PolyData(geometry_filter.GetOutput())
+#     conn_obj = connect_dots(output_obj)
+#
+#     return conn_obj
 
 
 def networkx_rep(input_object: PolyData) -> networkx.Graph:

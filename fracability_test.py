@@ -2,25 +2,23 @@
 import geopandas as gpd
 
 import pyvista as pv
-import reliability.Reliability_testing
-from matplotlib import pyplot as plt
-import numpy as np
-import scipy.stats as ss
+
 
 from fracability import Entities
 from fracability.operations.Geometry import center_object, tidy_intersections
 from fracability.operations.Topology import nodes_conn
+import fracability.Representations as rep
 from fracability.operations.Statistics import NetworkFitter
 
 
-n_path = 'fracability/datasets/frac_pesce.shp'
-b_path = 'fracability/datasets/grid_pesce.shp'
+# n_path = 'fracability/datasets/frac_pesce.shp'
+# b_path = 'fracability/datasets/grid_pesce.shp'
 #
 # n1_path = '/home/gabriele/STORAGE/Unibro/Libri-e-dispense/Magistrale/Tesi/pz_pers/test_reti/attachments/Set_1.shp'
 # n2_path = '/home/gabriele/STORAGE/Unibro/Libri-e-dispense/Magistrale/Tesi/pz_pers/test_reti/attachments/Set_2.shp'
 #
-# n_path = 'fracability/datasets/Fracture_network.shp'
-# b_path = 'fracability/datasets/Interpretation_boundary_laghettoSalza.shp'
+n_path = 'fracability/datasets/Fracture_network.shp'
+b_path = 'fracability/datasets/Interpretation_boundary_laghettoSalza.shp'
 
 
 fracs = gpd.read_file(n_path)
@@ -51,13 +49,12 @@ tidy_intersections(fracture_net)
 
 
 nodes = nodes_conn(fracture_net)
-print('ciao')
+
 # print(fracture_net.entity_df)
 #
 # nodes = fracture_net.nodes.vtk_object
 
 nodes.vtk_object.set_active_scalars('node_type')
-print('ciao')
 
 plotter = pv.Plotter()
 
@@ -65,7 +62,7 @@ plotter = pv.Plotter()
 plotter.add_mesh(fracture_net.vtk_object, color='white')
 
 plotter.add_mesh(nodes.vtk_object, render_points_as_spheres=True, point_size=8)
-print('ciao')
+# print('ciao')
 # plotter.add_mesh(fractures.vtk_object.points, render_points_as_spheres=True, point_size=8)
 plotter.show()
 #
