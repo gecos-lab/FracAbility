@@ -10,94 +10,10 @@ import pandas as pd
 from shapely.geometry import MultiLineString, Polygon, LineString, Point
 from pyvista import PolyData, DataSet
 from networkx import Graph
-from vtkmodules.vtkFiltersGeometry import vtkGeometryFilter
+import fracability.Plotters as plts
 
 import fracability.Representations as Rep
-from abc import ABCMeta, abstractmethod, abstractproperty
-
-
-class BaseEntity(object):
-    """
-    Abstract class for Fracture network entities:
-
-    1. Nodes
-    2. Fractures
-    3. Boundaries
-    4. Fracture Networks
-    """
-    __metaclass__ = ABCMeta
-
-    def __init__(self, gdf: GeoDataFrame = None):
-        """
-        Init the entity. If a geopandas dataframe is specified then it is
-        set as the source entity df.
-
-        :param gdf: Geopandas dataframe
-        """
-        self._df: GeoDataFrame
-        self.name: str
-
-        if gdf is not None:
-            self.entity_df = gdf
-
-    @property
-    @abstractmethod
-    def entity_df(self) -> GeoDataFrame:
-        """
-        Each entity is based on a geopandas dataframe. This property returns or sets
-        the entity_df of the given entity.
-
-        :getter: Returns the GeoDataFrame
-        :setter: Sets the GeoDataFrame
-        :type: GeoDataFrame
-
-        Notes
-        -------
-        When set, the dataframe is modified to conform to the assigned entity structure.
-        """
-
-        pass
-
-    @entity_df.setter
-    def entity_df(self, gpd: GeoDataFrame = None):
-        self._df = gpd
-
-    @property
-    @abstractmethod
-    def vtk_object(self) -> PolyData:
-        """
-        Each entity can be represented with a vtk object.
-        This returns a Pyvista PolyData object representing the entity_df.
-
-        :getter: Returns a Pyvista PolyData object
-        :setter: Sets a generic Pyvista DataSet
-        :type: pyvista PolyData
-
-        Notes
-        -------
-        When the get method is applied the PolyData is build **on the fly** using the entity_df as a source.
-
-        When set the DataSet is **cast to a PolyData**.
-        """
-        pass
-
-    @property
-    @abstractmethod
-    def network_object(self) -> Graph:
-        """
-        Each entity can be represented with a networkx graph.
-        This returns the network object using the vtk object (and so the df).
-
-        :getter: Returns a networkx Graph object
-        :setter: Sets a Graph object
-        :type: pyvista Graph
-
-        Notes
-        -------
-        When the get method is applied the Graph is build **on the fly** using the object and so the entity_df.
-        """
-
-        pass
+from fracability.AbstractClasses import BaseEntity
 
 
 class Nodes(BaseEntity):
@@ -142,6 +58,12 @@ class Nodes(BaseEntity):
         network_obj = Rep.networkx_rep(self.vtk_object)
         return network_obj
 
+    def matplot(self):
+        plts.matplot_nodes(self)
+
+    def vtkplot(self):
+        plts.vtkplot_nodes(self)
+
     @property
     def node_count(self):
 
@@ -173,9 +95,12 @@ class Nodes(BaseEntity):
 
         return PI, PY, PX, PU, precise_n
 
+
 class Fractures(BaseEntity):
     """
     Base entity for fractures
+
+    + Add method to choose different sets
     """
     @property
     def entity_df(self):
@@ -191,6 +116,8 @@ class Fractures(BaseEntity):
             self._df['type'] = 'fracture'
         if 'censored' not in self._df.columns:
             self._df['censored'] = 0
+        if 'set' not in self._df.columns:
+            self._df['set'] = None
 
     @property
     def vtk_object(self) -> PolyData:
@@ -209,6 +136,12 @@ class Fractures(BaseEntity):
     def network_object(self) -> Graph:
         network_obj = Rep.networkx_rep(self.vtk_object)
         return network_obj
+
+    def matplot(self):
+        plts.matplot_frac_bound(self)
+
+    def vtkplot(self):
+        plts.vtkplot_frac_bound(self)
 
 
 class Boundary(BaseEntity):
@@ -281,6 +214,12 @@ class Boundary(BaseEntity):
         network_obj = Rep.networkx_rep(self.vtk_object)
         return network_obj
 
+    def matplot(self):
+        plts.matplot_frac_bound(self)
+
+    def vtkplot(self):
+        plts.vtkplot_frac_bound(self)
+
 
 class FractureNetwork(BaseEntity):
     """
@@ -317,66 +256,6 @@ class FractureNetwork(BaseEntity):
 
         # Use the base entity init.
         super().__init__(gdf)
-
-    @property
-    def fractures(self) -> Fractures:
-        """
-        Retrieve the fracture objects
-
-        :return: A fracture object
-        """
-
-        return self._fractures
-
-    @fractures.setter
-    def fractures(self, frac_obj: Fractures):
-        """
-        Set the fracture objects
-
-        :param frac_obj:  Fracture object to be set
-        """
-
-        self._fractures = frac_obj
-
-    @property
-    def boundaries(self) -> Boundary:
-        """
-        Retrieve the Boundary object
-
-        :return: The boundary object
-        """
-
-        return self._boundaries
-
-    @boundaries.setter
-    def boundaries(self, bound_obj: Boundary):
-        """
-        Set the boundary objects
-
-        :param bound_obj: Boundary object
-        """
-
-        self._boundaries = bound_obj
-
-    @property
-    def nodes(self) -> Nodes:
-        """
-        Retrieve the nodes of the FractureNetwork
-
-        :return: Nodes of the fracture network
-        """
-
-        return self._nodes
-
-    @nodes.setter
-    def nodes(self, nodes_obj: Nodes):
-        """
-        Set the nodes of the FractureNetwork
-
-        :param nodes_obj: Nodes to be set
-        """
-
-        self._nodes = nodes_obj
 
     @property
     def entity_df(self) -> GeoDataFrame:
@@ -461,7 +340,73 @@ class FractureNetwork(BaseEntity):
         network_obj = Rep.networkx_rep(self.vtk_object)
         return network_obj
 
-    def add_fractures(self, fractures: Fractures, name: str = None):
+    def matplot(self):
+        plts.matplot_frac_net(self)
+
+    def vtkplot(self):
+        plts.vtkplot_frac_net(self)
+
+    @property
+    def fractures(self) -> Fractures:
+        """
+        Retrieve the fracture objects
+
+        :return: A fracture object
+        """
+
+        return self._fractures
+
+    @fractures.setter
+    def fractures(self, frac_obj: Fractures):
+        """
+        Set the fracture objects
+
+        :param frac_obj:  Fracture object to be set
+        """
+
+        self._fractures = frac_obj
+
+    @property
+    def boundaries(self) -> Boundary:
+        """
+        Retrieve the Boundary object
+
+        :return: The boundary object
+        """
+
+        return self._boundaries
+
+    @boundaries.setter
+    def boundaries(self, bound_obj: Boundary):
+        """
+        Set the boundary objects
+
+        :param bound_obj: Boundary object
+        """
+
+        self._boundaries = bound_obj
+
+    @property
+    def nodes(self) -> Nodes:
+        """
+        Retrieve the nodes of the FractureNetwork
+
+        :return: Nodes of the fracture network
+        """
+
+        return self._nodes
+
+    @nodes.setter
+    def nodes(self, nodes_obj: Nodes):
+        """
+        Set the nodes of the FractureNetwork
+
+        :param nodes_obj: Nodes to be set
+        """
+
+        self._nodes = nodes_obj
+
+    def add_fractures(self, fractures: list, name: str = None):
 
         """
         Method used to add fractures to the FractureNetwork
@@ -470,7 +415,15 @@ class FractureNetwork(BaseEntity):
         :param name: Name of the fractures added (for example set_1). By default is None
         """
 
-        self.fractures = fractures
+        new_df = GeoDataFrame(columns=fractures[0].entity_df.columns, crs=fractures[0].entity_df.crs)
+
+        for i, fracture_obj in enumerate(fractures):
+            obj_df = fracture_obj.entity_df
+            obj_df['set'] = i+1
+            new_df = pd.concat([new_df, obj_df], ignore_index=True)
+
+        new_fractures = Fractures(new_df)
+        self.fractures = new_fractures
 
     def add_boundaries(self, boundaries: Boundary):
         """
