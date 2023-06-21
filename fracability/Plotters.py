@@ -45,77 +45,73 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from pyvista import Plotter
 import ternary
-from fracability.Entities import BaseEntity
-from fracability.operations.Statistics import AbstractStatistics
+from fracability.operations.Statistics import NetworkDistribution
 import numpy as np
 
 
-def matplot_entity(entity: BaseEntity, markersize=5):
+def matplot_nodes(entity, markersize=5, return_ax=False):
 
-    """
-    Plot the given entity using matplotlib
-    :param markersize:
-    :param entity:
-    :return:
-    """
+    if 'Fracture net plot' not in plt.get_figlabels():
+        figure = plt.figure(num=f'Fractures plot')
 
-    name = entity.__class__.__name__
-
-    figure = plt.figure(num=f'{name} plot')
-
-    ax = plt.subplot(111)
-
-    if name == 'Nodes':
-
-        points = entity.vtk_object.points
-        node_types = entity.vtk_object['node_type']
-        I = np.where(node_types == 1)
-        Y = np.where(node_types == 3)
-        X = np.where(node_types == 4)
-        U = np.where(node_types == 5)
-
-        ax.plot(points[I][:, 0], points[I][:, 1], 'or', markersize=markersize)
-        ax.plot(points[Y][:, 0], points[Y][:, 1], '^g', markersize=markersize)
-        ax.plot(points[X][:, 0], points[X][:, 1], 'sb', markersize=markersize)
-        ax.plot(points[U][:, 0], points[U][:, 1], 'py', markersize=markersize)
-
-    elif name == 'Fractures':
-        entity.entity_df.plot(ax=ax, color='black')
-
-    elif name == 'Boundary':
-        entity.entity_df.plot(ax=ax, color='blue')
+        ax = plt.subplot(111)
     else:
-        nodes = entity.nodes
-        fractures = entity.fractures
-        boundaries = entity.boundaries
+        ax = plt.gca()
 
-        points = nodes.vtk_object.points
-        node_types = nodes.vtk_object['node_type']
-        I = np.where(node_types == 1)
-        Y = np.where(node_types == 3)
-        X = np.where(node_types == 4)
-        U = np.where(node_types == 5)
+    points = entity.vtk_object.points
+    node_types = entity.vtk_object['node_type']
+    I = np.where(node_types == 1)
+    Y = np.where(node_types == 3)
+    X = np.where(node_types == 4)
+    U = np.where(node_types == 5)
 
-        fractures.entity_df.plot(ax=ax, color='black')
-        boundaries.entity_df.plot(ax=ax, color='blue')
-        ax.plot(points[I][:, 0], points[I][:, 1], 'ob', markersize=markersize)
-        ax.plot(points[Y][:, 0], points[Y][:, 1], '^g', markersize=markersize)
-        ax.plot(points[X][:, 0], points[X][:, 1], 'sr', markersize=markersize)
-        ax.plot(points[U][:, 0], points[U][:, 1], 'py', markersize=markersize)
+    ax.plot(points[I][:, 0], points[I][:, 1], 'or', markersize=markersize)
+    ax.plot(points[Y][:, 0], points[Y][:, 1], '^g', markersize=markersize)
+    ax.plot(points[X][:, 0], points[X][:, 1], 'sb', markersize=markersize)
+    ax.plot(points[U][:, 0], points[U][:, 1], 'py', markersize=markersize)
 
-    plt.show()
+    if return_ax:
+        return ax
+    else:
+        plt.show()
 
 
-def plot_vtk_entity(entity: BaseEntity, pointsize=7):
+def matplot_frac_bound(entity, linewidth=2, color='black', return_ax=False):
 
-    """
-    Plot the given entity using vtk
-    :param pointsize:
-    :param entity:
-    :return:
-    """
+    if 'Fracture net plot' not in plt.get_figlabels():
+        figure = plt.figure(num=f'Fractures plot')
 
-    name = entity.__class__.__name__
+        ax = plt.subplot(111)
+    else:
+        ax = plt.gca()
+
+    entity.entity_df.plot(ax=ax, color=color, linewidth=linewidth)
+
+    if return_ax:
+        return ax
+    else:
+        plt.show()
+
+
+def matplot_frac_net(entity, markersize=5, linewidth=2, color=['black', 'blue'], return_ax=False):
+
+    figure = plt.figure(num=f'Fracture net plot')
+    ax = plt.subplot(111)
+    points = entity.nodes
+    fractures = entity.fractures
+    boundary = entity.boundaries
+
+    matplot_frac_bound(fractures, color=color[0], return_ax=True)
+    matplot_frac_bound(boundary, color=color[1], return_ax=True)
+    matplot_nodes(points, return_ax=True)
+
+    if return_ax:
+        return ax
+    else:
+        plt.show()
+
+
+def vtkplot_nodes(entity, markersize=7, return_plot= False):
 
     plotter = Plotter()
 
@@ -133,79 +129,71 @@ def plot_vtk_entity(entity: BaseEntity, pointsize=7):
         'U': 'Yellow'
     }
 
+    nodes = entity.vtk_object
 
-    if name == 'Nodes':
+    class_names = [class_dict[i] for i in nodes['node_type']]
 
-        nodes = entity.vtk_object
+    used_tags = list(set(class_names))
+    used_tags.sort()
+    cmap = [cmap_dict[i] for i in used_tags]
 
-        class_names = [class_dict[i] for i in nodes['node_type']]
+    sargs = dict(interactive=False,
+                 vertical=False,
+                 height=0.1,
+                 title_font_size=16,
+                 label_font_size=14)
 
-        used_tags = list(set(class_names))
-        used_tags.sort()
-        cmap = [cmap_dict[i] for i in used_tags]
+    actor = plotter.add_mesh(nodes,
+                             scalars=class_names,
+                             render_points_as_spheres=True,
+                             point_size=markersize,
+                             show_scalar_bar=True,
+                             scalar_bar_args=sargs,
+                             cmap=cmap)
 
-        sargs = dict(interactive=False,
-                     vertical=False,
-                     height=0.1,
-                     title_font_size=16,
-                     label_font_size=14)
-
-        plotter.add_mesh(nodes,
-                         scalars=class_names,
-                         render_points_as_spheres=True,
-                         point_size=pointsize,
-                         show_scalar_bar=True,
-                         scalar_bar_args=sargs,
-                         cmap=cmap)
-
-    elif name == 'Fractures':
-        plotter.add_mesh(entity.vtk_object,
-                         color='white',
-                         line_width=1,
-                         show_scalar_bar=False)
-    elif name == 'Boundaries':
-        plotter.add_mesh(entity.vtk_object,
-                         color='blue',
-                         line_width=1,
-                         show_scalar_bar=False)
-
+    if return_plot:
+        return actor
     else:
-        nodes = entity.nodes.vtk_object
-        fractures = entity.fractures.vtk_object
-        boundaries = entity.boundaries.vtk_object
-
-        class_names = [class_dict[i] for i in nodes['node_type']]
-
-        used_tags = list(set(class_names))
-        used_tags.sort()
-        cmap = [cmap_dict[i] for i in used_tags]
-
-        sargs = dict(interactive=False,
-                     vertical=False,
-                     height=0.1,
-                     title_font_size=16,
-                     label_font_size=14)
-
-        plotter.add_mesh(fractures,
-                         color='white',
-                         line_width=1,
-                         show_scalar_bar=False)
-        plotter.add_mesh(boundaries,
-                         color='white',
-                         line_width=1,
-                         show_scalar_bar=False)
-
-        plotter.add_mesh(nodes,
-                         scalars=class_names,
-                         render_points_as_spheres=True,
-                         point_size=pointsize,
-                         show_scalar_bar=True,
-                         scalar_bar_args=sargs,
-                         cmap=cmap)
-    plotter.show()
+        plotter.show()
 
 
-def matplot_stats_summary(fitter: AbstractStatistics, x_min: float = 0.0, x_max: float = None, res: int = 200):
+def vtkplot_frac_bound(entity, linewidth=1, color='white', return_plot= False):
+    plotter = Plotter()
+
+    actor = plotter.add_mesh(entity.vtk_object,
+                     color=color,
+                     line_width=linewidth,
+                     show_scalar_bar=False)
+
+    if return_plot:
+        return actor
+    else:
+        plotter.show()
+
+
+def vtkplot_frac_net(entity, markersize=5, linewidth=2, color=['white', 'white'], return_plot = False):
+
+    plotter = Plotter()
+
+    nodes = entity.nodes
+    fractures = entity.fractures
+    boundaries = entity.boundaries
+
+    node_actor = vtkplot_nodes(nodes, return_plot=True)
+    fractures_actor = vtkplot_frac_bound(fractures, color=color[0], return_plot=True)
+    boundary_actor = vtkplot_frac_bound(boundaries, color=color[1], return_plot=True)
+
+    plotter.add_actor(node_actor)
+    plotter.add_actor(fractures_actor)
+    plotter.add_actor(boundary_actor)
+
+    if return_plot:
+        actors = plotter.actors()
+    else:
+        plotter.show()
+
+
+def matplot_stats_summary(network_distribution: NetworkDistribution, function_list: list = ['pdf', 'cdf', 'sf']):
     sns.set_theme()
     """
     Summarize PDF, CDF and SF functions and display mean, std, var, median, mode, 5th and 95th percentile all
@@ -222,84 +210,74 @@ def matplot_stats_summary(fitter: AbstractStatistics, x_min: float = 0.0, x_max:
 
     """
 
-    if x_max is None:
-        x_max = max(fitter.lengths)
-
-    cdf = fitter.ecdf.cdf
+    cdf = network_distribution.ecdf.cdf
     x_vals = cdf.quantiles
 
-    fit_rec = fitter.fit_records
+    distribution = network_distribution.distribution
+    name = network_distribution.distribution_name
 
-    for index, line in fit_rec.iterrows():
+    original_data = network_distribution.fit_data
 
-        dist = line['distribution']
-        name = line['name']
-        aicc = line['AICc']
-        bic = line['BIC']
-        ll = line['log_likelihood']
+    fig = plt.figure(num=f'{name} summary plot', figsize=(13, 7))
+    fig.text(0.5, 0.02, 'Length [m]', ha='center')
+    fig.text(0.5, 0.95, name, ha='center')
+    fig.text(0.04, 0.5, 'Density', va='center', rotation='vertical')
 
-        params = fitter.get_fit_parameters(name)
+    for i, func_name in enumerate(function_list[:3]):
+        func = getattr(distribution, func_name)
 
-        fig = plt.figure(num=f'{name} summary plot', figsize=(13, 7))
-        fig.text(0.5, 0.02, 'Length [m]', ha='center')
-        fig.text(0.5, 0.95, name, ha='center')
-        fig.text(0.04, 0.5, 'Density', va='center', rotation='vertical')
+        y_vals = func(x_vals)
 
-        for i, func_name in enumerate(fitter.function_list[:3]):
-            func = getattr(dist, func_name)
+        plt.subplot(2, 2, i+1)
 
-            y_vals = func(x_vals, *params)
+        sns.lineplot(x=x_vals, y=y_vals, color='r', label=f'{name} {func_name}')
 
-            plt.subplot(2, 2, i+1)
+        if func_name == 'pdf':
+            sns.histplot(original_data.lengths, stat='density', bins=50)
+        if func_name == 'cdf':
+            sns.lineplot(x=x_vals, y=cdf.probabilities, color='b', label='Empirical CDF')
 
-            sns.lineplot(x=x_vals, y=y_vals, color='r', label=f'{name} {func_name}')
+        plt.title(func_name)
+        plt.grid(True)
+        plt.legend()
 
-            if func_name == 'pdf':
-                sns.histplot(fitter.lengths, stat='density', bins=50)
-            if func_name == 'cdf':
-                sns.lineplot(x=x_vals, y=cdf.probabilities, color='b', label='Empirical CDF')
+    plt.subplot(2, 2, i+2)
+    plt.axis("off")
+    plt.ylim([0, 8])
+    plt.xlim([0, 10])
+    dec = 4
 
-            plt.title(func_name)
-            plt.grid(True)
-            plt.legend()
+    text_mean = f'Mean = {np.round(network_distribution.mean, dec)}'
+    text_std = f'Std = {np.round(network_distribution.std, dec)}'
+    text_var = f'Var = {np.round(network_distribution.var, dec)}'
+    text_median = f'Median = {np.round(network_distribution.median, dec)}'
+    text_mode = f'Mode = {np.round(network_distribution.mode, dec)}'
+    text_b5 = f'5th Percentile = {np.round(network_distribution.b5, dec)}'
+    text_b95 = f'95th Percentile = {np.round(network_distribution.b95, dec)}'
 
-        plt.subplot(2, 2, i+2)
-        plt.axis("off")
-        plt.ylim([0, 8])
-        plt.xlim([0, 10])
-        dec = 4
+    plt.text(0, 7.5, 'Summary table')
+    plt.text(0, 6.5, text_mean)
+    plt.text(0, 5.5, text_median)
+    plt.text(0, 4.5, text_mode)
+    plt.text(0, 3.5, text_b5)
+    plt.text(0, 2.5, text_b95)
+    plt.text(0, 1.5, text_std)
+    plt.text(0, 0.5, text_var)
 
-        text_mean = f'Mean = {np.round(dist.mean(*params), 3)}'
-        text_std = f'Std = {round(dist.std(*params), 3)}'
-        text_var = f'Var = {round(dist.var(*params), 3)}'
-        text_median = f'Median = {round(dist.median(*params), 3)}'
-        # text_mode = f'Mode = {round(dist.mode(*params), 3)}'
-        # text_b5 = f'5th Percentile = {round(dist.b5(*params), 3)}'
-        # text_b95 = f'95th Percentile = {round(dist.b95(*params), 3)}'
+    plt.text(6, 7.5, 'Test results:')
 
-        plt.text(0, 7.5, 'Summary table')
-        plt.text(0, 6.5, text_mean)
-        plt.text(0, 5.5, text_median)
-        # plt.text(0, 4.5, text_mode)
-        # plt.text(0, 3.5, text_b5)
-        # plt.text(0, 2.5, text_b95)
-        plt.text(0, 1.5, text_std)
-        plt.text(0, 0.5, text_var)
+    text_crit_val = f'BIC value = {np.round(network_distribution.BIC, 3)}'
+    text_result = f'AICc value = {np.round(network_distribution.AICc, 3)}'
+    text_ks_val = f'Log Likelihood value = {np.round(network_distribution.log_likelihood, 3)}'
 
-        plt.text(6, 7.5, 'Test results:')
-
-        text_result = f'AICc value = {np.round(aicc, 3)}'
-        text_crit_val = f'BIC value = {np.round(bic, 3)}'
-        text_ks_val = f'Log Likelihood value = {np.round(ll, 3)}'
-
-        plt.text(6, 6.5, text_result)
-        plt.text(6, 5.5, text_crit_val)
-        plt.text(6, 4.5, text_ks_val)
+    plt.text(6, 6.5, text_result)
+    plt.text(6, 5.5, text_crit_val)
+    plt.text(6, 4.5, text_ks_val)
 
     plt.show()
 
 
-def matplot_ternary(entity: BaseEntity):
+def matplot_ternary(entity):
 
     """
     Plot the ternary diagram for nodes
