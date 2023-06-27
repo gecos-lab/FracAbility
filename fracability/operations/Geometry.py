@@ -3,7 +3,7 @@ import time
 
 from vtkmodules.vtkFiltersCore import vtkConnectivityFilter, vtkAppendPolyData
 
-from fracability.Entities import BaseEntity
+from fracability.AbstractClasses import BaseEntity
 from fracability.utils.shp_operations import int_node
 import numpy as np
 from copy import deepcopy
@@ -54,11 +54,9 @@ def center_object(obj: BaseEntity, trans_center: np.array = None, return_center:
 
 @Halo(text='Calculating intersections', spinner='line', placement='right')
 def tidy_intersections(obj: BaseEntity, buffer=0.05, inplace: bool = True):
-
     gdf = obj.entity_df.copy()
     df_buffer = gdf.buffer(buffer)
-    
-    start = time.time()
+
     for idx_line1, line in gdf.iterrows():
         if line['type'] == 'boundary':
             continue
@@ -86,7 +84,6 @@ def tidy_intersections(obj: BaseEntity, buffer=0.05, inplace: bool = True):
 
 
 def calculate_seg_length(obj: BaseEntity, regions: [int] = None, inplace: bool = True):
-
     df = obj.entity_df.copy()
 
     lengths = df.length

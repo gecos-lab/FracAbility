@@ -25,7 +25,6 @@ class BaseEntity(ABC):
         :param gdf: Geopandas dataframe
         """
         self._df: GeoDataFrame
-        self.name: str
 
         if gdf is not None:
             self.entity_df = gdf
@@ -102,6 +101,31 @@ class BaseEntity(ABC):
         Plot entity using vtk backend
         :return:
         """
+
+    @property
+    def name(self):
+        return self.__class__.__name__
+
+
+class BaseOperator(ABC):
+    """
+    Abstract class for Operators such as:
+
+    1. Geometry operations
+    2. Topology operations
+    3. Statistics operations
+
+    This class provides a unified input for the different operators since all are based on the BaseObj and associated
+    entity_df
+    """
+
+    def __init__(self, obj: BaseEntity):
+        self.df = obj.entity_df.loc[obj.entity_df['active_set'] == 1].copy()
+        self.obj = obj
+
+    @property
+    def name(self):
+        return self.__class__.__name__
 
 
 class AbstractStatistics(ABC):

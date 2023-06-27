@@ -44,7 +44,7 @@ class Nodes(BaseEntity):
     def vtk_object(self) -> PolyData:
 
         df = self.entity_df
-        vtk_obj = Rep.point_vtk_rep(df)
+        vtk_obj = Rep.node_vtk_rep(df)
         return vtk_obj
 
     @vtk_object.setter
@@ -95,16 +95,21 @@ class Nodes(BaseEntity):
 
         return PI, PY, PX, PU, precise_n
 
+    def ternary_plot(self):
+        plts.matplot_ternary(self)
+
 
 class Fractures(BaseEntity):
     """
     Base entity for fractures
 
-    + Add method to choose different sets
+    + Add method to activate different sets
+    + Add method to plot rose diagram
     """
     @property
     def entity_df(self):
-        return self._df
+        active_df = self._df.loc[self._df['active_set'] == 1].copy()
+        return active_df
 
     @entity_df.setter
     def entity_df(self, gdf: GeoDataFrame):
@@ -118,11 +123,13 @@ class Fractures(BaseEntity):
             self._df['censored'] = 0
         if 'set' not in self._df.columns:
             self._df['set'] = None
+        if 'active_set' not in self._df.columns:
+            self._df['active_set'] = 1
 
     @property
     def vtk_object(self) -> PolyData:
         df = self.entity_df
-        vtk_obj = Rep.frac_bound_vtk_rep(df)
+        vtk_obj = Rep.frac_vtk_rep(df)
         return vtk_obj
 
     @vtk_object.setter
@@ -137,6 +144,16 @@ class Fractures(BaseEntity):
         network_obj = Rep.networkx_rep(self.vtk_object)
         return network_obj
 
+    def activate_set(self, set_number: int = None):
+
+        active_df = self._df.copy()
+        if set_number is None:
+            active_df.loc[:, 'active_set'] = 1
+        else:
+            active_df.loc[:, 'active_set'] = 0
+            active_df.loc[active_df['set'] == set_number, 'active_set'] = 1
+
+        self.entity_df = active_df
     def matplot(self):
         plts.matplot_frac_bound(self)
 
@@ -199,7 +216,7 @@ class Boundary(BaseEntity):
     def vtk_object(self) -> PolyData:
 
         df = self.entity_df
-        vtk_obj = Rep.frac_bound_vtk_rep(df)
+        vtk_obj = Rep.bound_vtk_rep(df)
         return vtk_obj
 
     @vtk_object.setter
@@ -406,21 +423,23 @@ class FractureNetwork(BaseEntity):
 
         self._nodes = nodes_obj
 
-    def add_fractures(self, fractures: list, name: str = None):
+    def add_fractures(self, fractures: Fractures, set_number: int):
 
         """
         Method used to add fractures to the FractureNetwork
 
-        :param fractures: Fracture object
-        :param name: Name of the fractures added (for example set_1). By default is None
+        :param fractures: list of Fracture objects to add
+        :param set_number: Number of the fracture set
         """
+        if self.fractures is None:
+            new_df = GeoDataFrame(columns=fractures.entity_df.columns, crs=fractures.entity_df.crs)
 
-        new_df = GeoDataFrame(columns=fractures[0].entity_df.columns, crs=fractures[0].entity_df.crs)
+        else:
+            new_df = self.fractures.entity_df
 
-        for i, fracture_obj in enumerate(fractures):
-            obj_df = fracture_obj.entity_df
-            obj_df['set'] = i+1
-            new_df = pd.concat([new_df, obj_df], ignore_index=True)
+        obj_df = fractures.entity_df
+        obj_df['set'] = set_number
+        new_df = pd.concat([new_df, obj_df], ignore_index=True)
 
         new_fractures = Fractures(new_df)
         self.fractures = new_fractures

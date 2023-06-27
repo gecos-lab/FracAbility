@@ -18,8 +18,8 @@ from fracability.Plotters import matplot_stats_summary
 # n_path = 'fracability/datasets/frac_pesce.shp'
 # b_path = 'fracability/datasets/grid_pesce.shp'
 #
-n1_path = '/home/gabriele/STORAGE/Unibro/Libri-e-dispense/Magistrale/Tesi/pz_pers/test_reti/attachments/Set_1.shp'
-n2_path = '/home/gabriele/STORAGE/Unibro/Libri-e-dispense/Magistrale/Tesi/pz_pers/test_reti/attachments/Set_2.shp'
+n1_path = 'fracability/datasets/Set_1.shp'
+n2_path = 'fracability/datasets/Set_2.shp'
 #
 n_path = 'fracability/datasets/Fracture_network.shp'
 b_path = 'fracability/datasets/Interpretation_boundary_laghettoSalza.shp'
@@ -42,15 +42,29 @@ fracture_net = Entities.FractureNetwork()
 
 fracture_net.boundaries = boundaries
 
-fracture_net.fractures = fractures
+
+fracture_net.add_fractures(fractures_1, set_number=1)
+fracture_net.add_fractures(fractures_2, set_number=2)
 
 center_object(fracture_net)
 
 tidy_intersections(fracture_net)
 
-nodes = nodes_conn(fracture_net)
 
-fracture_net.nodes = nodes
+# print(fracture_net.vtk_object.array_names)
+#
+# plotter = pv.Plotter()
+#
+# plotter.add_mesh(fracture_net.vtk_object,scalars='set')
+# plotter.show()
+
+nodes_conn(fracture_net)
+
+print(fracture_net.entity_df)
+# fracture_net.nodes = nodes
+
+fracture_net.nodes.ternary_plot()
+
 # fracture_net.matplot()
 
 fitter = NetworkFitter(fracture_net)

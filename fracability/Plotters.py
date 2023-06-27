@@ -120,11 +120,13 @@ def vtkplot_nodes(entity, markersize=7, return_plot= False):
         2: 'V',
         3: 'Y',
         4: 'X',
-        5: 'U'
+        5: 'U',
+        6: 'Y2'
     }
     cmap_dict = {
         'I': 'Blue',
         'Y': 'Green',
+        'Y2': 'Cyan',
         'X': 'Red',
         'U': 'Yellow'
     }
@@ -157,7 +159,36 @@ def vtkplot_nodes(entity, markersize=7, return_plot= False):
         plotter.show()
 
 
-def vtkplot_frac_bound(entity, linewidth=1, color='white', return_plot= False):
+def vtkplot_fractures(entity, linewidth=1, color='white', color_set=False, return_plot=False):
+    plotter = Plotter()
+
+    vtk_object = entity.vtk_object
+    if color_set:
+        if 'set' in vtk_object.array_names:
+            actor = plotter.add_mesh(entity.vtk_object,
+                                     scalars='set',
+                                     line_width=linewidth,
+                                     cmap=['Red','Blue'],
+                                     show_scalar_bar=False)
+        else:
+            actor = plotter.add_mesh(entity.vtk_object,
+                                     color=color,
+                                     line_width=linewidth,
+                                     show_scalar_bar=False)
+    else:
+
+        actor = plotter.add_mesh(entity.vtk_object,
+                         color=color,
+                         line_width=linewidth,
+                         show_scalar_bar=False)
+
+    if return_plot:
+        return actor
+    else:
+        plotter.show()
+
+
+def vtkplot_boundaries(entity, linewidth=1, color='white', return_plot=False):
     plotter = Plotter()
 
     actor = plotter.add_mesh(entity.vtk_object,
@@ -171,17 +202,17 @@ def vtkplot_frac_bound(entity, linewidth=1, color='white', return_plot= False):
         plotter.show()
 
 
-def vtkplot_frac_net(entity, markersize=5, linewidth=2, color=['white', 'white'], return_plot = False):
+def vtkplot_frac_net(entity, markersize=5, linewidth=2, color=['white', 'white'], return_plot=False):
 
     plotter = Plotter()
 
-    nodes = entity.nodes
     fractures = entity.fractures
+    nodes = entity.nodes
     boundaries = entity.boundaries
 
     node_actor = vtkplot_nodes(nodes, return_plot=True)
-    fractures_actor = vtkplot_frac_bound(fractures, color=color[0], return_plot=True)
-    boundary_actor = vtkplot_frac_bound(boundaries, color=color[1], return_plot=True)
+    fractures_actor = vtkplot_fractures(fractures, color=color[0], return_plot=True)
+    boundary_actor = vtkplot_boundaries(boundaries, color=color[1], return_plot=True)
 
     plotter.add_actor(node_actor)
     plotter.add_actor(fractures_actor)
@@ -189,6 +220,7 @@ def vtkplot_frac_net(entity, markersize=5, linewidth=2, color=['white', 'white']
 
     if return_plot:
         actors = plotter.actors()
+        return actors
     else:
         plotter.show()
 
@@ -277,20 +309,19 @@ def matplot_stats_summary(network_distribution: NetworkDistribution, function_li
     plt.show()
 
 
-def matplot_ternary(entity):
+def matplot_ternary(entity, merge_set_intersection=True):
 
     """
     Plot the ternary diagram for nodes
     :param entity: 
     :return: 
     """
-    name = entity.__class__.__name__
     figure, tax = ternary.figure(scale=100)
     figure.set_size_inches(10, 10)
 
-    if name == 'FractureNetwork':
+    if entity.name == 'FractureNetwork':
         nodes = entity.nodes
-    elif name == 'Nodes':
+    elif entity.name == 'Nodes':
         nodes = entity
 
     PI, PY, PX = nodes.node_count[: 3]
@@ -329,7 +360,7 @@ def matplot_ternary(entity):
     tax.left_corner_label("Y", fontsize=15)
 
     tax.get_axes().set_aspect(1)  # This is used to avoid deformation when rescaling the plotter window
-    tax.clear_matplotlib_ticks()
+    # tax.clear_matplotlib_ticks()
     tax.get_axes().axis('off')
 
     plt.show()

@@ -70,7 +70,7 @@ class NetworkData:
         return self.data.__dict__['_uncensored']
 
     @non_censored_lengths.setter
-    def non_censored_lengths(self, complete_length_list: list = []):
+    def non_censored_lengths(self, complete_length_list: list = None):
         self.data = ss.CensoredData(uncensored=complete_length_list, right=self.censored_lengths)
 
     @property
@@ -87,7 +87,7 @@ class NetworkData:
         return self.data.__dict__['_right']
 
     @censored_lengths.setter
-    def censored_lengths(self, censored_length_list: list = []):
+    def censored_lengths(self, censored_length_list: list = None):
         self.data = ss.CensoredData(uncensored=self.non_censored_lengths, right=censored_length_list)
 
     @property
@@ -199,7 +199,6 @@ class NetworkDistribution:
             return self.distribution.logsf(x_values)
         else:
             return np.array([0])
-
 
 
 class NetworkFitter:
