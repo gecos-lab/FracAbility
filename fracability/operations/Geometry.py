@@ -45,6 +45,7 @@ def center_object(obj: BaseEntity, trans_center: np.array = None, return_center:
         return trans_center
 
     if inplace:
+        print(df)
         obj.entity_df = df
     else:
         copy_obj = deepcopy(obj)

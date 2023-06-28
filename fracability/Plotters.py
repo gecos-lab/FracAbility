@@ -163,6 +163,7 @@ def vtkplot_nodes(entity, markersize=7, return_plot= False):
 
 
 def vtkplot_fractures(entity, linewidth=1, color='white', color_set=False, return_plot=False):
+
     plotter = Plotter()
 
     vtk_object = entity.vtk_object
@@ -181,9 +182,9 @@ def vtkplot_fractures(entity, linewidth=1, color='white', color_set=False, retur
     else:
 
         actor = plotter.add_mesh(entity.vtk_object,
-                         color=color,
-                         line_width=linewidth,
-                         show_scalar_bar=False)
+                                 color=color,
+                                 line_width=linewidth,
+                                 show_scalar_bar=False)
 
     if return_plot:
         return actor
@@ -192,6 +193,7 @@ def vtkplot_fractures(entity, linewidth=1, color='white', color_set=False, retur
 
 
 def vtkplot_boundaries(entity, linewidth=1, color='white', return_plot=False):
+
     plotter = Plotter()
 
     actor = plotter.add_mesh(entity.vtk_object,
@@ -209,17 +211,18 @@ def vtkplot_frac_net(entity, markersize=5, linewidth=2, color=['white', 'white']
 
     plotter = Plotter()
 
-    fractures = entity.fractures
     nodes = entity.nodes
+    fractures = entity.fractures
     boundaries = entity.boundaries
-
 
     if nodes is not None:
         node_actor = vtkplot_nodes(nodes, return_plot=True)
         plotter.add_actor(node_actor)
+
     if fractures is not None:
         fractures_actor = vtkplot_fractures(fractures, color=color[0], return_plot=True)
         plotter.add_actor(fractures_actor)
+
     if boundaries is not None:
         boundary_actor = vtkplot_boundaries(boundaries, color=color[1], return_plot=True)
         plotter.add_actor(boundary_actor)

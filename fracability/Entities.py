@@ -158,7 +158,7 @@ class Fractures(BaseEntity):
         plts.matplot_frac_bound(self)
 
     def vtkplot(self):
-        plts.vtkplot_frac_bound(self)
+        plts.vtkplot_fractures(self)
 
 
 class Boundary(BaseEntity):
@@ -235,7 +235,7 @@ class Boundary(BaseEntity):
         plts.matplot_frac_bound(self)
 
     def vtkplot(self):
-        plts.vtkplot_frac_bound(self)
+        plts.vtkplot_boundaries(self)
 
 
 class FractureNetwork(BaseEntity):
@@ -315,15 +315,21 @@ class FractureNetwork(BaseEntity):
         This is an internal method that is called when a df is set.
 
         """
+        node_df = gdf.loc[gdf['type'] == 'node']
+        fractures_df = gdf.loc[gdf['type'] == 'fracture']
+        boundary_df = gdf.loc[gdf['type'] == 'boundary']
 
-        # self._df = gdf
-        nodes = Nodes(gdf.loc[gdf['type'] == 'node'])
-        fractures = Fractures(gdf.loc[gdf['type'] == 'fracture'])
-        boundary = Boundary(gdf.loc[gdf['type'] == 'boundary'])
+        if not node_df.empty:
+            nodes = Nodes(node_df)
+            self.nodes = nodes
 
-        self.nodes = nodes
-        self.fractures = fractures
-        self.boundaries = boundary
+        if not fractures_df.empty:
+            fractures = Fractures(fractures_df)
+            self.fractures = fractures
+
+        if not boundary_df.empty:
+            boundary = Boundary(boundary_df)
+            self.boundaries = boundary
 
         # print(self.boundaries.entity_df)
 

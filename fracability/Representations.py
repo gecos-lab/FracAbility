@@ -93,19 +93,22 @@ def bound_vtk_rep(input_df: geopandas.GeoDataFrame) -> PolyData:
 
 
 def fracture_network_rep(input_df: geopandas.GeoDataFrame) -> PolyData:
+
     nodes_df = input_df.loc[input_df['type'] == 'node']
     fractures_df = input_df.loc[input_df['type'] == 'fracture']
     boundaries_df = input_df.loc[input_df['type'] == 'boundary']
 
-    nodes_vtk = node_vtk_rep(nodes_df)
-    fractures_vtk = frac_vtk_rep(fractures_df)
-    boundaries_vtk = bound_vtk_rep(boundaries_df)
-
     appender = vtkAppendPolyData()
 
-    appender.AddInputData(nodes_vtk)
-    appender.AddInputData(fractures_vtk)
-    appender.AddInputData(boundaries_vtk)
+    if not nodes_df.empty:
+        nodes_vtk = node_vtk_rep(nodes_df)
+        appender.AddInputData(nodes_vtk)
+    if not fractures_df.empty:
+        fractures_vtk = frac_vtk_rep(fractures_df)
+        appender.AddInputData(fractures_vtk)
+    if not boundaries_df.empty:
+        boundaries_vtk = bound_vtk_rep(boundaries_df)
+        appender.AddInputData(boundaries_vtk)
 
     appender.Update()
 

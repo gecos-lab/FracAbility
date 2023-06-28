@@ -47,22 +47,16 @@ fracture_net.add_fractures(fractures_1, set_number=1)
 fracture_net.add_fractures(fractures_2, set_number=2)
 
 
-fracture_net.fractures.activate_set(2)
+fracture_net.fractures.activate_set()
 
 
 center_object(fracture_net)
 
-# tidy_intersections(fracture_net)
+
+tidy_intersections(fracture_net)
 
 
-# print(fracture_net.vtk_object.array_names)
-#
-# plotter = pv.Plotter()
-#
-# plotter.add_mesh(fracture_net.vtk_object,scalars='set')
-# plotter.show()
-
-# nodes_conn(fracture_net)
+nodes_conn(fracture_net)
 
 fracture_net.vtkplot()
 fracture_net.matplot()
