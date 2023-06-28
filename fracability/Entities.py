@@ -289,14 +289,15 @@ class FractureNetwork(BaseEntity):
         When set the dataframe is modified to conform to the assigned entity structure.
         """
 
-        fractures_df = self.fractures.entity_df
-        boundaries_df = self.boundaries.entity_df
+        df = self.fractures.entity_df
 
         if self.nodes is not None:
             nodes_df = self.nodes.entity_df
-            df = pd.concat([nodes_df, fractures_df, boundaries_df], ignore_index=True)
-        else:
-            df = pd.concat([fractures_df, boundaries_df], ignore_index=True)
+            df = pd.concat([nodes_df, df], ignore_index=True)
+
+        if self.boundaries is not None:
+            boundaries_df = self.boundaries.entity_df
+            df = pd.concat([df, boundaries_df], ignore_index=True)
 
         df['id'] = df.index
 

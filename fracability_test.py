@@ -46,9 +46,13 @@ fracture_net.boundaries = boundaries
 fracture_net.add_fractures(fractures_1, set_number=1)
 fracture_net.add_fractures(fractures_2, set_number=2)
 
+
+fracture_net.fractures.activate_set(2)
+
+
 center_object(fracture_net)
 
-tidy_intersections(fracture_net)
+# tidy_intersections(fracture_net)
 
 
 # print(fracture_net.vtk_object.array_names)
@@ -58,22 +62,7 @@ tidy_intersections(fracture_net)
 # plotter.add_mesh(fracture_net.vtk_object,scalars='set')
 # plotter.show()
 
-nodes_conn(fracture_net)
+# nodes_conn(fracture_net)
 
-print(fracture_net.entity_df)
-# fracture_net.nodes = nodes
-
-fracture_net.nodes.ternary_plot()
-
-# fracture_net.matplot()
-
-fitter = NetworkFitter(fracture_net)
-
-# fitter.find_best_distribution()
-# matplot_stats_summary(fitter)
-
-fitter.fit('gamma')
-
-distr = fitter.get_fit_distribution(['gamma'])
-
-matplot_stats_summary(distr[0])
+fracture_net.vtkplot()
+fracture_net.matplot()

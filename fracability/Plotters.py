@@ -97,13 +97,16 @@ def matplot_frac_net(entity, markersize=5, linewidth=2, color=['black', 'blue'],
 
     figure = plt.figure(num=f'Fracture net plot')
     ax = plt.subplot(111)
-    points = entity.nodes
+    nodes = entity.nodes
     fractures = entity.fractures
     boundary = entity.boundaries
 
-    matplot_frac_bound(fractures, color=color[0], return_ax=True)
-    matplot_frac_bound(boundary, color=color[1], return_ax=True)
-    matplot_nodes(points, return_ax=True)
+    if fractures is not None:
+        matplot_frac_bound(fractures, color=color[0], return_ax=True)
+    if boundary is not None:
+        matplot_frac_bound(boundary, color=color[1], return_ax=True)
+    if nodes is not None:
+        matplot_nodes(nodes, return_ax=True)
 
     if return_ax:
         return ax
@@ -210,13 +213,16 @@ def vtkplot_frac_net(entity, markersize=5, linewidth=2, color=['white', 'white']
     nodes = entity.nodes
     boundaries = entity.boundaries
 
-    node_actor = vtkplot_nodes(nodes, return_plot=True)
-    fractures_actor = vtkplot_fractures(fractures, color=color[0], return_plot=True)
-    boundary_actor = vtkplot_boundaries(boundaries, color=color[1], return_plot=True)
 
-    plotter.add_actor(node_actor)
-    plotter.add_actor(fractures_actor)
-    plotter.add_actor(boundary_actor)
+    if nodes is not None:
+        node_actor = vtkplot_nodes(nodes, return_plot=True)
+        plotter.add_actor(node_actor)
+    if fractures is not None:
+        fractures_actor = vtkplot_fractures(fractures, color=color[0], return_plot=True)
+        plotter.add_actor(fractures_actor)
+    if boundaries is not None:
+        boundary_actor = vtkplot_boundaries(boundaries, color=color[1], return_plot=True)
+        plotter.add_actor(boundary_actor)
 
     if return_plot:
         actors = plotter.actors()
