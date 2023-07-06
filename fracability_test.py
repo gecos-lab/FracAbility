@@ -7,11 +7,12 @@ import pyvista as pv
 from fracability import Entities
 from fracability.operations.Geometry import center_object, tidy_intersections
 from fracability.operations.Topology import nodes_conn
-import fracability.Plotters as plotters
 import matplotlib.pyplot as plt
 
 from fracability.operations.Statistics import NetworkFitter
 from fracability.Plotters import matplot_stats_summary
+
+from scipy.stats import probplot
 
 
 
@@ -31,32 +32,40 @@ fracs_2 = gpd.read_file(n2_path)
 
 bound_gpd = gpd.read_file(b_path)
 
-fractures = Entities.Fractures(fracs)
+fractures = Entities.Fractures(fracs, 1)
 
-fractures_1 = Entities.Fractures(fracs_1)
-fractures_2 = Entities.Fractures(fracs_2)
+
+fractures_1 = Entities.Fractures(fracs_1, 1)
+fractures_2 = Entities.Fractures(fracs_2, 2)
 
 boundaries = Entities.Boundary(bound_gpd)
 
 fracture_net = Entities.FractureNetwork()
 
-fracture_net.boundaries = boundaries
 
+fracture_net.add_boundaries(boundaries)
 
-fracture_net.add_fractures(fractures_1, set_number=1)
-fracture_net.add_fractures(fractures_2, set_number=2)
-
-
-fracture_net.fractures.activate_set()
-
-
+fracture_net.add_fractures(fractures_1)
+fracture_net.add_fractures(fractures_2)
+# fracture_net.add_fractures(fractures)
+#
 center_object(fracture_net)
+#
 
+fracture_net.activate_fractures([1])
 
 tidy_intersections(fracture_net)
 
-
 nodes_conn(fracture_net)
 
-fracture_net.vtkplot()
-fracture_net.matplot()
+fracture_net.plot_ternary()
+
+fitter = NetworkFitter(fracture_net)
+
+fitter.find_best_distribution()
+
+probplot(x=fitter.net_data.lengths, dist=fitter.best_fit()['distribution'].distribution, plot=True)
+
+
+plt.show()
+

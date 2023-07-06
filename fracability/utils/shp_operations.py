@@ -7,7 +7,7 @@ from shapely.ops import split,snap
 import matplotlib.pyplot as plt
 
 
-def int_node(line1, line2, idx_list):
+def int_node(line1, line2, idx_list, gdf):
     """
     Function used to add the intersection node to a line crossed or touched by a second line.
     This function works by extending of a given factor the start and end segment the line2 and then use shapely to:
@@ -68,6 +68,7 @@ def int_node(line1, line2, idx_list):
                 # If found then create a LineString composed of the two segments (we don't use merge because this is the
                 # only way to be sure that no multipart object is created; merge creates multipart if the two points are not
                 # exactly overlapping).
+
                 if len(split_lines.geoms) == 1 and counter < 2:
                     line1, line2 = line2, line1
                 elif len(split_lines.geoms) == 1 and counter >= 2:
@@ -90,6 +91,20 @@ def int_node(line1, line2, idx_list):
     except IndexError:
         print(f'Possible duplicate point found, fix geometry on gis or by using the clean_dup_points cleaner function')
         exit()
+    except ValueError:
+        print(f'lines {idx_list} overlapping, checking if single or multiple point overlap')
+        element = np.array(line1.coords)
+        test_element = np.array(extended_line.coords)
+        mask = np.isin(element, test_element)
+
+        if len(element[mask]) == 4:
+            print('Single point overlap. Geometry is correct, continuing. ')
+            pass
+        else:
+            print('Multiple point overlap. Check and fix geometry, stopping.')
+            exit()
+
+        # print(gdf.loc[idx_list[0]-5:idx_list[1]+5])
     return new_geom_dict
 
 

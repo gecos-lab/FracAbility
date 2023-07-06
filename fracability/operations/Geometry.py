@@ -5,12 +5,13 @@ from vtkmodules.vtkFiltersCore import vtkConnectivityFilter, vtkAppendPolyData
 
 from fracability.AbstractClasses import BaseEntity
 from fracability.utils.shp_operations import int_node
+
 import numpy as np
 from copy import deepcopy
 from halo import Halo
 
 
-def center_object(obj: BaseEntity, trans_center: np.array = None, return_center: bool = False, inplace: bool = True):
+def center_object(obj, trans_center: np.array = None, return_center: bool = False, inplace: bool = True):
     """
     Translate the center of the Entity object to a given point. If no trans_center is specified then the object
     will be moved to the origin (0,0,0).
@@ -35,7 +36,10 @@ def center_object(obj: BaseEntity, trans_center: np.array = None, return_center:
         Copy of the modified input object (preserves the original input)
     """
 
-    df = obj.entity_df.copy()
+    if obj.name == 'FractureNetwork':
+        df = obj.fracture_network_to_components_df()
+    else:
+        df = obj.entity_df.copy()
 
     if trans_center is None:
         trans_center = np.array(df.dissolve().centroid[0].coords).flatten()
@@ -45,7 +49,7 @@ def center_object(obj: BaseEntity, trans_center: np.array = None, return_center:
         return trans_center
 
     if inplace:
-        print(df)
+        # print(df)
         obj.entity_df = df
     else:
         copy_obj = deepcopy(obj)
@@ -54,13 +58,21 @@ def center_object(obj: BaseEntity, trans_center: np.array = None, return_center:
 
 
 @Halo(text='Calculating intersections', spinner='line', placement='right')
-def tidy_intersections(obj: BaseEntity, buffer=0.05, inplace: bool = True):
-    gdf = obj.entity_df.copy()
+def tidy_intersections(obj, buffer=0.05, inplace: bool = True):
+
+    if obj.name == 'FractureNetwork':
+        gdf = obj.fracture_network_to_components_df()
+        gdf = gdf.loc[gdf['type'] != 'node']
+    else:
+        gdf = obj.entity_df.copy()
+
     df_buffer = gdf.buffer(buffer)
 
     for idx_line1, line in gdf.iterrows():
+
         if line['type'] == 'boundary':
             continue
+
         line1 = line['geometry']
 
         idx_list = df_buffer.index[df_buffer.intersects(line1) == True]  # Subset the intersecting lines
@@ -68,7 +80,7 @@ def tidy_intersections(obj: BaseEntity, buffer=0.05, inplace: bool = True):
 
         intersections = gdf.loc[idx_list]
         for line2, idx_line2 in zip(intersections['geometry'], idx_list):  # for each intersecting line:
-            new_geom = int_node(line1, line2, [idx_line1, idx_line2])  # Calculate and add the intersection node.
+            new_geom = int_node(line1, line2, [idx_line1, idx_line2], gdf)  # Calculate and add the intersection node.
 
             for key, value in new_geom.items():
                 gdf.loc[key, 'geometry'] = value  # substitute the original geometry with the new geometry

@@ -1,0 +1,24 @@
+###### Report for 08-05-2023_14_37_09 ######
+
+----------- Input -----------
+
+Input network data: attachments/Set_2.shp
+Input boundary data: rerobe/Interpretation_boundary_laghettoSalza.shp
+
+----------- Output -----------
+
+Run in: 32.69897198677063s
+Number of segments: 1036
+Number of nodes: 16349
+
+Number of I nodes: 1485 
+Number of Y nodes: 286 
+Number of X nodes: 35 
+Number of U nodes: 281 
+
+I nodes relative %: 83.85093167701864
+Y nodes relative %: 89.09657320872275
+X nodes relative %: 2.3026315789473686
+U nodes relative %: 15.911664779161947
+
+Mean connections per segment: 0.6611874437961394

@@ -1,31 +1,31 @@
 import numpy as np
 
-from abc import ABC
-
+import pandas as pd
 from pandas import DataFrame
 import scipy.stats as ss
 from scipy.optimize import minimize
 import ast
 
 
-from fracability.AbstractClasses import BaseEntity
-
-
 class NetworkData:
+
     """ Class used to represent fracture or fracture network data.
     It acts as a wrapper for the scipy CensoredData class
     """
 
-    def __init__(self, obj: BaseEntity = None):
-        self._obj: BaseEntity = obj
+    def __init__(self, obj=None):
+        self._obj = obj  # fracture/fracture network object
 
         self._data: ss.CensoredData
-        self._lengths: np.array
+        self._lengths: np.ndarray  # array of all the lengths (both complete and censored)
 
-        self._function_list: list = ['pdf', 'cdf', 'sf', 'hf', 'chf']
+        self._function_list: list = ['pdf', 'cdf', 'sf', 'hf', 'chf']  # list of possible functions
 
         if obj is not None:
-            entity_df = self._obj.entity_df
+            if self._obj.name == 'FractureNetwork':
+                entity_df = self._obj.fracture_network_to_components_df()
+            else:
+                entity_df = self._obj.entity_df
 
             self.lengths = entity_df.loc[entity_df['censored'] >= 0, 'length'].values
             non_censored_lengths = entity_df.loc[entity_df['censored'] == 0, 'length'].values
@@ -34,7 +34,11 @@ class NetworkData:
             self.data = ss.CensoredData(uncensored=non_censored_lengths, right=censored_lengths)
 
     @property
-    def data(self):
+    def data(self) -> ss.CensoredData:
+        """
+        Property that returns or sets the CensoredData class of the fracture network
+        :return:
+        """
         return self._data
 
     @data.setter
@@ -42,7 +46,7 @@ class NetworkData:
         self._data = data
 
     @property
-    def lengths(self):
+    def lengths(self) -> np.ndarray:
 
         """
         This property returns or sets the complete list of length data for the fracture network
@@ -54,11 +58,11 @@ class NetworkData:
         return self._lengths
 
     @lengths.setter
-    def lengths(self, length_list: list = None):
+    def lengths(self, length_list: np.ndarray = None):
         self._lengths = length_list
 
     @property
-    def non_censored_lengths(self):
+    def non_censored_lengths(self) -> np.ndarray:
 
         """
         This property returns or sets the list of non-censored length data of the fracture network
@@ -70,11 +74,11 @@ class NetworkData:
         return self.data.__dict__['_uncensored']
 
     @non_censored_lengths.setter
-    def non_censored_lengths(self, complete_length_list: list = None):
+    def non_censored_lengths(self, complete_length_list: np.ndarray = None):
         self.data = ss.CensoredData(uncensored=complete_length_list, right=self.censored_lengths)
 
     @property
-    def censored_lengths(self):
+    def censored_lengths(self) -> np.ndarray:
 
         """
         This property returns or sets the list of censored length data of the fracture network
@@ -87,11 +91,15 @@ class NetworkData:
         return self.data.__dict__['_right']
 
     @censored_lengths.setter
-    def censored_lengths(self, censored_length_list: list = None):
+    def censored_lengths(self, censored_length_list: np.ndarray = None):
         self.data = ss.CensoredData(uncensored=self.non_censored_lengths, right=censored_length_list)
 
     @property
-    def function_list(self):
+    def function_list(self) -> list:
+        """
+        Property that returns the list of available probability functions (pdf, cdf etc)
+        :return:
+        """
         return self._function_list
 
 
@@ -107,7 +115,11 @@ class NetworkDistribution:
         self.fit_data = fit_data
 
     @property
-    def distribution(self):
+    def distribution(self) -> ss.rv_continuous:
+        """
+        Property that returns or sets a *frozen* ss.rv_continuous class
+        :return:
+        """
         return self._distribution
 
     @distribution.setter
@@ -115,48 +127,100 @@ class NetworkDistribution:
         self._distribution = distribution
 
     @property
-    def distribution_name(self):
+    def distribution_name(self) -> str:
+        """
+        Property that returns the name of the given distribution
+        :return:
+        """
         return self.distribution.dist.name
 
     @property
-    def distribution_parameters(self):
+    def distribution_parameters(self) -> tuple:
+        """
+        Property that returns the parameters of the frozen distribution
+        :return:
+        """
         return self.distribution.args
 
     @property
-    def mean(self):
+    def mean(self) -> float:
+        """
+        Property that returns the mean of the frozen distribution
+        :return:
+        """
         return self.distribution.mean()
 
     @property
-    def mode(self):
+    def mode(self) -> list:
+        """
+        Property that returns the mode(s) of the pdf of the given distribution
+        :return:
+        """
         return minimize(lambda x: -self.distribution.pdf(x), np.ceil(self.distribution_parameters[-1])).x
 
     @property
-    def median(self):
+    def median(self) -> float:
+        """
+        Property that returns the median of the distribution
+        :return:
+        """
         return self.distribution.median()
 
     @property
-    def var(self):
+    def var(self) -> float:
+        """
+        Property that returns the variance of the distribution
+        :return:
+        """
         return self.distribution.var()
 
     @property
-    def std(self):
+    def std(self) -> float:
+        """
+        Property that returns the standard deviation of the distribution
+        :return:
+        """
         return self.distribution.std()
 
     @property
-    def b5(self):
+    def b5(self) -> float:
+        """
+        Property that returns the 5th percentile of the distribution
+        :return:
+        """
         return self.distribution.ppf(0.05)
 
     @property
-    def b95(self):
+    def b95(self) -> float:
+        """
+        Property that returns the 95th percentile of the distribution
+        :return:
+        """
         return self.distribution.ppf(0.95)
 
     @property
-    def ecdf(self):
-        return ss.ecdf(self.fit_data.data)
+    def ecdf(self) -> ss._survival.EmpiricalDistributionFunction:
+        """
+        Property that returns the empirical cdf of the data
+        :return:
+        """
+        return ss.ecdf(self.fit_data.data).cdf
 
     @property
-    def log_likelihood(self):
+    def esf(self):
+        """
+        Property that returns the empirical sf of the data
+        :return:
+        """
+        return ss.ecdf(self.fit_data.data).sf
 
+    @property
+    def log_likelihood(self) -> float:
+        """
+        Property that returns the log likelihood of the distribution. The likelihood is calculated by adding
+        the cumulative sum of the log pdf and log sf of the fitted distribution.
+        :return:
+        """
         log_f = self.log_pdf(self.fit_data.non_censored_lengths)
         log_r = self.log_sf(self.fit_data.censored_lengths)
 
@@ -166,7 +230,11 @@ class NetworkDistribution:
         return LL_f + LL_rc
 
     @property
-    def AICc(self):
+    def AICc(self) -> float:
+        """
+        Property that returns the Akaike Information Criterion (for small number of values) of the distribution
+        :return:
+        """
 
         LL2 = -2 * self.log_likelihood
 
@@ -177,8 +245,11 @@ class NetworkDistribution:
         return AICc
 
     @property
-    def BIC(self):
-
+    def BIC(self) -> float:
+        """
+        Property that returns the Bayesian Information Criterion of the distribution
+        :return:
+        """
         LL2 = -2 * self.log_likelihood
 
         k = len(self.distribution_parameters)
@@ -187,7 +258,11 @@ class NetworkDistribution:
         BIC = np.log(n)*k + LL2
         return BIC
 
-    def log_pdf(self, x_values: np.array = None):
+    def log_pdf(self, x_values: np.array = None) -> np.array:
+        """
+        Property that returns the log of the pdf of the distribution
+        :return:
+        """
 
         if x_values.any():
             return self.distribution.logpdf(x_values)
@@ -210,20 +285,40 @@ class NetworkFitter:
     # Add bool do not consider censoring
     # add bool to plot pdf,cdf, sf with no censoring
 
-    def __init__(self, obj: BaseEntity = None):
+    def __init__(self, obj=None):
 
-        self.net_data = NetworkData(obj)
+        self._net_data: NetworkData
         self._accepted_fit: list = []
         self._rejected_fit: list = []
         self._fit_dataframe: DataFrame = DataFrame(columns=['name', 'AICc', 'BIC',
                                                             'log_likelihood', 'distribution', 'params'])
 
+        self.net_data = NetworkData(obj)
+
+    @property
+    def net_data(self) -> NetworkData:
+        """
+        Property that returns or sets a NetworkData object
+        :return:
+        """
+        return self._net_data
+
+    @property
+    def fit_records(self) -> DataFrame:
+
+        """ Return the sorted fit dataframe"""
+
+        return self._fit_dataframe.sort_values(by='BIC', ignore_index=True)
+
+    @net_data.setter
+    def net_data(self, data: NetworkData):
+        self._net_data = data
+
     def fit(self, distribution_name: str):
 
         """
         Fit the data of the entity_df using scipy available distributions
-        :param distribution_name: Name of the distribution
-        :param censored_data:
+        :param distribution_name: Name of the distribution to fit
         :return:
         """
 
@@ -236,6 +331,7 @@ class NetworkFitter:
                 params = distribution.fit(self.net_data.data, floc=0)
 
         else:
+            # if there are no censored data, use the lengths
             if distribution_name == 'norm' or distribution_name == 'logistic':
                 params = distribution.fit(self.net_data.lengths)
             else:
@@ -251,7 +347,27 @@ class NetworkFitter:
                                                              AICc, BIC,
                                                              log_likelihood, distribution, str(params)]
 
-    def get_fit_parameters(self, distribution_names: list = None) -> list:
+    def get_fitted_parameters(self, distribution_name: str) -> tuple:
+        """
+        Get the fitted distributions parameters in the fit records df
+        :param distribution_name: Name of the distribution
+        """
+        parameters = self.fit_records.loc[self.fit_records['name'] == distribution_name, 'params'].values[0]
+        return ast.literal_eval(parameters)
+
+    def get_fitted_distribution(self, distribution_name: str) -> NetworkDistribution:
+
+        """
+        get the fitted NetworkDistribution object
+        :param distribution_name: name of the distribution
+        :return:
+        """
+
+        distribution = self.fit_records.loc[self.fit_records['name'] == distribution_name, 'distribution'].values[0]
+
+        return distribution
+
+    def get_fitted_parameters_list(self, distribution_names: list = None) -> list:
 
         """
         Get the parameters of the computed fit(s)
@@ -268,7 +384,12 @@ class NetworkFitter:
 
         return parameter_list
 
-    def get_fit_distribution(self, distribution_names: list = None) -> list:
+    def get_fitted_distribution_list(self, distribution_names: list = None) -> list:
+        """
+        Get a list of NetworkDistribution objects  fot the given distribution name
+        :param distribution_names:
+        :return:
+        """
 
         if distribution_names is None:
             distribution_names = self.fit_records['name'].tolist()
@@ -281,26 +402,34 @@ class NetworkFitter:
 
         return distribution_list
 
-    @property
-    def fit_records(self) -> DataFrame:
+    def best_fit(self) -> pd.Series:
 
-        """ Return the sorted fit dataframe"""
-
-        return self._fit_dataframe.sort_values(by='BIC', ignore_index=True)
-
-    def best_fit(self):
+        """
+        Return the best fit in the fit records dataframe
+        :return:
+        """
 
         df = self.fit_records
 
         return df.loc[0]
 
-    def rejected_fit(self):
+    def rejected_fit(self) -> pd.DataFrame:
+
+        """
+        Return the fit records dataframe without the best fit
+        :return:
+        """
 
         df = self.fit_records
 
         return df.loc[1:]
 
-    def find_best_distribution(self, distribution_list: list = None):
+    def find_best_distribution(self, distribution_list: list = None) -> pd.Series:
+        """
+        Method used to find the best distribution using BIC ranking
+        :param distribution_list: list of distribution to test
+        :return:
+        """
 
         if distribution_list is None:
 
@@ -348,6 +477,7 @@ class NetworkFitter:
         #     plt.legend()
         #
         # plt.show()
+
 
     # def summary_plot(self, x_min: float = 0.0, x_max: float = None, res: int = 200):
         #

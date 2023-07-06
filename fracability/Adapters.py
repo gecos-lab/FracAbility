@@ -14,6 +14,8 @@ from vtkmodules.vtkFiltersGeometry import vtkGeometryFilter
 from fracability.operations.Cleaners import connect_dots
 
 
+#  =============== VTK representations ===============
+
 def node_vtk_rep(input_df: geopandas.GeoDataFrame) -> PolyData:
 
     points = np.array([point.coords for point in input_df.geometry]).reshape(-1, 3)
@@ -92,17 +94,19 @@ def bound_vtk_rep(input_df: geopandas.GeoDataFrame) -> PolyData:
     return conn_obj
 
 
-def fracture_network_rep(input_df: geopandas.GeoDataFrame) -> PolyData:
+def fracture_network_vtk_rep(input_df: geopandas.GeoDataFrame, include_nodes=True) -> PolyData:
 
-    nodes_df = input_df.loc[input_df['type'] == 'node']
     fractures_df = input_df.loc[input_df['type'] == 'fracture']
     boundaries_df = input_df.loc[input_df['type'] == 'boundary']
 
     appender = vtkAppendPolyData()
 
-    if not nodes_df.empty:
-        nodes_vtk = node_vtk_rep(nodes_df)
-        appender.AddInputData(nodes_vtk)
+    if include_nodes:
+        nodes_df = input_df.loc[input_df['type'] == 'node']
+        if not nodes_df.empty:
+            nodes_vtk = node_vtk_rep(nodes_df)
+            appender.AddInputData(nodes_vtk)
+
     if not fractures_df.empty:
         fractures_vtk = frac_vtk_rep(fractures_df)
         appender.AddInputData(fractures_vtk)
@@ -122,7 +126,10 @@ def fracture_network_rep(input_df: geopandas.GeoDataFrame) -> PolyData:
     return conn_obj
 
 
-def networkx_rep(input_object: PolyData) -> networkx.Graph:
+#  =============== Networkx representations ===============
+
+
+def networkx_rep(input_object: PolyData) -> networkx.Graph():
 
     network = input_object
     lines = network.lines  # Get the connectivity list of the object
@@ -131,7 +138,7 @@ def networkx_rep(input_object: PolyData) -> networkx.Graph:
                       np.arange(0, lines.size, 3))  # remove padding eg. [2 id1 id2 2 id3 id4 ...] -> remove the 2
 
     test_types = np.array([{'type': t} for t in network['type']])
-    edges = np.c_[lines.reshape(-1, 2), test_types]
+    edges = np.c_[lines.reshape(-1, 2)]
 
     network = nx.Graph()  # Create a networkx graph instance
 
@@ -139,5 +146,4 @@ def networkx_rep(input_object: PolyData) -> networkx.Graph:
 
     output_obj = network
     return output_obj
-
 

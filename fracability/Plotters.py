@@ -49,7 +49,7 @@ from fracability.operations.Statistics import NetworkDistribution
 import numpy as np
 
 
-def matplot_nodes(entity, markersize=5, return_ax=False):
+def matplot_nodes(entity, markersize=7, return_ax=False):
 
     if 'Fracture net plot' not in plt.get_figlabels():
         figure = plt.figure(num=f'Fractures plot')
@@ -57,16 +57,18 @@ def matplot_nodes(entity, markersize=5, return_ax=False):
         ax = plt.subplot(111)
     else:
         ax = plt.gca()
-
-    points = entity.vtk_object.points
-    node_types = entity.vtk_object['node_type']
+    vtk_object = entity.vtk_object()
+    points = vtk_object.points
+    node_types = vtk_object['node_type']
     I = np.where(node_types == 1)
     Y = np.where(node_types == 3)
     X = np.where(node_types == 4)
     U = np.where(node_types == 5)
+    Y2 = np.where(node_types == 6)
 
     ax.plot(points[I][:, 0], points[I][:, 1], 'or', markersize=markersize)
     ax.plot(points[Y][:, 0], points[Y][:, 1], '^g', markersize=markersize)
+    ax.plot(points[Y2][:, 0], points[Y2][:, 1], '^c', markersize=markersize)
     ax.plot(points[X][:, 0], points[X][:, 1], 'sb', markersize=markersize)
     ax.plot(points[U][:, 0], points[U][:, 1], 'py', markersize=markersize)
 
@@ -76,7 +78,7 @@ def matplot_nodes(entity, markersize=5, return_ax=False):
         plt.show()
 
 
-def matplot_frac_bound(entity, linewidth=2, color='black', return_ax=False):
+def matplot_frac_bound(entity, linewidth=1, color='black', return_ax=False):
 
     if 'Fracture net plot' not in plt.get_figlabels():
         figure = plt.figure(num=f'Fractures plot')
@@ -117,6 +119,8 @@ def matplot_frac_net(entity, markersize=5, linewidth=2, color=['black', 'blue'],
 def vtkplot_nodes(entity, markersize=7, return_plot= False):
 
     plotter = Plotter()
+    plotter.view_xy()
+    plotter.enable_image_style()
 
     class_dict = {
         1: 'I',
@@ -165,6 +169,8 @@ def vtkplot_nodes(entity, markersize=7, return_plot= False):
 def vtkplot_fractures(entity, linewidth=1, color='white', color_set=False, return_plot=False):
 
     plotter = Plotter()
+    plotter.view_xy()
+    plotter.enable_image_style()
 
     vtk_object = entity.vtk_object
     if color_set:
@@ -195,6 +201,8 @@ def vtkplot_fractures(entity, linewidth=1, color='white', color_set=False, retur
 def vtkplot_boundaries(entity, linewidth=1, color='white', return_plot=False):
 
     plotter = Plotter()
+    plotter.view_xy()
+    plotter.enable_image_style()
 
     actor = plotter.add_mesh(entity.vtk_object,
                      color=color,
@@ -210,6 +218,8 @@ def vtkplot_boundaries(entity, linewidth=1, color='white', return_plot=False):
 def vtkplot_frac_net(entity, markersize=5, linewidth=2, color=['white', 'white'], return_plot=False):
 
     plotter = Plotter()
+    plotter.view_xy()
+    plotter.enable_image_style()
 
     nodes = entity.nodes
     fractures = entity.fractures
@@ -251,7 +261,7 @@ def matplot_stats_summary(network_distribution: NetworkDistribution, function_li
 
     """
 
-    cdf = network_distribution.ecdf.cdf
+    cdf = network_distribution.ecdf
     x_vals = cdf.quantiles
 
     distribution = network_distribution.distribution
@@ -318,13 +328,13 @@ def matplot_stats_summary(network_distribution: NetworkDistribution, function_li
     plt.show()
 
 
-def matplot_ternary(entity, merge_set_intersection=True):
+def matplot_ternary(entity):
 
     """
     Plot the ternary diagram for nodes
-    :param entity: 
-    :return: 
+    :param entity:
     """
+
     figure, tax = ternary.figure(scale=100)
     figure.set_size_inches(10, 10)
 
