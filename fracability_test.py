@@ -15,7 +15,6 @@ from fracability.Plotters import matplot_stats_summary
 from scipy.stats import probplot
 
 
-
 # n_path = 'fracability/datasets/frac_pesce.shp'
 # b_path = 'fracability/datasets/grid_pesce.shp'
 #
@@ -52,20 +51,19 @@ fracture_net.add_fractures(fractures_2)
 center_object(fracture_net)
 #
 
-fracture_net.activate_fractures([1])
+# fracture_net.activate_fractures([1])
 
 tidy_intersections(fracture_net)
 
 nodes_conn(fracture_net)
 
-fracture_net.plot_ternary()
+# fracture_net.plot_ternary()
+
+# fracture_net.fractures.entity_df.to_csv('data.csv', columns=['length', 'censored'])
 
 fitter = NetworkFitter(fracture_net)
 
 fitter.find_best_distribution()
 
-probplot(x=fitter.net_data.lengths, dist=fitter.best_fit()['distribution'].distribution, plot=True)
-
-
-plt.show()
+matplot_stats_summary(fitter.best_fit()['distribution'])
 

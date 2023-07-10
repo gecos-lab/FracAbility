@@ -262,6 +262,7 @@ def matplot_stats_summary(network_distribution: NetworkDistribution, function_li
     """
 
     cdf = network_distribution.ecdf
+    sf = network_distribution.esf
     x_vals = cdf.quantiles
 
     distribution = network_distribution.distribution
@@ -286,8 +287,9 @@ def matplot_stats_summary(network_distribution: NetworkDistribution, function_li
         if func_name == 'pdf':
             sns.histplot(original_data.lengths, stat='density', bins=50)
         if func_name == 'cdf':
-            sns.lineplot(x=x_vals, y=cdf.probabilities, color='b', label='Empirical CDF')
-
+            sns.lineplot(x=cdf.quantiles, y=cdf.probabilities, color='b', label='Empirical CDF')
+        if func_name == 'sf':
+            sns.lineplot(x=sf.quantiles, y=sf.probabilities, color='b', label='Empirical SF')
         plt.title(func_name)
         plt.grid(True)
         plt.legend()
@@ -298,32 +300,40 @@ def matplot_stats_summary(network_distribution: NetworkDistribution, function_li
     plt.xlim([0, 10])
     dec = 4
 
-    text_mean = f'Mean = {np.round(network_distribution.mean, dec)}'
-    text_std = f'Std = {np.round(network_distribution.std, dec)}'
-    text_var = f'Var = {np.round(network_distribution.var, dec)}'
-    text_median = f'Median = {np.round(network_distribution.median, dec)}'
-    text_mode = f'Mode = {np.round(network_distribution.mode, dec)}'
-    text_b5 = f'5th Percentile = {np.round(network_distribution.b5, dec)}'
-    text_b95 = f'95th Percentile = {np.round(network_distribution.b95, dec)}'
+    text_mean = f'{np.round(network_distribution.mean, dec)}'
+    text_std = f'{np.round(network_distribution.std, dec)}'
+    text_var = f'{np.round(network_distribution.var, dec)}'
+    text_median = f'{np.round(network_distribution.median, dec)}'
+    text_mode = f'{np.round(network_distribution.mode, dec)}'
+    text_b5 = f'{np.round(network_distribution.b5, dec)}'
+    text_b95 = f'{np.round(network_distribution.b95, dec)}'
 
-    plt.text(0, 7.5, 'Summary table')
-    plt.text(0, 6.5, text_mean)
-    plt.text(0, 5.5, text_median)
-    plt.text(0, 4.5, text_mode)
-    plt.text(0, 3.5, text_b5)
-    plt.text(0, 2.5, text_b95)
-    plt.text(0, 1.5, text_std)
-    plt.text(0, 0.5, text_var)
+    plt.table(cellText=[[text_mean], [text_median], [text_mode],
+                        [text_b5], [text_b95], [text_std], [text_var]],
+              rowLabels=['Mean', 'Median', 'Mode',
+                         'B5', 'B95', 'Std', 'Var'],
+              colLabels=['Value'],
+              colWidths=[0.3],
+              bbox=([0.1, 0, 0.3, 0.9]))
 
-    plt.text(6, 7.5, 'Test results:')
+    # plt.text(0, 7.5, 'Summary table')
+    # plt.text(0, 6.5, text_mean)
+    # plt.text(0, 5.5, text_median)
+    # plt.text(0, 4.5, text_mode)
+    # plt.text(0, 3.5, text_b5)
+    # plt.text(0, 2.5, text_b95)
+    # plt.text(0, 1.5, text_std)
+    # plt.text(0, 0.5, text_var)
 
-    text_crit_val = f'BIC value = {np.round(network_distribution.BIC, 3)}'
-    text_result = f'AICc value = {np.round(network_distribution.AICc, 3)}'
-    text_ks_val = f'Log Likelihood value = {np.round(network_distribution.log_likelihood, 3)}'
-
-    plt.text(6, 6.5, text_result)
-    plt.text(6, 5.5, text_crit_val)
-    plt.text(6, 4.5, text_ks_val)
+    # plt.text(6, 7.5, 'Test results:')
+    #
+    # text_crit_val = f'BIC value = {np.round(network_distribution.BIC, 3)}'
+    # text_result = f'AICc value = {np.round(network_distribution.AICc, 3)}'
+    # text_ks_val = f'Log Likelihood value = {np.round(network_distribution.log_likelihood, 3)}'
+    #
+    # plt.text(6, 6.5, text_result)
+    # plt.text(6, 5.5, text_crit_val)
+    # plt.text(6, 4.5, text_ks_val)
 
     plt.show()
 
