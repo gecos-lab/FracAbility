@@ -1,0 +1,49 @@
+name: Bug Report
+description: Create a report to help us fix broken features
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: Describe the bug, what's wrong, and what you expected.
+      description: |
+        Provide a clear and concise description of what the bug is and what you expected to happen.
+      placeholder: What went wrong?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce the bug.
+      description: |
+        Please provide a list of steps to reproduce the bug and, if possible, include a code snippet/snippets to reproduce the bug.
+      placeholder: Provide some code for us to reproduce the bug!
+      value: "```python\nInsert code here\n```"
+    validations:
+      required: true
+  - type: textarea
+    id: system-information
+    attributes:
+      label: System Information
+      placeholder: The log will automatically be formatted! No need to type backticks.
+      description: |
+        Please run the following code wherever you are experiencing the bug, and paste the output below.
+        This report helps us track down bugs and will be critical to addressing your bug.
+        ```python
+        # Get system info
+        import pyvista as pv
+        print(pv.Report())
+        ```
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: screenshots_videos
+    attributes:
+      label: Screenshots and/or videos
+      description: If applicable, please add screenshots/short videos to the text box below
+  - type: input
+    id: data
+    attributes:
+      label: Datasets
+      description: If possible, please upload the dataset/part of the dataset you used (if more than one file please zip them).

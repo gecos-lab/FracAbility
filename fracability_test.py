@@ -67,3 +67,4 @@ fitter.find_best_distribution()
 
 matplot_stats_summary(fitter.best_fit()['distribution'])
 
+pv.Report()
