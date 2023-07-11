@@ -48,4 +48,4 @@ body:
       label: Datasets
       description: If possible, please upload the dataset/part of the dataset you used. If possible please provide a description of the dataset and what to expect. Please zip files that are inherent to each other.
       placeholder: Upload here your data
-      value: "This file contains xyz: your_file.csv\n\n This zip contains all the files related to xyz: your_zip.zip"
+      value: "- This file contains xyz: _your_file.csv_\n- This zip contains all the files related to xyz: _your_zip.zip_"
