@@ -31,8 +31,8 @@ body:
         This report helps us track down bugs and will be critical to addressing your bug.
         ```python
         # Get system info
-        import pyvista as pv
-        print(pv.Report())
+        from fracability.utils import general_use
+        general_use.report()
         ```
       render: shell
     validations:
@@ -42,7 +42,7 @@ body:
     attributes:
       label: Screenshots and/or videos
       description: If applicable, please add screenshots/short videos to the text box below
-  - type: input
+  - type: textarea
     id: data
     attributes:
       label: Datasets
