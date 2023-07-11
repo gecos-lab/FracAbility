@@ -46,4 +46,4 @@ body:
     id: data
     attributes:
       label: Datasets
-      description: If possible, please upload the dataset/part of the dataset you used (if more than one file please zip them).
+      description: If possible, please upload the dataset/part of the dataset you used. If possible please provide a description of the dataset and what to expect. Please zip files that are inherent to each other.
