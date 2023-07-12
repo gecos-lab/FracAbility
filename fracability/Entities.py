@@ -28,7 +28,7 @@ class Nodes(BaseEntity):
         super().__init__(gdf)
 
     @property
-    def entity_df(self):
+    def entity_df(self) -> GeoDataFrame:
         return self._df
 
     @entity_df.setter
@@ -64,14 +64,8 @@ class Nodes(BaseEntity):
         network_obj = Rep.networkx_rep(self.vtk_object)
         return network_obj
 
-    def matplot(self):
-        plts.matplot_nodes(self)
-
-    def vtkplot(self):
-        plts.vtkplot_nodes(self)
-
     @property
-    def node_count(self):
+    def node_count(self) -> tuple[float, float, float, float, float]:
 
         nodes = self.vtk_object['node_type']
         unique, count = np.unique(nodes, return_counts=True)
@@ -102,8 +96,7 @@ class Nodes(BaseEntity):
         else:
             Y2_nodes = 0
 
-
-        tot_Y_nodes = Y_nodes+Y2_nodes
+        tot_Y_nodes = Y_nodes + Y2_nodes
 
         if I_nodes + tot_Y_nodes == 0:
             PI = 0
@@ -128,6 +121,12 @@ class Nodes(BaseEntity):
         precise_n = 4 * (1 - PI / 100) / (1 - PX / 100)
 
         return PI, PY, PX, PU, precise_n
+
+    def matplot(self):
+        plts.matplot_nodes(self)
+
+    def vtkplot(self):
+        plts.vtkplot_nodes(self)
 
     def ternary_plot(self):
         plts.matplot_ternary(self)
@@ -193,7 +192,7 @@ class Boundary(BaseEntity):
     """
     Base entity for boundaries
     """
-    def __init__(self, gdf: GeoDataFrame = None, group_n: int = 0):
+    def __init__(self, gdf: GeoDataFrame = None, group_n: int = 1):
 
         self.group_n = group_n
         super().__init__(gdf)
@@ -299,7 +298,7 @@ class FractureNetwork:
 
     """
 
-    def __init__(self):
+    def __init__(self, gdf: GeoDataFrame = None):
         self.column_names = ['type', 'object', 'node_type', 'fracture_set', 'boundary_group', 'active']
         self._df: DataFrame = DataFrame(columns=self.column_names)
 
@@ -404,14 +403,20 @@ class FractureNetwork:
         be appended
         """
 
-        node_type = list(set(nodes.entity_df['node_type']))[0]
+        node_types = set(nodes.entity_df['node_type'])
 
-        if node_type not in self._df['node_type'].values:
-            new_df = DataFrame([['nodes', nodes, node_type, 1]], columns=['type', 'object',
-                                                                          'node_type', 'active'])
-            self._df = pd.concat([self._df, new_df], ignore_index=True)
-        else:
-            self._df.loc[self._df['node_type'] == node_type, 'object'] = nodes
+        for node_type in node_types:
+
+            nodes_df = nodes.entity_df.loc[nodes.entity_df['node_type'] == node_type]
+
+            nodes_group = Nodes(nodes_df, node_type)
+
+            if node_type not in self._df['node_type'].values:
+                new_df = DataFrame([['nodes', nodes_group, node_type, 1]], columns=['type', 'object',
+                                                                              'node_type', 'active'])
+                self._df = pd.concat([self._df, new_df], ignore_index=True)
+            else:
+                self._df.loc[self._df['node_type'] == node_type, 'object'] = nodes_group
 
     def nodes_object(self, node_type: int) -> Nodes:
         """
@@ -434,15 +439,28 @@ class FractureNetwork:
             for t in node_type:
                 self.entity_df.loc[self.entity_df['node_type'] == t, 'active'] = 1
 
+    def deactivate_nodes(self, node_type: list = None):
+        """
+        Method that activates the nodes provided in the node_type list.
+        :param node_type: List of node types to be activated
+        """
+
+        if node_type is None:
+            self.entity_df.loc[self.entity_df['type'] == 'nodes', 'active'] = 0
+        else:
+            self.entity_df.loc[self.entity_df['type'] == 'nodes', 'active'] = 1
+            for t in node_type:
+                self.entity_df.loc[self.entity_df['node_type'] == t, 'active'] = 0
+
     def is_type_active(self, node_type: int) -> bool:
         """
         Method used to return if a given node type is active in the fracture network
         :param node_type: node type to check
         :return: Bool value of the test
         """
-        active_nodes = self._active_nodes_components
+        nodes = self._nodes_components
 
-        value = active_nodes.loc[active_nodes['node_type'] == node_type, 'active'].values[0]
+        value = nodes.loc[nodes['node_type'] == node_type, 'active'].values[0]
 
         return value
 
@@ -504,15 +522,19 @@ class FractureNetwork:
         Fracture object dataframe. If the set is already present the fracture object will be overwritten if not it will
         be appended
         """
+        fracture_sets = set(fractures.entity_df['set'])
 
-        set_n = list(set(fractures.entity_df['set']))[0]
+        for set_n in fracture_sets:
 
-        if set_n not in self._df['fracture_set'].values:
-            new_df = DataFrame([['fractures', fractures, set_n, 1]], columns=['type', 'object',
-                                                                              'fracture_set', 'active'])
-            self._df = pd.concat([self._df, new_df], ignore_index=True)
-        else:
-            self._df.loc[self._df['fracture_set'] == set_n, 'object'] = fractures
+            fractures_df = fractures.entity_df.loc[fractures.entity_df['set'] == set_n]
+            fractures_group = Fractures(fractures_df, set_n)
+
+            if set_n not in self._df['fracture_set'].values:
+                new_df = DataFrame([['fractures', fractures_group, set_n, 1]], columns=['type', 'object',
+                                                                                        'fracture_set', 'active'])
+                self._df = pd.concat([self._df, new_df], ignore_index=True)
+            else:
+                self._df.loc[self._df['set'] == set_n, 'object'] = fractures_group
 
     def fracture_object(self, set_n: int) -> Fractures:
         """
@@ -535,6 +557,19 @@ class FractureNetwork:
             for n in set_n:
                 self.entity_df.loc[self.entity_df.fracture_set == n, 'active'] = 1
 
+    def deactivate_fractures(self, set_n: list = None):
+        """
+        Method that activates the fractures provided in the set_n list.
+        :param set_n: List of sets to be activated
+        """
+
+        if set_n is None:
+            self.entity_df.loc[self.entity_df['type'] == 'fractures', 'active'] = 0
+        else:
+            self.entity_df.loc[self.entity_df['type'] == 'fractures', 'active'] = 1
+            for n in set_n:
+                self.entity_df.loc[self.entity_df.fracture_set == n, 'active'] = 0
+
     def is_set_active(self, set_n: int) -> bool:
         """
         Method used to return if a given fracture set is active in the fracture network
@@ -542,9 +577,9 @@ class FractureNetwork:
         :return: Bool value of the test
         """
 
-        active_fractures = self._active_fractures_components
+        fractures = self._fractures_components
 
-        value = active_fractures.loc[active_fractures['fracture_set'] == set_n, 'active'].values[0]
+        value = fractures.loc[fractures['fracture_set'] == set_n, 'active'].values[0]
 
         return value
 
@@ -609,15 +644,20 @@ class FractureNetwork:
         be appended
         """
 
-        group_n = list(set(boundary.entity_df['group']))[0]
+        boundary_groups = set(boundary.entity_df['group'])
 
-        if group_n not in self._df['boundary_group']:
+        for group_n in boundary_groups:
 
-            new_df = DataFrame([['boundary', boundary, group_n, 1]], columns=['type', 'object',
-                                                                              'boundary_group', 'active'])
-            self._df = pd.concat([self._df, new_df], ignore_index=True)
-        else:
-            self._df.loc[self._df['boundary_group'] == group_n, 'object'] = boundary
+            boundary_df = boundary.entity_df.loc[boundary.entity_df['group'] == group_n]
+            boundary_group = Boundary(boundary_df, group_n)
+
+            if group_n not in self._df['boundary_group'].values:
+
+                new_df = DataFrame([['boundary', boundary_group, group_n, 1]], columns=['type', 'object',
+                                                                                        'boundary_group', 'active'])
+                self._df = pd.concat([self._df, new_df], ignore_index=True)
+            else:
+                self._df.loc[self._df['boundary_group'] == group_n, 'object'] = boundary_group
 
     def boundary_object(self, group_n: int) -> Fractures:
         """
@@ -640,7 +680,21 @@ class FractureNetwork:
         else:
             self.entity_df.loc[self.entity_df['type'] == 'boundary', 'active'] = 0
             for n in group_n:
-                self.entity_df.loc[self.entity_df.fracture_set == n, 'active'] = 1
+                self.entity_df.loc[self.entity_df.boundary_group == n, 'active'] = 1
+
+    def deactivate_boundaries(self, group_n: list = None):
+
+        """
+        Method that deactivates the boundary provided in the group_n list.
+        :param group_n: List of groups to be activated
+        """
+
+        if group_n is None:
+            self.entity_df.loc[self.entity_df['type'] == 'boundary', 'active'] = 0
+        else:
+            self.entity_df.loc[self.entity_df['type'] == 'boundary', 'active'] = 1
+            for n in group_n:
+                self.entity_df.loc[self.entity_df.boundary_group == n, 'active'] = 0
 
     def is_group_active(self, group_n: int) -> bool:
         """
@@ -649,8 +703,8 @@ class FractureNetwork:
         :return: Bool value of the test
         """
 
-        active_boundaries = self._active_boundaries_components
-        value = active_boundaries.loc[active_boundaries['boundary_group'] == group_n, 'active'].values[0]
+        boundaries = self._boundaries_components
+        value = boundaries.loc[boundaries['boundary_group'] == group_n, 'active'].values[0]
 
         return value
 
@@ -690,8 +744,6 @@ class FractureNetwork:
         vtk_obj = Rep.fracture_network_vtk_rep(self.fracture_network_to_components_df(), include_nodes=include_nodes)
         return vtk_obj
 
-    #  ==================== Plotting methods ====================
-
     @property
     def network_object(self) -> Graph:
         """
@@ -701,6 +753,8 @@ class FractureNetwork:
 
         network_object = Rep.networkx_rep(self.vtk_object(include_nodes=False))
         return network_object
+
+    #  ==================== Plotting methods ====================
 
     def vtkplot(self):
         """

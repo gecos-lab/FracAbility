@@ -123,6 +123,8 @@ def fracture_network_vtk_rep(input_df: geopandas.GeoDataFrame, include_nodes=Tru
     output_obj = PolyData(geometry_filter.GetOutput())
     conn_obj = connect_dots(output_obj)
 
+
+
     return conn_obj
 
 

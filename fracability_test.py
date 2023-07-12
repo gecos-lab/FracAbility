@@ -57,14 +57,16 @@ tidy_intersections(fracture_net)
 
 nodes_conn(fracture_net)
 
+fracture_net.fracture_network_to_components_df().to_csv('network.csv', sep=',', index=False)
+
 # fracture_net.plot_ternary()
 
 # fracture_net.fractures.entity_df.to_csv('data.csv', columns=['length', 'censored'])
 
-fitter = NetworkFitter(fracture_net)
-
-fitter.find_best_distribution()
-
-matplot_stats_summary(fitter.best_fit()['distribution'])
-
-pv.Report()
+# fitter = NetworkFitter(fracture_net)
+#
+# fitter.find_best_distribution()
+#
+# matplot_stats_summary(fitter.best_fit()['distribution'])
+#
+# pv.Report()
