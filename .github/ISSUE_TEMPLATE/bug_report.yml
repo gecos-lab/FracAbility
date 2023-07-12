@@ -25,14 +25,14 @@ body:
     id: system-information
     attributes:
       label: System Information
-      placeholder: The log will automatically be formatted! No need to type backticks.
+      placeholder: The log will automatically be formatted and copied to clipboard! No need to type backticks.
       description: |
         Please run the following code wherever you are experiencing the bug, and paste the output below.
         This report helps us track down bugs and will be critical to addressing your bug.
         ```python
         # Get system info
-        import pyvista as pv
-        print(pv.Report())
+        from fracability.utils import general_use
+        general_use.report()
         ```
       render: shell
     validations:
@@ -42,8 +42,10 @@ body:
     attributes:
       label: Screenshots and/or videos
       description: If applicable, please add screenshots/short videos to the text box below
-  - type: input
+  - type: textarea
     id: data
     attributes:
       label: Datasets
-      description: If possible, please upload the dataset/part of the dataset you used (if more than one file please zip them).
+      description: If possible, please upload the dataset/part of the dataset you used. If possible please provide a description of the dataset and what to expect. Please zip files that are inherent to each other.
+      placeholder: Upload here your data
+      value: "- This file contains xyz: _your_file.csv_\n- This zip contains all the files related to xyz: _your_zip.zip_"

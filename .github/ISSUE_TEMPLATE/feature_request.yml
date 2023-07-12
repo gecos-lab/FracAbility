@@ -21,6 +21,6 @@ body:
     id: pseudocode-and-screenshots
     attributes:
       label: Pseudocode or Screenshots
-      description: Feel free to include pseudocode or screenshots of the requested outcome.
+      description: Feel free to include pseudocode or code snippents and, if possible, screenshots of the requested outcome.
       placeholder: Provide some code for us to reproduce the bug!
       value: "```python\nInsert code here\n```\nOr drag your screenshot here!"
