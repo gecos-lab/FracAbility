@@ -102,6 +102,50 @@ class NetworkData:
         """
         return self._function_list
 
+    @property
+    def mean(self) -> np.ndarray:
+        return np.mean(self.lengths)
+
+    @property
+    def std(self) -> np.ndarray:
+        return np.std(self.lengths)
+
+    @property
+    def var(self) -> np.ndarray:
+        return np.var(self.lengths)
+
+    @property
+    def median(self) -> np.ndarray:
+        return np.median(self.lengths)
+
+    @property
+    def mode(self) -> tuple:
+        return ss.mode(self.lengths)
+
+    @property
+    def b5(self) -> np.ndarray:
+        return np.percentile(self.lengths, 5)
+
+    @property
+    def b95(self) -> np.ndarray:
+        return np.percentile(self.lengths, 95)
+
+    @property
+    def ecdf(self) -> ss._survival.EmpiricalDistributionFunction:
+        """
+        Property that returns the empirical cdf of the data
+        :return:
+        """
+        return ss.ecdf(self.data).cdf
+
+    @property
+    def esf(self) -> ss._survival.EmpiricalDistributionFunction:
+        """
+        Property that returns the empirical sf of the data
+        :return:
+        """
+        return ss.ecdf(self.data).sf
+
 
 class NetworkDistribution:
     """
@@ -197,22 +241,6 @@ class NetworkDistribution:
         :return:
         """
         return self.distribution.ppf(0.95)
-
-    @property
-    def ecdf(self) -> ss._survival.EmpiricalDistributionFunction:
-        """
-        Property that returns the empirical cdf of the data
-        :return:
-        """
-        return ss.ecdf(self.fit_data.data).cdf
-
-    @property
-    def esf(self):
-        """
-        Property that returns the empirical sf of the data
-        :return:
-        """
-        return ss.ecdf(self.fit_data.data).sf
 
     @property
     def log_likelihood(self) -> float:

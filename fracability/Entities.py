@@ -122,11 +122,11 @@ class Nodes(BaseEntity):
 
         return PI, PY, PX, PU, precise_n
 
-    def matplot(self):
-        plts.matplot_nodes(self)
+    def matplot(self, markersize=7, return_ax=False):
+        plts.matplot_nodes(self, markersize, return_ax)
 
-    def vtkplot(self):
-        plts.vtkplot_nodes(self)
+    def vtkplot(self, markersize=7, return_plot=False):
+        plts.vtkplot_nodes(self, markersize, return_plot)
 
     def ternary_plot(self):
         plts.matplot_ternary(self)
@@ -181,10 +181,10 @@ class Fractures(BaseEntity):
         return network_obj
 
     def matplot(self):
-        plts.matplot_frac_bound(self)
+        plts.matplot_fractures(self)
 
-    def vtkplot(self):
-        plts.vtkplot_fractures(self)
+    def vtkplot(self, linewidth=1, color='white', color_set=False, return_plot=False):
+        plts.vtkplot_fractures(self, linewidth, color, color_set, return_plot)
 
 
 class Boundary(BaseEntity):
@@ -265,7 +265,7 @@ class Boundary(BaseEntity):
         return network_obj
 
     def matplot(self):
-        plts.matplot_frac_bound(self)
+        plts.matplot_boundaries(self)
 
     def vtkplot(self):
         plts.vtkplot_boundaries(self)
@@ -301,6 +301,15 @@ class FractureNetwork:
     def __init__(self, gdf: GeoDataFrame = None):
         self.column_names = ['type', 'object', 'node_type', 'fracture_set', 'boundary_group', 'active']
         self._df: DataFrame = DataFrame(columns=self.column_names)
+
+        if gdf is not None:
+            nodes = Nodes(gdf.loc[gdf['type'] == 'node'])
+            fractures = Fractures(gdf.loc[gdf['type'] == 'fracture'])
+            boundaries = Boundary(gdf.loc[gdf['type'] == 'boundary'])
+
+            self.add_nodes(nodes)
+            self.add_fractures(fractures)
+            self.add_boundaries(boundaries)
 
     @property
     def name(self):
@@ -756,20 +765,30 @@ class FractureNetwork:
 
     #  ==================== Plotting methods ====================
 
-    def vtkplot(self):
+    def vtkplot(self,
+                markersize=5,
+                linewidth=[2, 2],
+                color=['white', 'white'],
+                color_set=False,
+                return_plot=False):
         """
         Method used to plot the fracture network using vtk
         :return:
         """
 
-        plts.vtkplot_frac_net(self)
+        plts.vtkplot_frac_net(self, markersize, linewidth, color, color_set, return_plot)
 
-    def matplot(self):
+    def matplot(self,
+                markersize=5,
+                linewidth=[2, 2],
+                color=['black', 'blue'],
+                color_set=False,
+                return_ax=False):
         """
         Method used to plot the fracture network using matplotlib
         :return:
         """
-        plts.matplot_frac_net(self)
+        plts.matplot_frac_net(self, markersize, linewidth, color, color_set, return_ax)
 
     def plot_ternary(self):
         """

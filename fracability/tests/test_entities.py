@@ -140,12 +140,20 @@ class TestFractureNetwork:
         assert 1 in set(fracture_net.entity_df.fracture_set)
         assert 2 in set(fracture_net.entity_df.fracture_set)
 
-    # def test_add_boundaries(self):
-    #     fracture_net = FractureNetwork()
-    #     fracture_net.add_boundaries(pytest.boundaries)
-    #     assert 0 in set(fracture_net.entity_df.boundary_group)
+    def test_add_boundaries(self):
+        fracture_net = FractureNetwork()
+        fracture_net.add_boundaries(pytest.boundaries)
+        assert 1 in set(fracture_net.entity_df.boundary_group)
 
-    def test_create_fn(self):
+    def test_create_fn_df(self):
+        fracture_net = FractureNetwork(example_fracture_network.fracture_net_components())
+        assert not fracture_net.entity_df.empty
+        assert not fracture_net.nodes.entity_df.empty
+        assert not fracture_net.fractures.entity_df.empty
+        assert not fracture_net.boundaries.entity_df.empty
+        assert fracture_net.fracture_network_to_components_df().equals(example_fracture_network.fracture_net_components())
+
+    def test_create_fn_add(self):
 
         pytest.fracture_net = FractureNetwork()
         pytest.fracture_net.add_nodes(pytest.nodes)
@@ -153,6 +161,9 @@ class TestFractureNetwork:
         pytest.fracture_net.add_boundaries(pytest.boundaries)
 
         assert not pytest.fracture_net.entity_df.empty
+        assert not pytest.fracture_net.nodes.entity_df.empty
+        assert not pytest.fracture_net.fractures.entity_df.empty
+        assert not pytest.fracture_net.boundaries.entity_df.empty
         assert pytest.fracture_net.fracture_network_to_components_df().equals(example_fracture_network.fracture_net_components())
 
     def test_activate_nodes(self):
