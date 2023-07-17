@@ -60,7 +60,7 @@ def matplot_nodes(entity, markersize=7, return_plot=False, show_plot=True):
         ax = plt.gca()
     vtk_object = entity.vtk_object
     points = vtk_object.points
-    node_types = vtk_object['node_type']
+    node_types = vtk_object['n_type']
     I = np.where(node_types == 1)
     Y = np.where(node_types == 3)
     X = np.where(node_types == 4)
@@ -90,14 +90,14 @@ def matplot_fractures(entity, linewidth=1, color='black', color_set=False, retur
         ax = plt.gca()
 
     if color_set:
-        if 'set' in entity.entity_df.columns:
-            n_sets = len(set(entity.entity_df['set']))
+        if 'f_set' in entity.entity_df.columns:
+            n_sets = len(set(entity.entity_df['f_set']))
             cmap = matplotlib.colormaps.get_cmap("rainbow").resampled(n_sets)
             entity.entity_df.plot(ax=ax,
                                   cmap=cmap,
                                   linewidth=linewidth)
         else:
-            entity.entity_df.plot(ax=ax, color=color, linewidth=linewidth)
+            return False
     else:
 
         entity.entity_df.plot(ax=ax, color=color, linewidth=linewidth)
@@ -174,7 +174,7 @@ def vtkplot_nodes(entity, markersize=7, return_plot=False, show_plot=True):
 
     nodes = entity.vtk_object
 
-    class_names = [class_dict[i] for i in nodes['node_type']]
+    class_names = [class_dict[i] for i in nodes['n_type']]
 
     used_tags = list(set(class_names))
     used_tags.sort()
@@ -202,27 +202,36 @@ def vtkplot_nodes(entity, markersize=7, return_plot=False, show_plot=True):
             plotter.show()
 
 
-def vtkplot_fractures(entity, linewidth=1, color='white', color_set=False, return_plot=False, show_plot=True):
+def vtkplot_fractures(entity,
+                      linewidth=1,
+                      color='white',
+                      color_set=False,
+                      return_plot=False,
+                      show_plot=True,
+                      display_property: str = None):
 
+    print(display_property)
     plotter = Plotter()
     plotter.view_xy()
     plotter.enable_image_style()
 
     vtk_object = entity.vtk_object
+
     if color_set:
-        if 'set' in vtk_object.array_names:
-            n_sets = len(set(vtk_object['set']))
+        display_property = 'f_set'
+
+    if display_property:
+        print(display_property)
+        if display_property in vtk_object.array_names:
+            n_sets = len(set(vtk_object[display_property]))
             cmap = matplotlib.colormaps.get_cmap("rainbow").resampled(n_sets)
             actor = plotter.add_mesh(entity.vtk_object, #this needs fixin'. Connecting fractures color are "contaminated"
-                                     scalars='set',
+                                     scalars=display_property,
                                      line_width=linewidth,
                                      cmap=cmap,
                                      show_scalar_bar=False)
         else:
-            actor = plotter.add_mesh(entity.vtk_object,
-                                     color=color,
-                                     line_width=linewidth,
-                                     show_scalar_bar=False)
+            return False
     else:
 
         actor = plotter.add_mesh(entity.vtk_object,

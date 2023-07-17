@@ -11,53 +11,7 @@ from copy import deepcopy
 from halo import Halo
 
 
-def center_object(obj, trans_center: np.array = None, return_center: bool = False, inplace: bool = True):
-    """
-    Translate the center of the Entity object to a given point. If no trans_center is specified then the object
-    will be moved to the origin (0,0,0).
-
-    Parameters
-    ----------
-    obj: Boundary, Fractures, FractureNetwork
-        A fracability entity object
-    trans_center: array
-        Point to which translate the object
-    return_center: bool
-        Bool flag to specify to return the translation center
-    inplace: bool
-        Bool flag to specify if the operation overwrites the entity or creates a new instance
-
-    Returns
-    ----------
-    trans_center: array
-        Point of translation. If trans_center is not specified in the output then this will return the center of
-        the object
-    copy_obj: object
-        Copy of the modified input object (preserves the original input)
-    """
-
-    if obj.name == 'FractureNetwork':
-        df = obj.fracture_network_to_components_df()
-    else:
-        df = obj.entity_df.copy()
-
-    if trans_center is None:
-        trans_center = np.array(df.dissolve().centroid[0].coords).flatten()
-
-    df['geometry'] = df.translate(-trans_center[0], -trans_center[1])
-    if return_center:
-        return trans_center
-
-    if inplace:
-        # print(df)
-        obj.entity_df = df
-    else:
-        copy_obj = deepcopy(obj)
-        copy_obj.entity_df = df
-        return copy_obj
-
-
-@Halo(text='Calculating intersections', spinner='line', placement='right')
+# @Halo(text='Calculating intersections', spinner='line', placement='right')
 def tidy_intersections(obj, buffer=0.05, inplace: bool = True):
 
     if obj.name == 'FractureNetwork':
@@ -96,25 +50,24 @@ def tidy_intersections(obj, buffer=0.05, inplace: bool = True):
         return copy_obj
 
 
-def calculate_seg_length(obj: BaseEntity, regions: [int] = None, inplace: bool = True):
-    df = obj.entity_df.copy()
+def calculate_seg_length(obj: BaseEntity, inplace: bool = True):
 
-    lengths = df.length
+    if obj.name == 'FractureNetwork':
+        gdf = obj.fracture_network_to_components_df()
+        gdf = gdf.loc[gdf['type'] != 'node']
+        gdf = gdf.loc[gdf['type'] != 'boundary']
+    elif obj.name == 'Nodes':
+        print('cannot calculate lengths of nodes')
+        return
+    else:
+        gdf = obj.entity_df.copy()
 
-    df.loc[:, 'length'] = lengths
+    df = gdf.copy()
 
-    # connectivity = vtkConnectivityFilter()
-    # connectivity.AddInputData(vtk_obj)
-    # if regions is None:
-    #     regions = set(vtk_obj['RegionId'])
-    # lengths = []
-    # for region in regions:
-    #     connectivity.SetExtractionModeToSpecifiedRegions()
-    #     connectivity.InitializeSpecifiedRegionList()
-    #     connectivity.AddSpecifiedRegion(region)
-    #     connectivity.Update()
-    #     extr_obj = PolyData(connectivity.GetOutput())
-    #     lengths.append(np.sum(extr_obj.compute_arc_length()['arc_length']))
+    if 'lengths' in df.columns:
+        print('length column already present. Delete it to recalculate lengths')
+    else:
+        df['lengths'] = df.length
 
     if inplace:
         obj.entity_df = df

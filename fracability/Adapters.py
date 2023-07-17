@@ -20,11 +20,11 @@ def node_vtk_rep(input_df: geopandas.GeoDataFrame) -> PolyData:
 
     points = np.array([point.coords for point in input_df.geometry]).reshape(-1, 3)
     types = input_df['type'].values
-    node_types = input_df['node_type'].values
+    node_types = input_df['n_type'].values
 
     points_vtk = PolyData(points)
     points_vtk['type'] = types
-    points_vtk['node_type'] = node_types
+    points_vtk['n_type'] = node_types
 
     return points_vtk
 
@@ -33,10 +33,11 @@ def frac_vtk_rep(input_df: geopandas.GeoDataFrame) -> PolyData:
     appender = vtkAppendPolyData()
 
     for index, geom, set_n in zip(input_df.index, input_df['geometry'],
-                                  input_df['set']):  # For each geometry in the df
+                                  input_df['f_set']):  # For each geometry in the df
 
         x, y = geom.coords.xy  # get xy as an array
         z = np.zeros_like(x)  # create a zeros z array with the same dim of the x (or y)
+
 
         points = np.stack((x, y, z), axis=1)  # Stack the coordinates to a [n,3] shaped array
         # offset = np.round(points[0][0])
@@ -44,11 +45,14 @@ def frac_vtk_rep(input_df: geopandas.GeoDataFrame) -> PolyData:
         pv_obj.cell_data['type'] = ['fracture'] * pv_obj.GetNumberOfCells()
         pv_obj.point_data['type'] = ['fracture'] * pv_obj.GetNumberOfPoints()
 
-        pv_obj.cell_data['set'] = [set_n] * pv_obj.GetNumberOfCells()
-        pv_obj.point_data['set'] = [set_n] * pv_obj.GetNumberOfPoints()
+        pv_obj.cell_data['f_set'] = [set_n] * pv_obj.GetNumberOfCells()
 
-        pv_obj['RegionId'] = [index] * pv_obj.GetNumberOfPoints()
+        pv_obj.cell_data['RegionId'] = [index] * pv_obj.GetNumberOfCells()
 
+        if 'lengths' in input_df.columns:
+            pv_obj.cell_data['length'] = input_df.loc[index, 'lengths']
+
+        pv_obj = pv_obj.cell_data_to_point_data()
         # line.plot()
 
         appender.AddInputData(pv_obj)  # Add the new object
@@ -67,7 +71,9 @@ def bound_vtk_rep(input_df: geopandas.GeoDataFrame) -> PolyData:
 
     appender = vtkAppendPolyData()
 
-    for index, geom in zip(input_df.index, input_df['geometry']):  # For each geometry in the df
+    for index, geom, b_group in zip(input_df.index,
+                                    input_df['geometry'],
+                                    input_df['b_group']):  # For each geometry in the df
 
         x, y = geom.coords.xy  # get xy as an array
         z = np.zeros_like(x)  # create a zeros z array with the same dim of the x (or y)
@@ -78,7 +84,11 @@ def bound_vtk_rep(input_df: geopandas.GeoDataFrame) -> PolyData:
         pv_obj.cell_data['type'] = ['boundary'] * pv_obj.GetNumberOfCells()
         pv_obj.point_data['type'] = ['boundary'] * pv_obj.GetNumberOfPoints()
 
-        pv_obj['RegionId'] = [index] * pv_obj.GetNumberOfPoints()
+        pv_obj.cell_data['b_group'] = [b_group] * pv_obj.GetNumberOfCells()
+
+        pv_obj.cell_data['RegionId'] = [index] * pv_obj.GetNumberOfCells()
+
+        pv_obj = pv_obj.cell_data_to_point_data()
 
         # line.plot()
 
@@ -123,8 +133,6 @@ def fracture_network_vtk_rep(input_df: geopandas.GeoDataFrame, include_nodes=Tru
     output_obj = PolyData(geometry_filter.GetOutput())
     conn_obj = connect_dots(output_obj)
 
-
-
     return conn_obj
 
 
@@ -139,7 +147,7 @@ def networkx_rep(input_object: PolyData) -> networkx.Graph():
     lines = np.delete(lines,
                       np.arange(0, lines.size, 3))  # remove padding eg. [2 id1 id2 2 id3 id4 ...] -> remove the 2
 
-    test_types = np.array([{'type': t} for t in network['type']])
+    # test_types = np.array([{'type': t} for t in network['type']])
     edges = np.c_[lines.reshape(-1, 2)]
 
     network = nx.Graph()  # Create a networkx graph instance

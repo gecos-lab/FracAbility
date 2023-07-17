@@ -1,10 +1,12 @@
 from abc import ABC, abstractmethod, abstractproperty
 
 from geopandas import GeoDataFrame
+from geopandas import read_file
 from pyvista import PolyData
 from networkx import Graph
 import scipy.stats as ss
 import numpy as np
+from copy import deepcopy
 
 
 class BaseEntity(ABC):
@@ -17,7 +19,7 @@ class BaseEntity(ABC):
     4. Fracture Networks
     """
 
-    def __init__(self, gdf: GeoDataFrame = None):
+    def __init__(self, gdf: GeoDataFrame = None, shp: str = None):
         """
         Init the entity. If a geopandas dataframe is specified then it is
         set as the source entity df.
@@ -26,7 +28,9 @@ class BaseEntity(ABC):
         """
         self._df: GeoDataFrame
 
-        if gdf is not None:
+        if shp is not None:
+            self.entity_df = read_file(shp)
+        elif gdf is not None:
             self.entity_df = gdf
 
     @property
@@ -103,8 +107,109 @@ class BaseEntity(ABC):
         """
 
     @property
-    def name(self):
+    def name(self) -> str:
+        """
+        Property used to return the name of the class (i.e. Fractures)
+        :return: Name of the class as string
+        """
         return self.__class__.__name__
+
+    @property
+    def crs(self) -> str:
+        """
+        Property used to return the crs of the entity
+        :return: Name of the coordinate system as a string
+        """
+        return self.entity_df.crs
+
+    @property
+    def centroid(self) -> np.ndarray:
+        """
+        Property used to return the centroid of the entity. Dissolve is used to aggregate each shape in a single entity.
+        :return: 1D numpy array of the centroid
+        """
+        trans_center = np.array(self.entity_df.dissolve().centroid[0].coords).flatten()
+        return trans_center
+
+    @property
+    def get_copy(self):
+        """
+        Property used to return a deep copy of the entity
+        :return:
+        """
+        return deepcopy(self)
+
+    def center_object(self, trans_center: np.array = None, return_center: bool = False,
+                      inplace: bool = True):
+        """
+        Method used to center the center of an Entity object to a given point. If no point is specified then the object
+        will be moved to the origin (0,0,0).
+
+        Parameters
+        ----------
+        obj: Boundary, Fractures, FractureNetwork
+            A fracability entity object
+        trans_center: array
+            Point to which translate the object
+        return_center: bool
+            Bool flag to specify to return the translation center
+        inplace: bool
+            Bool flag to specify if the operation overwrites the entity or creates a new instance
+
+        Returns
+        ----------
+        trans_center: array
+            Point of translation. If trans_center is not specified in the output then this will return the center of
+            the object
+        copy_obj: object
+            Copy of the modified input object (preserves the original input)
+        """
+
+        if self.name == 'FractureNetwork':
+            df = self.fracture_network_to_components_df()
+        else:
+            df = self.entity_df.copy()
+
+        if trans_center is None:
+            trans_center = self.centroid
+
+        df['geometry'] = df.translate(-trans_center[0], -trans_center[1])
+
+        if inplace:
+
+            self.entity_df = df
+
+            if return_center:
+                return trans_center
+
+        else:
+            copy_obj = deepcopy(self)
+            copy_obj.entity_df = df
+
+            if return_center:
+                return copy_obj, trans_center
+            else:
+                return copy_obj
+
+    def save_csv(self, path: str, sep: str = ',', index: bool = False):
+        """
+        Save the entity df as csv
+        :param index:
+        :type sep: object
+        :param path:
+        :return:
+        """
+
+        self.entity_df.to_csv(path, sep=sep, index=index)
+
+    def save_shp(self, path: str):
+        """
+        Save the entity df as shp
+        :param path:
+        :return:
+        """
+        if not self.entity_df.empty:
+            self.entity_df.to_file(path, crs=self.crs)
 
 
 class BaseOperator(ABC):

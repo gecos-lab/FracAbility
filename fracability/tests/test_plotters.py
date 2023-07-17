@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 
 @pytest.fixture(scope="session", autouse=True)
-def execute_before_any_test():
+def environment_var():
     data = example_fracture_network.fracture_net_components()
     pytest.fracture_net = FractureNetwork(data)
     pytest.fitter = NetworkFitter(pytest.fracture_net)
@@ -19,7 +19,7 @@ class TestMatplot:
 
     def test_matplot_nodes(self):
         nodes = pytest.fracture_net.nodes
-
+        assert 'n_type' in nodes.entity_df.columns
         ax = matplot_nodes(nodes, markersize=5, return_plot=True)
         assert ax
         plt.close()
@@ -33,6 +33,7 @@ class TestMatplot:
         ax = matplot_fractures(fractures, linewidth=2, color='red', color_set=False, return_plot=True)
         assert ax
         plt.close()
+        assert 'f_set' in fractures.entity_df.columns
         ax = matplot_fractures(fractures, linewidth=2, color='red', color_set=True, return_plot=True)
         assert ax
         plt.close()
@@ -40,6 +41,7 @@ class TestMatplot:
     def test_matplot_boundaries(self):
         boundaries = pytest.fracture_net.boundaries
         # matplot_boundaries(boundaries, linewidth=2, color='red', return_plot=False, show_plot=False)
+        assert 'b_group' in boundaries.entity_df.columns
         ax = matplot_boundaries(boundaries, linewidth=2, color='red', return_plot=True)
         assert ax
         plt.close()
@@ -116,12 +118,15 @@ class TestVTKPlot:
     def test_vtkplot_nodes(self):
         nodes = pytest.fracture_net.nodes
         # vtkplot_nodes(nodes, markersize=5, return_plot=False, show_plot=False)
+
+        assert 'n_type' in nodes.vtk_object.array_names
         assert vtkplot_nodes(nodes, markersize=5, return_plot=True, show_plot=False)
 
     def test_vtkplot_fractures(self):
         fractures = pytest.fracture_net.fractures
         # vtkplot_fractures(fractures, linewidth=2, color='black', color_set=False, return_plot=False, show_plot=False)
         # vtkplot_fractures(fractures, linewidth=2, color='white', color_set=True, return_plot=False, show_plot=False)
+        assert 'f_set' in fractures.vtk_object.array_names
         assert vtkplot_fractures(fractures, linewidth=2, color='white',
                                  color_set=False, return_plot=True, show_plot=False)
         assert vtkplot_fractures(fractures, linewidth=2, color='white',
@@ -130,6 +135,7 @@ class TestVTKPlot:
     def test_vtkplot_boundaries(self):
         boundaries = pytest.fracture_net.boundaries
         # vtkplot_boundaries(boundaries, linewidth=2, color='red', return_plot=False, show_plot=False)
+        assert 'b_group' in boundaries.vtk_object.array_names
         assert vtkplot_boundaries(boundaries, linewidth=2, color='white', return_plot=True, show_plot=False)
 
     def test_vtkplot_frac_net(self):
