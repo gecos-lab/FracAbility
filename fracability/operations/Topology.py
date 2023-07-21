@@ -1,13 +1,11 @@
 
 from vtkmodules.vtkFiltersCore import vtkConnectivityFilter
 
-from fracability.Entities import BaseEntity, FractureNetwork, Nodes
+from fracability.Entities import FractureNetwork, Nodes
 
-from fracability.Adapters import frac_vtk_rep
 
-from shapely.geometry import Point, MultiPoint
+from shapely.geometry import Point
 from geopandas import GeoDataFrame
-from pyvista import PolyData
 import numpy as np
 
 

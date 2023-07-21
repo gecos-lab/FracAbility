@@ -33,6 +33,7 @@ def test_tidy_intersections():
     assert tidy_intersections(frac_net, inplace=False).fracture_network_to_components_df().equals(control_df['ns1'])
     frac_net.activate_fractures()
 
+
 def test_calculate_length():
 
     set_1 = Entities.Fractures(shp=pytest.shp_path['set_1'], set_n=1)

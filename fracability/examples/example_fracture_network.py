@@ -32,6 +32,16 @@ def fracture_net_control_intersection():
 
     return {'complete': gdf, 'nb': gdf_nb, 'ns1':gdf_ns1}
 
+def fracture_net_control_topology():
+    """
+    method used to get the csv to control correct intersections
+    :return: GeoPandas dataframe
+    """
+    data = pd.read_csv(f'{DATADIR}/example_fracture_network_data/control_data/subset_network_control_topology.csv')
+    gdf = gpd.GeoDataFrame(data, geometry=gpd.GeoSeries.from_wkt(data["geometry"]), crs='epsg:32632')
+
+    return {'complete': gdf}
+
 
 def fracture_net_subset() -> tuple[dict, dict]:
     """

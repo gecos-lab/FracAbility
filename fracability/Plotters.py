@@ -50,7 +50,29 @@ from fracability.operations.Statistics import NetworkDistribution
 import numpy as np
 
 
-def matplot_nodes(entity, markersize=7, return_plot=False, show_plot=True):
+def matplot_nodes(entity,
+                  markersize=7,
+                  return_plot=False,
+                  show_plot=True):
+    """
+    Plot a fracability Nodes entity using matplotlib.
+
+    :param entity: Nodes entity to plot
+    :param markersize: Size of the markers as int
+    :param return_plot: Bool. If true the plot is returned. By default, False
+    :param show_plot: Bool. If true the plot is shown. By default, True
+    :return: If return_plot is true a matplotlib axis is returned
+
+    Notes
+    -------
+    The nodes are represented using this color and marker codes:
+
+    1. I nodes: blue red circle
+    2. Y nodes: green triangle
+    3. Y2 nodes: cyan triangle
+    4. X nodes: blue square
+    5. U nodes: yellow pentagon
+    """
 
     if 'Fracture net plot' not in plt.get_figlabels():
         figure = plt.figure(num=f'Nodes plot')
@@ -80,8 +102,24 @@ def matplot_nodes(entity, markersize=7, return_plot=False, show_plot=True):
             plt.show()
 
 
-def matplot_fractures(entity, linewidth=1, color='black', color_set=False, return_plot=False, show_plot=True):
+def matplot_fractures(entity,
+                      linewidth=1,
+                      color='black',
+                      color_set=False,
+                      return_plot=False,
+                      show_plot=True):
+    """
+    Plot a fracability Fracture entity using matplotlib.
 
+    :param entity: Fracture entity to plot
+    :param linewidth: Size of the lines as int
+    :param color: General color of the lines as str.
+    :param color_set: Bool. If true the lines are based on the set values.
+    :param return_plot: Bool. If true the plot is returned. By default, False
+    :param show_plot: Bool. If true the plot is shown. By default, True
+    :return: If return_plot is true a matplotlib axis is returned
+
+    """
     if 'Fracture net plot' not in plt.get_figlabels():
         figure = plt.figure(num=f'Fractures plot')
 
@@ -109,7 +147,21 @@ def matplot_fractures(entity, linewidth=1, color='black', color_set=False, retur
             plt.show()
 
 
-def matplot_boundaries(entity, linewidth=1, color='black', return_plot=False, show_plot=True):
+def matplot_boundaries(entity,
+                       linewidth=1,
+                       color='black',
+                       return_plot=False,
+                       show_plot=True):
+    """
+    Plot a fracability Boundary entity using matplotlib.
+
+    :param entity: Boundary entity to plot
+    :param linewidth: Size of the lines as int
+    :param color: General color of the lines as str
+    :param return_plot: Bool. If true the plot is returned. By default, False
+    :param show_plot: Bool. If true the plot is shown. By default, True
+    :return: If return_plot is true a matplotlib axis is returned
+    """
 
     if 'Fracture net plot' not in plt.get_figlabels():
         figure = plt.figure(num=f'Boundaries plot')
@@ -127,9 +179,28 @@ def matplot_boundaries(entity, linewidth=1, color='black', return_plot=False, sh
             plt.show()
 
 
-def matplot_frac_net(entity, markersize=5, linewidth=[2, 2],
-                     color=['black', 'blue'], color_set=False, return_plot=False, show_plot=True):
+def matplot_frac_net(entity,
+                     markersize=5,
+                     linewidth=[2, 2],
+                     color=['black', 'blue'],
+                     color_set=False,
+                     return_plot=False,
+                     show_plot=True):
+    """
+    Plot a fracability FractureNetwork entity using matplotlib.
 
+    :param entity: FractureNetwork entity to plot
+    :param markersize: Size of the nodes
+    :param linewidth: Size of the lines as a list of ints. The first value of the list will be the width of the fractures
+    while the second the width of the boundary.
+    :param color: General color of the lines as list of strings. The first value of the list will be the width of the fractures
+    while the second the width of the boundary.
+    :param color_set: Bool. If true the lines are based on the set values.
+    :param return_plot: Bool. If true the plot is returned. By default, False
+    :param show_plot: Bool. If true the plot is shown. By default, True
+    :return: If return_plot is true a matplotlib axis is returned
+
+    """
     figure = plt.figure(num=f'Fracture net plot')
     ax = plt.subplot(111)
     nodes = entity.nodes
@@ -150,8 +221,20 @@ def matplot_frac_net(entity, markersize=5, linewidth=[2, 2],
             plt.show()
 
 
-def vtkplot_nodes(entity, markersize=7, return_plot=False, show_plot=True):
+def vtkplot_nodes(entity,
+                  markersize=7,
+                  return_plot=False,
+                  show_plot=True):
+    """
+    Plot a fracability Nodes entity using vtk.
 
+    :param entity: FractureNetwork entity to plot
+    :param markersize: Size of the nodes
+    :param return_plot: Bool. If true the plot is returned. By default, False
+    :param show_plot: Bool. If true the plot is shown. By default, True
+    :return: If return_plot is true a matplotlib axis is returned
+
+    """
     plotter = Plotter()
     plotter.view_xy()
     plotter.enable_image_style()
@@ -210,7 +293,19 @@ def vtkplot_fractures(entity,
                       show_plot=True,
                       display_property: str = None):
 
-    print(display_property)
+    """
+    Plot a fracability Fracture entity using vtk.
+
+    :param entity: Fracture entity to plot
+    :param linewidth: width of the lines
+    :param color: General color of the lines as str.
+    :param color_set: Bool. If true the fractures are colored using the set.
+    :param return_plot: Bool. If true the plot is returned. By default, False
+    :param show_plot: Bool. If true the plot is shown. By default, True
+    :return: If return_plot is true a matplotlib axis is returned
+
+    """
+
     plotter = Plotter()
     plotter.view_xy()
     plotter.enable_image_style()
@@ -221,7 +316,7 @@ def vtkplot_fractures(entity,
         display_property = 'f_set'
 
     if display_property:
-        print(display_property)
+
         if display_property in vtk_object.array_names:
             n_sets = len(set(vtk_object[display_property]))
             cmap = matplotlib.colormaps.get_cmap("rainbow").resampled(n_sets)
@@ -247,8 +342,21 @@ def vtkplot_fractures(entity,
             plotter.show()
 
 
-def vtkplot_boundaries(entity, linewidth=1, color='white', return_plot=False, show_plot=True):
+def vtkplot_boundaries(entity,
+                       linewidth=1,
+                       color='white',
+                       return_plot=False,
+                       show_plot=True):
+    """
+    Plot a fracability Boundary entity using vtk.
 
+    :param entity: Fracture entity to plot
+    :param linewidth: width of the lines
+    :param color: General color of the lines as str.
+    :param return_plot: Bool. If true the plot is returned. By default, False
+    :param show_plot: Bool. If true the plot is shown. By default, True
+    :return: If return_plot is true a matplotlib axis is returned
+    """
     plotter = Plotter()
     plotter.view_xy()
     plotter.enable_image_style()
@@ -266,9 +374,28 @@ def vtkplot_boundaries(entity, linewidth=1, color='white', return_plot=False, sh
             plotter.show()
 
 
-def vtkplot_frac_net(entity, markersize=5, linewidth=[2, 2],
-                     color=['white', 'white'], color_set=False, return_plot=False, show_plot=True):
+def vtkplot_frac_net(entity,
+                     markersize=5,
+                     linewidth=[2, 2],
+                     color=['white', 'white'],
+                     color_set=False,
+                     return_plot=False,
+                     show_plot=True):
+    """
+    Plot a fracability FractureNetwork entity using matplotlib.
 
+    :param entity: FractureNetwork entity to plot
+    :param markersize: Size of the nodes
+    :param linewidth: Size of the lines as a list of ints. The first value of the list will be the width of the fractures
+    while the second the width of the boundary.
+    :param color: General color of the lines as list of strings. The first value of the list will be the width of the fractures
+    while the second the width of the boundary.
+    :param color_set: Bool. If true the lines are based on the set values.
+    :param return_plot: Bool. If true the plot is returned. By default, False
+    :param show_plot: Bool. If true the plot is shown. By default, True
+    :return: If return_plot is true a matplotlib axis is returned
+
+    """
     plotter = Plotter()
     plotter.view_xy()
     plotter.enable_image_style()
@@ -299,21 +426,22 @@ def vtkplot_frac_net(entity, markersize=5, linewidth=[2, 2],
             plotter.show()
 
 
-def matplot_stats_pdf(network_distribution: NetworkDistribution, histogram: bool = True, show_plot=True):
-    sns.set_theme()
+def matplot_stats_pdf(network_distribution: NetworkDistribution,
+                      histogram: bool = True,
+                      show_plot: bool = True):
     """
     Plot PDF and histogram.
 
     Parameters
     -------
-    x_min: Lower value of the range. By default is set to 0
+    network_distribution: Input NetworkDistribution object
 
-    x_max: Higher value of the range. If None the maximum length of the dataset is used. None by default
+    histogram: Bool. If true plot also the histogram of the data. By default, is True
 
-    res: Point resolution between x_min and x_max. By default is set to 1000
+    show_plot: Bool. If true show the plot. By default, is True
 
     """
-
+    sns.set_theme()
     distribution = network_distribution.distribution
     name = network_distribution.distribution_name
 
@@ -336,30 +464,26 @@ def matplot_stats_pdf(network_distribution: NetworkDistribution, histogram: bool
     plt.grid(True)
     plt.legend()
 
-    # if table:
-    #     plt.subplot(2, 1, 2)
-    #     matplot_stats_table(network_distribution)
-
-    # cellText = [[text_mean_th, text_median_th, text_mode_th, text_b5_th, text_b95_th, text_std_th, text_var_th],
-    #             [text_mean, text_median, text_mode, text_b5, text_b95, text_std, text_var]],
     if show_plot:
         plt.show()
 
 
-def matplot_stats_cdf(network_distribution: NetworkDistribution, plot_ecdf: bool = True, show_plot: bool = True):
-    sns.set_theme()
+def matplot_stats_cdf(network_distribution: NetworkDistribution,
+                      plot_ecdf: bool = True,
+                      show_plot: bool = True):
     """
     Plot CDF and ECDF.
 
     Parameters
     -------
-    x_min: Lower value of the range. By default is set to 0
+    network_distribution: Input NetworkDistribution object
 
-    x_max: Higher value of the range. If None the maximum length of the dataset is used. None by default
+    plot_ecdf: Bool. If true plot also the empirical CDF curve of the data. By default, is True
 
-    res: Point resolution between x_min and x_max. By default is set to 1000
+    show_plot: Bool. If true show the plot. By default, is True
 
     """
+    sns.set_theme()
 
     distribution = network_distribution.distribution
     name = network_distribution.distribution_name
@@ -384,31 +508,26 @@ def matplot_stats_cdf(network_distribution: NetworkDistribution, plot_ecdf: bool
     plt.grid(True)
     plt.legend()
 
-    # if table:
-    #     plt.subplot(2, 1, 2)
-    #     matplot_stats_table(network_distribution)
-
-    # cellText = [[text_mean_th, text_median_th, text_mode_th, text_b5_th, text_b95_th, text_std_th, text_var_th],
-    #             [text_mean, text_median, text_mode, text_b5, text_b95, text_std, text_var]],
     if show_plot:
         plt.show()
 
 
-def matplot_stats_sf(network_distribution: NetworkDistribution, plot_esf: bool = True, show_plot: bool = True):
-    sns.set_theme()
+def matplot_stats_sf(network_distribution: NetworkDistribution,
+                     plot_esf: bool = True,
+                     show_plot: bool = True):
     """
     Plot SF and ESF.
 
     Parameters
     -------
-    x_min: Lower value of the range. By default is set to 0
+    network_distribution: Input NetworkDistribution object
 
-    x_max: Higher value of the range. If None the maximum length of the dataset is used. None by default
+    plot_esf: Bool. If true plot also the empirical SF curve of the data. By default, is True
 
-    res: Point resolution between x_min and x_max. By default is set to 1000
+    show_plot: Bool. If true show the plot. By default, is True
 
     """
-
+    sns.set_theme()
     distribution = network_distribution.distribution
     name = network_distribution.distribution_name
 
@@ -436,7 +555,30 @@ def matplot_stats_sf(network_distribution: NetworkDistribution, plot_esf: bool =
         plt.show()
 
 
-def matplot_stats_table(network_distribution: NetworkDistribution, vertical: bool = True, show_plot: bool = True):
+def matplot_stats_table(network_distribution: NetworkDistribution,
+                        vertical: bool = True,
+                        show_plot: bool = True):
+    """
+    Plot the stats summary table for both the data and the NetworkDistribution. In particular the following
+    estimators are calculated:
+
+        1. Mean
+        2. Standard Deviation
+        3. Variance
+        4. Median
+        5. Mode
+        6. 5th percentile
+        7. 95th percentile
+
+    Parameters
+    -----------
+    network_distribution: Input NetworkDistribution object
+
+    vertical: Bool. If true the table is vertical (2cols x 7rows). By default, is True
+
+    show_plot: Bool. If true show the plot. By default, is True
+
+    """
 
     name = network_distribution.distribution_name
 
@@ -486,23 +628,27 @@ def matplot_stats_table(network_distribution: NetworkDistribution, vertical: boo
         plt.show()
 
 
-def matplot_stats_summary(network_distribution: NetworkDistribution, function_list: list = ['pdf', 'cdf', 'sf'],
-                          table=True, show_plot: bool = True):
-    sns.set_theme()
+def matplot_stats_summary(network_distribution: NetworkDistribution,
+                          function_list: list = ['pdf', 'cdf', 'sf'],
+                          table: bool = True,
+                          show_plot: bool = True):
     """
-    Summarize PDF, CDF and SF functions and display mean, std, var, median, mode, 5th and 95th percentile all
+    Summarize PDF, CDF and SF functions and display summary table all
     in a single plot.
-    A range of values and the resolution can be defined with the x_min, x_max and res parameters.
+
 
     Parameters
     -------
-    x_min: Lower value of the range. By default is set to 0
+    network_distribution: Input NetworkDistribution object
 
-    x_max: Higher value of the range. If None the maximum length of the dataset is used. None by default
+    function_list: List of function to calculate (cdf, pdf etc.). By default pdf, cdf and sf functions are calculated
 
-    res: Point resolution between x_min and x_max. By default is set to 1000
+    table: Bool. If true the summary table is shown. By default is true
+
+    show_plot: Bool. If true show the plot. By default, is True
 
     """
+    sns.set_theme()
 
     name = network_distribution.distribution_name
 
@@ -536,11 +682,23 @@ def matplot_stats_summary(network_distribution: NetworkDistribution, function_li
         plt.show()
 
 
-def matplot_ternary(entity, return_plot:bool = False, show_plot: bool = True ):
+def matplot_ternary(entity,
+                    return_plot: bool = False,
+                    show_plot: bool = True):
 
     """
     Plot the ternary diagram for nodes
-    :param entity:
+
+    Parameters
+    ----------
+
+    entity: The fracability Nodes entity
+
+    return_plot: Bool. If true return the plot. By default, false
+
+    show_plot: Bool. If true show the plot. By default, true.
+
+
     """
 
     figure, tax = ternary.figure(scale=100)
@@ -594,6 +752,3 @@ def matplot_ternary(entity, return_plot:bool = False, show_plot: bool = True ):
     else:
         if show_plot:
             plt.show()
-
-
-

@@ -52,7 +52,7 @@ def frac_vtk_rep(input_df: geopandas.GeoDataFrame) -> PolyData:
         if 'lengths' in input_df.columns:
             pv_obj.cell_data['length'] = input_df.loc[index, 'lengths']
 
-        pv_obj = pv_obj.cell_data_to_point_data()
+        pv_obj.cell_data_to_point_data()
         # line.plot()
 
         appender.AddInputData(pv_obj)  # Add the new object
@@ -88,7 +88,6 @@ def bound_vtk_rep(input_df: geopandas.GeoDataFrame) -> PolyData:
 
         pv_obj.cell_data['RegionId'] = [index] * pv_obj.GetNumberOfCells()
 
-        pv_obj = pv_obj.cell_data_to_point_data()
 
         # line.plot()
 
@@ -132,6 +131,7 @@ def fracture_network_vtk_rep(input_df: geopandas.GeoDataFrame, include_nodes=Tru
 
     output_obj = PolyData(geometry_filter.GetOutput())
     conn_obj = connect_dots(output_obj)
+    print(conn_obj.array_names)
 
     return conn_obj
 
