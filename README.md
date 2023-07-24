@@ -1,6 +1,7 @@
 
-![logo](./docs/images/logo_small_small.png)
 <div align="center">
+
+![logo](./docs/images/logo_small_small.png)
 
 [![GitHub release](https://img.shields.io/github/release/gbene/FracAbility?include_prereleases=&sort=semver&color=orange)](https://github.com/gbene/FracAbility/releases/)
 [![License](https://img.shields.io/badge/License-AGPL--3.0-orange)](#license)
@@ -76,7 +77,7 @@ For usage details please refer to the documentation
 
 <div align="center">
 
-[![View - Online docs](https://img.shields.io/badge/View-Online_docs-blue?style=for-the-badge)](https://michaelcurrin.github.io/generic-project-template/ "Go to online documentation")
+[![View - Online docs](https://img.shields.io/badge/View-Online_docs-blue?style=for-the-badge)](/ "Go to online documentation")
 [![view - Documentation](https://img.shields.io/badge/view-Documentation-blue?style=for-the-badge)](/docs/ "Go to project documentation")
 </div>
 
