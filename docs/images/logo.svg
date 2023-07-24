@@ -8,8 +8,8 @@
    version="1.1"
    id="svg5"
    sodipodi:docname="logo.svg"
-   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
-   inkscape:export-filename="/home/gabriele/STORAGE/Progetti/code/Python/fracability/icon3.png"
+   inkscape:version="1.3 (1:1.3+202307231459+0e150ed6c4)"
+   inkscape:export-filename="logo.png"
    inkscape:export-xdpi="200"
    inkscape:export-ydpi="200"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
@@ -27,12 +27,12 @@
      inkscape:document-units="mm"
      showgrid="false"
      inkscape:zoom="0.99511788"
-     inkscape:cx="46.728132"
-     inkscape:cy="50.747757"
+     inkscape:cx="439.14395"
+     inkscape:cy="132.14515"
      inkscape:window-width="1920"
-     inkscape:window-height="1003"
-     inkscape:window-x="0"
-     inkscape:window-y="40"
+     inkscape:window-height="1011"
+     inkscape:window-x="1920"
+     inkscape:window-y="32"
      inkscape:window-maximized="1"
      inkscape:current-layer="g163652"
      showguides="true"
@@ -41,7 +41,9 @@
      fit-margin-left="2"
      fit-margin-right="2"
      fit-margin-bottom="2"
-     lock-margins="true" />
+     lock-margins="true"
+     inkscape:showpageshadow="2"
+     inkscape:deskcolor="#d1d1d1" />
   <defs
      id="defs2">
     <inkscape:path-effect
@@ -171,19 +173,18 @@
            y="-38.979786" />
         <flowRoot
            xml:space="preserve"
-           transform="translate(-96.72837,-620.4589)"
-           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:34.6667px;line-height:1.15;font-family:sans-serif;-inkscape-font-specification:sans-serif;text-align:justify;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none"
+           transform="translate(-117.31423,-615.0644)"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:32px;line-height:1.15;font-family:sans-serif;-inkscape-font-specification:sans-serif;text-align:justify;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none"
            id="flowRoot150207"><flowRegion
              id="flowRegion150209"
-             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:sans-serif;-inkscape-font-specification:sans-serif;text-align:justify;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none"><rect
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:32px;font-family:sans-serif;-inkscape-font-specification:sans-serif;text-align:justify;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none"><rect
                id="rect150211"
                width="998.17462"
                height="79.496323"
                x="30.719482"
                y="681.01044"
-               style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:sans-serif;-inkscape-font-specification:sans-serif;text-align:justify;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:2.13543" /></flowRegion><flowPara
-             id="flowPara151667"
-             style="font-size:34.6667px">Python toolbox for objective fracture network analysis</flowPara></flowRoot>
+               style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:sans-serif;-inkscape-font-specification:sans-serif;text-align:justify;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:2.13543;font-size:32.0000004px" /></flowRegion><flowPara
+             id="flowPara151667">Python toolbox for survival analysis in fractured rock systems</flowPara></flowRoot>
         <g
            id="g217915"
            transform="translate(7.5198976,-11.081321)">
@@ -229,16 +230,16 @@
                id="tspan12644">ability</tspan></text>
           <text
              xml:space="preserve"
-             style="font-size:40px;line-height:1.15;font-family:'TeX Gyre Termes';-inkscape-font-specification:'TeX Gyre Termes';white-space:pre;inline-size:953.963;fill:#000000;fill-opacity:1;stroke:none;stroke-width:2.13543;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+             style="font-size:40px;line-height:1.15;font-family:'TeX Gyre Termes';-inkscape-font-specification:'TeX Gyre Termes';white-space:pre;inline-size:953.963;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:2.13543;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
              x="-134.07755"
              y="659.36127"
              id="text5966-0"
              transform="translate(49.73522,-600)"><tspan
                x="-134.07755"
                y="659.36127"
-               id="tspan987"><tspan
+               id="tspan2"><tspan
                  style="font-family:sans-serif;-inkscape-font-specification:sans-serif"
-                 id="tspan985"> </tspan></tspan></text>
+                 id="tspan1"> </tspan></tspan></text>
           <text
              xml:space="preserve"
              style="font-size:66.6667px;line-height:1.15;font-family:'TeX Gyre Termes';-inkscape-font-specification:'TeX Gyre Termes'"
