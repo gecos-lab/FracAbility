@@ -9,7 +9,7 @@
    id="svg1308"
    inkscape:version="1.3 (1:1.3+202307231459+0e150ed6c4)"
    sodipodi:docname="logo_small_small.svg"
-   inkscape:export-filename="/home/gabriele/STORAGE/Progetti/github/FracAbility/docs/images/logo_small.png"
+   inkscape:export-filename="logo_small_small.png"
    inkscape:export-xdpi="200"
    inkscape:export-ydpi="200"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
@@ -45,6 +45,17 @@
      id="defs1305">
     <inkscape:path-effect
        effect="bspline"
+       id="path-effect7"
+       is_visible="true"
+       lpeversion="1"
+       weight="33.333333"
+       steps="2"
+       helper_size="0"
+       apply_no_weight="true"
+       apply_with_weight="true"
+       only_selected="false" />
+    <inkscape:path-effect
+       effect="bspline"
        id="path-effect217823"
        is_visible="true"
        lpeversion="1"
@@ -63,7 +74,10 @@
     <g
        id="g2217"
        style="stroke-width:1.5;stroke-miterlimit:4;stroke-dasharray:none"
-       transform="matrix(0.64331311,0,0,0.64331311,32.068375,33.386421)">
+       transform="matrix(0.64331311,0,0,0.64331311,32.068375,33.386421)"
+       inkscape:export-filename="./g2217.png"
+       inkscape:export-xdpi="200"
+       inkscape:export-ydpi="200">
       <rect
          style="fill:#ffffff;fill-opacity:1;stroke:#ff0000;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
          id="rect1706"
@@ -109,14 +123,14 @@
              id="tspan12644">ability</tspan></text>
         <text
            xml:space="preserve"
-           style="font-size:40px;line-height:1.15;font-family:'TeX Gyre Termes';-inkscape-font-specification:'TeX Gyre Termes';white-space:pre;inline-size:953.963;fill:#000000;fill-opacity:1;stroke:none;stroke-width:5.66929;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           style="font-size:40px;line-height:1.15;font-family:'TeX Gyre Termes';-inkscape-font-specification:'TeX Gyre Termes';white-space:pre;inline-size:953.963;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:5.66929;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
            x="-134.07755"
            y="659.36127"
            id="text5966-0"
            transform="matrix(0.26458333,0,0,0.26458333,68.471711,-70.539349)"><tspan
              x="-134.07755"
              y="659.36127"
-             id="tspan2"><tspan
+             id="tspan6"><tspan
                style="font-family:sans-serif;-inkscape-font-specification:sans-serif"
                id="tspan1"> </tspan></tspan></text>
         <text
@@ -127,6 +141,81 @@
            id="text195142"><tspan
              sodipodi:role="line"
              id="tspan195140"
+             x="33.076733"
+             y="99.602638"
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17.6389px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.5;stroke-miterlimit:4;stroke-dasharray:none">Frac</tspan></text>
+      </g>
+    </g>
+    <g
+       id="g6"
+       style="stroke-width:1.5;stroke-miterlimit:4;stroke-dasharray:none"
+       transform="matrix(0.64331311,0,0,0.64331311,32.068375,33.386421)"
+       inkscape:export-filename="./g2217.png"
+       inkscape:export-xdpi="200"
+       inkscape:export-ydpi="200">
+      <rect
+         style="fill:#ffffff;fill-opacity:1;stroke:#ff0000;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         id="rect1"
+         width="120.86709"
+         height="26.315117"
+         x="29.472691"
+         y="80.443924"
+         ry="4.1315494" />
+      <g
+         id="g5"
+         style="stroke-width:1.5;stroke-miterlimit:4;stroke-dasharray:none">
+        <path
+           style="fill:none;stroke:#000000;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           d="m 68.715281,94.884831 c 9.750819,0 19.501374,0 29.251664,0"
+           id="path1"
+           inkscape:path-effect="#path-effect7"
+           inkscape:original-d="m 68.715281,94.884831 c 9.750819,2.65e-4 19.501374,2.65e-4 29.251664,0"
+           sodipodi:nodetypes="cc" />
+        <circle
+           style="fill:#ffdd23;fill-opacity:1;stroke:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+           id="circle1"
+           cx="88.518723"
+           cy="73.450134"
+           r="6.8650689"
+           transform="rotate(15.596807)" />
+        <circle
+           style="fill:#009b01;fill-opacity:1;stroke:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+           id="circle2"
+           cx="120.37373"
+           cy="65.224373"
+           r="6.8650689"
+           transform="rotate(15.596807)" />
+        <text
+           xml:space="preserve"
+           style="font-size:17.6389px;line-height:1.15;font-family:'TeX Gyre Termes';-inkscape-font-specification:'TeX Gyre Termes';text-align:end;text-anchor:end;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           x="147.34097"
+           y="99.940575"
+           id="text2"><tspan
+             sodipodi:role="line"
+             x="147.34097"
+             y="99.940575"
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17.6389px;font-family:sans-serif;-inkscape-font-specification:sans-serif;text-align:end;text-anchor:end;fill:#000000;fill-opacity:1;stroke-width:1.5;stroke-miterlimit:4;stroke-dasharray:none"
+             id="tspan2">ability</tspan></text>
+        <text
+           xml:space="preserve"
+           style="font-size:40px;line-height:1.15;font-family:'TeX Gyre Termes';-inkscape-font-specification:'TeX Gyre Termes';white-space:pre;inline-size:953.963;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:5.66929;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           x="-134.07755"
+           y="659.36127"
+           id="text4"
+           transform="matrix(0.26458333,0,0,0.26458333,68.471711,-70.539349)"><tspan
+             x="-134.07755"
+             y="659.36127"
+             id="tspan8"><tspan
+               style="font-family:sans-serif;-inkscape-font-specification:sans-serif"
+               id="tspan7"> </tspan></tspan></text>
+        <text
+           xml:space="preserve"
+           style="font-size:17.6389px;line-height:1.15;font-family:'TeX Gyre Termes';-inkscape-font-specification:'TeX Gyre Termes';stroke:#000000;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           x="33.076733"
+           y="99.602638"
+           id="text5"><tspan
+             sodipodi:role="line"
+             id="tspan5"
              x="33.076733"
              y="99.602638"
              style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17.6389px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.5;stroke-miterlimit:4;stroke-dasharray:none">Frac</tspan></text>
