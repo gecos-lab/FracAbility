@@ -43,12 +43,20 @@ in function of time and not space, accomplishes exactly this.
 ## Features 📋
 
 - **Shapefile importing support**
+
+
 - **Rapid topology analysis and identification of I,Y,X and U nodes**
+
+
 - **Backbone(s) identification**
+
+
 - **Statistical analysis tools:**
     + Empirical CDF and SF calculation
     + Distribution fitting
     + Statistical model testing
+
+
 - **Plotting tools:**
     + Network objects plotting using matplotlib or vtk
     + Ternary node plot 
@@ -62,10 +70,11 @@ We are planning to make this package available using pip and conda.
 <details>
   <summary>Main dependencies</summary>
 
-[![dependency - shapely](https://img.shields.io/badge/dependency-shapely-blue)](https://pypi.org/project/shapely)
-[![dependency - vtk](https://img.shields.io/badge/dependency-vtk-blue)](https://pypi.org/project/vtk)
-[![dependency - scipy](https://img.shields.io/badge/dependency-scipy-blue)](https://pypi.org/project/scipy)
-[![dependency - networkx](https://img.shields.io/badge/dependency-networkx-blue)](https://pypi.org/project/networkx)
+[![dependency - shapely](https://img.shields.io/badge/dependency-shapely==2.0.1-blue)](https://pypi.org/project/shapely)
+[![dependency - vtk](https://img.shields.io/badge/dependency-vtk==9.2.6-blue)](https://pypi.org/project/vtk)
+
+[![dependency - scipy](https://img.shields.io/badge/dependency-scipy==1.11-blue)](https://pypi.org/project/scipy)
+[![dependency - networkx](https://img.shields.io/badge/dependency-networkx==3.1-blue)](https://pypi.org/project/networkx)
 
 
 </details>
@@ -73,13 +82,12 @@ We are planning to make this package available using pip and conda.
 
 ## Documentation
 
-For usage details please refer to the documentation 
-
-<div align="center">
+For usage details please refer to the documentation:
 
 [![View - Online docs](https://img.shields.io/badge/View-Online_docs-blue?style=for-the-badge)](/ "Go to online documentation")
+
 [![view - Documentation](https://img.shields.io/badge/view-Documentation-blue?style=for-the-badge)](/docs/ "Go to project documentation")
-</div>
+
 
 
 ## References 🎓
