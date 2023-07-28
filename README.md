@@ -10,7 +10,7 @@
 ![maintained - yes](https://img.shields.io/badge/maintained-yes-green)
 </div>
 
-**FracAbility** is a Python toolbox that can be used to analyze fracture networks in digitalized rock
+**FracAbility** is a Python toolbox that can be used to analyse fracture networks in digitalized rock
 outcrops. This package provides tools to:
 
 1. Define the topology of fracture networks 

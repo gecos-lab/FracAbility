@@ -1,0 +1,14 @@
+
+1. Introduzione problema con qgis:
+	a. Ortofoto -> digitalizziamo
+	b. Misura delle lunghezze
+	c. Non tutto è interpretabile -> censoring
+	d. CSV
+	
+2. Ci serve una distribuzione che tenga conto del censoring -> survival analysis:
+	a. Reliability
+	b. MLE
+
+3. Come testare che la distribuzione sia corretta?:
+	a. KS test -> vincolo NIST
+	b. Chi-quadro -> come si fa il binning? -> Russi	
