@@ -2,9 +2,6 @@
 
 -------------------------------------
 
-Homepage
-=========
-
 Overview
 ---------
 
@@ -19,7 +16,7 @@ These are the main features available :
 - **Rapid topology analysis and identification of I,Y,X and U nodes**
 
 
-- **Backbone(s) identification**
+- **Fracture network backbone(s) identification**
 
 
 - **Statistical analysis tools:**
@@ -38,17 +35,17 @@ These are the main features available :
 The name FracAbility recalls the `reliability <https://github.com/MatthewReid854/reliability/tree/master>`_
 library that inspired and helped in the creation of this project.
 
-Project contents
------------------
+Documentation contents
+-----------------------
 
-Quickstart & Intro
+Quickstart & Theory
 ~~~~~~~~~~~~~~~~~~~
 
 .. toctree::
-  :maxdepth: 1
+  :maxdepth: 2
 
-  Introduction to fracture network analysis
   Quickstart
+  Introduction to fracture network analysis
   Recommended resources
 
 Tutorials
@@ -56,7 +53,7 @@ Tutorials
 
 
 .. toctree::
-  :maxdepth: 1
+  :maxdepth: 2
   :glob:
 
   Tutorial reference
@@ -70,8 +67,17 @@ API
 
   API reference
 
+Glossary
+~~~~~~~~~~~~~~~~~~~
 
-Status information
+.. toctree::
+  :maxdepth: 2
+
+  Glossary
+
+
+
+Library status information
 --------------------
 
 .. |pypi| image:: https://img.shields.io/pypi/v/fracability.svg?logo=python&logoColor=white
@@ -110,8 +116,3 @@ Status information
 +----------------------+----------------+-------------+
 
 
-
-Project index
---------------
-
-:ref:`genindex`

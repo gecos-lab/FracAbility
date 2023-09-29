@@ -27,14 +27,14 @@ To upgrade a previous installation of *reliability* to the most recent version, 
 A quick example
 ---------------
 
-A key feature of `fracability` is that the Entities and functions are designed to be used in a modular function to allow
-flexibility in the workflow and may be used or not depending on the necessity of the user.
+A key feature of `fracability` is that Entities and functions are designed to be used in a modular way.
+This allows flexibility for different workflows in which not all tools need to be used.
 
 In this example, we will quickly illustrate a typical workflow to:
 
-    1. Create a FractureNetwork object and define its intersections
-    2. Visualize the data
-    3. Analyze the length statistics
+1. Create a FractureNetwork object and define its intersections
+2. Visualize the data
+3. Analyze the length statistics
 
 Create a FractureNetwork entity
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -72,8 +72,6 @@ These steps create a fracture network entity composed by the fractures and the i
 identify the common nodes and define how many segments are connected to each node. This can be done using a couple of
 specific functions
 
-
-
 .. code:: python
 
         from fracability.geometric_operations import tidy_intersections
@@ -87,16 +85,22 @@ specific functions
 
 In these few lines we:
 
-    1. Cleaned and tidied the intersections between fractures (F-F) and boundaries (F-B)
-    2. Defined common nodes
-    3. Calculated the number of segments connected to each node
+1. Cleaned and tidied the intersections between fractures (F-F) and boundaries (F-B)
+2. Defined common nodes
+3. Calculated the number of segments connected to each node
 
 Visualize the network
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The fracture network entity can be visualized in different ways. We can access the geopandas dataframe, functioning as
-the database, we can plot the vtk object, we can also visualize the topological network (not recommended for big
-fracture networks).
+The fracture network entity can be visualized in different ways.
+
+1. We can view the geopandas dataframe, functioning as the database.
+
+2. We can plot the object in a 3D window using pyvista/vtk
+
+3. We can plot the object in a 2D window using matplotlib
+
+4. We can visualize the topological network (not recommended for big fracture networks).
 
 .. code:: python
 

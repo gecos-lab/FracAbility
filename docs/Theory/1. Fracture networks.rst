@@ -1,0 +1,58 @@
+.. image:: ../images/logo.png
+
+-------------------------------------
+
+Fracture networks
+==================================
+
+Fracture networks have an essential control on the hydraulic properties of rock masses. Research or exploitation
+of water, hydrothermal fluids, natural gas, and the characterization of reservoirs for carbon sequestration and
+hydrogen storage, all heavily rely on creating fracture models to understand the distribution of fractures and
+their properties in 3D space. This is achieved by creating Discrete Fracture Network (DFNs) based on **stochastic**
+algorithms. There are different DFN approaches provided by software:
+
++ `Petrel <https://www.software.slb.com/products/petrel>`_
++ `Move <https://www.petex.com/products/move-suite/>`_
++ `FracMan <https://www.golder.com/fracman/>`_
++ `DFNWorks <https://dfnworks.lanl.gov>`_.
+
+All of these use many different parameters to drive the building of the model. The most important are summarized
+in the following table:
+
+.. figure:: ../images/mystic_table.png
+   :align: center
+
+   Summary table of the most important parameters used as input for DFNs. The distinction fracture network and fracture
+   set identifies from where the property can be extracted.
+
+Structure of a fracture network
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Fracture networks can be subdivided in three main different components:
+
+1. Nodes
+2. Fractures
+3. Boundaries
+
+.. figure:: ../images/frac_net.png
+   :align: center
+
+   Subdivision of a simple fracture network
+
+**Nodes**
+
+The nodes can be defined as the intersection points between two fractures (pertaining to the same or different set).
+
+**Fractures**
+
+Fractures are, unsurprisingly, the most important component of the three. We define as a fracture a generic discontinuity
+in a rock volume grouping. Fractures can be further divided into **sets** (i.e. fractures that have the same genetic origin and processes).
+
+
+**Boundaries**
+
+Finally the boundaries are defined as the observational limits that the interpreter imposes in the outcrop.
+We define these limits as :term:`interpretational boundaries`. These delimit the areas of exposed rock where fractures can be measured and can be
+more than one.
+Boundaries can also present internal areas in which interpretation cannot be carried out defined
+as :term:`interpretational voids`.
