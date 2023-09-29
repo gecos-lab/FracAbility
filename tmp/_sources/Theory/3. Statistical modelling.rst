@@ -1,0 +1,42 @@
+.. image:: ../images/logo.png
+
+-------------------------------------
+
+
+Statistical parametrization
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For DFNs it is essential to provide a length distribution model. This is used in model construction to guide the creation
+of synthetic fractures with lengths that follow the given distribution. The immediate problem that arises is that
+often fractures are cut by boundaries thus giving partial length information. This type of data is defined as **censored
+data**.
+
+Censoring
+++++++++++
+Survival (or reliability) analysis are rooted in the medical, biological and engineering sphere, thus the continuous
+measured variable is **time**. In our case the measured variable is **space** (length) but the principles of survival
+analysis are maintained since it is still a continuous variable censored by an observational limit. We can thus translate
+the theory and definitions from a function of time to function of space.
+
+In general censoring can be of three main types:
+
+1. Right censoring: the fracture starts inside the boundary but terminates outside of it
+2. Left censoring: The fractures starts and terminates outside the boundary
+3. Interval censoring: The fracture is cut by internal holes (interpretational voids).
+
+When trying to estimate a parameter from the data, and eventually fit a distribution, censored data must be corrected or
+underestimation is assured.
+
+In this
+case the data is right-censored thus we can apply survival analysis techniques to correct for such bias. A in depth explanation
+is provided in the `reliability page
+
+
+
+Length parameter
++++++++++++++++++
+
+By following the schematic below we can introduce the problem
+
+.. image:: ../images/example_diagram.png
+   :align: center
