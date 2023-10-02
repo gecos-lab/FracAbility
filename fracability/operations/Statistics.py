@@ -13,7 +13,7 @@ class NetworkData:
     It acts as a wrapper for the scipy CensoredData class
     """
 
-    def __init__(self, obj=None):
+    def __init__(self, obj=None, include_censored=True):
         self._obj = obj  # fracture/fracture network object
 
         self._data: ss.CensoredData
@@ -23,15 +23,20 @@ class NetworkData:
 
         if obj is not None:
             if self._obj.name == 'FractureNetwork':
-                entity_df = self._obj.fracture_network_to_components_df()
+                frac_obj = self._obj.fractures
             else:
-                entity_df = self._obj.entity_df
+                frac_obj = self._obj
+
+            entity_df = frac_obj.entity_df
 
             self.lengths = entity_df.loc[entity_df['censored'] >= 0, 'length'].values
             non_censored_lengths = entity_df.loc[entity_df['censored'] == 0, 'length'].values
             censored_lengths = entity_df.loc[entity_df['censored'] == 1, 'length'].values
 
-            self.data = ss.CensoredData(uncensored=non_censored_lengths, right=censored_lengths)
+            if include_censored:
+                self.data = ss.CensoredData(uncensored=non_censored_lengths, right=censored_lengths)
+            else:
+                self.data = ss.CensoredData(uncensored=non_censored_lengths)
 
     @property
     def data(self) -> ss.CensoredData:
@@ -308,12 +313,13 @@ class NetworkFitter:
 
     """
     Class used to fit a Fracture or Fracture network object
+
+    Add bool to:
+        + Consider censored lengths as non-censored
+        + Do not consider censored lengths at all
+
     """
-
-    # Add bool do not consider censoring
-    # add bool to plot pdf,cdf, sf with no censoring
-
-    def __init__(self, obj=None):
+    def __init__(self, obj=None, include_censoring=True):
 
         self._net_data: NetworkData
         self._accepted_fit: list = []
@@ -321,7 +327,7 @@ class NetworkFitter:
         self._fit_dataframe: DataFrame = DataFrame(columns=['name', 'AICc', 'BIC',
                                                             'log_likelihood', 'distribution', 'params'])
 
-        self.net_data = NetworkData(obj)
+        self.net_data = NetworkData(obj, include_censoring)
 
     @property
     def net_data(self) -> NetworkData:

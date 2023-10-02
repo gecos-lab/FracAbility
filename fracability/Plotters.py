@@ -398,7 +398,9 @@ def vtkplot_frac_net(entity,
     """
     plotter = Plotter()
     plotter.view_xy()
+    plotter.add_camera_orientation_widget()
     plotter.enable_image_style()
+    plotter.background_color = 'gray'
 
     nodes = entity.nodes
     fractures = entity.fractures
