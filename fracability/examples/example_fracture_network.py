@@ -32,6 +32,7 @@ def fracture_net_control_intersection():
 
     return {'complete': gdf, 'nb': gdf_nb, 'ns1':gdf_ns1}
 
+
 def fracture_net_control_topology():
     """
     method used to get the csv to control correct intersections
@@ -45,8 +46,10 @@ def fracture_net_control_topology():
 
 def fracture_net_subset() -> tuple[dict, dict]:
     """
-    method used to get the shp dir and corresponding gdf of a subset of the complete example
-    :return:
+    Method used to get the directories of shapefiles and the corresponding gdf of a subset of the complete example. It
+    returns a tuple of dicts one containing the paths the other the gdf
+
+    :return: tuple of dicts
     """
     n1_path = f'{DATADIR}/example_fracture_network_data/shp/set_1_subset.shp'
     n2_path = f'{DATADIR}/example_fracture_network_data/shp/set_2_subset.shp'
@@ -63,3 +66,25 @@ def fracture_net_subset() -> tuple[dict, dict]:
     return {'fractures': n_path, 'set_1': n1_path, 'set_2': n2_path, 'bounds': b_path}, \
            {'fractures': fracs, 'set_1': fracs_1, 'set_2': fracs_2, 'bounds': bounds_gpd}
 
+
+def fracture_net() -> tuple[dict, dict]:
+    """
+        Method used to get the directories of shapefiles and the corresponding gdf of a complete network example. It
+        returns a tuple of dicts one containing the paths the other the gdf
+
+        :return: tuple of dicts
+    """
+    n1_path = f'{DATADIR}/example_fracture_network_data/shp/Set_1.shp'
+    n2_path = f'{DATADIR}/example_fracture_network_data/shp/Set_2.shp'
+
+    n_path = f'{DATADIR}/example_fracture_network_data/shp/Fracture_network.shp'
+    b_path = f'{DATADIR}/example_fracture_network_data/shp/Interpretation_boundary_laghettoSalza.shp'
+
+    fracs = gpd.read_file(n_path)
+
+    fracs_1 = gpd.read_file(n1_path)
+    fracs_2 = gpd.read_file(n2_path)
+    bounds_gpd = gpd.read_file(b_path)
+
+    return {'fractures': n_path, 'set_1': n1_path, 'set_2': n2_path, 'bounds': b_path}, \
+        {'fractures': fracs, 'set_1': fracs_1, 'set_2': fracs_2, 'bounds': bounds_gpd}
