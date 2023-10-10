@@ -20,18 +20,19 @@ def nodes_conn(obj: FractureNetwork, inplace=True):
     frac_idx = np.where(vtk_obj.point_data['type'] == 'fracture')[0]
 
     n_nodes = vtk_obj.n_points
+
     class_list = []
     Y_node_origin = []
 
     node_geometry = []
     for node in frac_idx:  # For each node of the fractures:
-        # print(f'Classifying node {node} of {len(frac_idx)} ', end='\r')
 
         n_edges = network_obj.degree[node]  # Calculate number of connected nodes
 
         point = Point(vtk_obj.points[node])
 
         cells = fractures_vtk_obj.extract_points(node)
+
         origin_list = ';'.join([str(int(c)) for c in set(cells['f_set'])])
 
         if n_edges == 2:  # Exclude internal and V nodes
@@ -44,7 +45,7 @@ def nodes_conn(obj: FractureNetwork, inplace=True):
             if 'boundary' in cells['type']:
 
                 n_edges = 5
-                index = vtk_obj['RegionId'][node]
+                index = vtk_obj.point_data['RegionId'][node]
                 entity_df_obj.loc[index, 'censored'] = 1
 
             else:

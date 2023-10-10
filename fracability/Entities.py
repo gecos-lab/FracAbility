@@ -187,9 +187,21 @@ class Fractures(BaseEntity):
     @vtk_object.setter
     def vtk_object(self, obj: DataSet):
 
-        for region in set(obj['RegionId']):
-            region = obj.extract_points(obj['RegionId'] == region)
-            self.entity_df.loc[self.entity_df['id'] == region, 'geometry'] = LineString(region.points)
+        if not self.entity_df.empty:
+            for region_id in set(obj['RegionId']):
+                region = obj.extract_points(obj['RegionId'] == region_id)
+                self.entity_df.loc[self.entity_df['id'] == region, 'geometry'] = LineString(region.points)
+        else:
+
+            idx = list(set(obj['RegionId']))
+            geometry = []
+            for region_id in idx:
+                region = obj.extract_cells(obj['RegionId'] == region_id)
+                geometry.append(LineString(region.points))
+            d = {'id': idx, 'geometry': geometry}
+            gdf = GeoDataFrame(d)
+            self.entity_df = gdf
+
 
     @property
     def network_object(self) -> Graph:
@@ -275,9 +287,21 @@ class Boundary(BaseEntity):
     @vtk_object.setter
     def vtk_object(self, obj: DataSet):
 
-        for region in set(obj['RegionId']):
-            region = obj.extract_points(obj['RegionId'] == region)
-            self.entity_df.loc[self.entity_df['id'] == region, 'geometry'] = LineString(region.points)
+        if not self.entity_df.empty:
+            for region_id in set(obj['RegionId']):
+                region = obj.extract_points(obj['RegionId'] == region_id)
+                self.entity_df.loc[self.entity_df['id'] == region, 'geometry'] = LineString(region.points)
+        else:
+            idx = list(set(obj['RegionId']))
+            geometry = []
+            for region_id in idx:
+                region = obj.extract_cells(obj['RegionId'] == region_id)
+
+                geometry.append(LineString(region.points))
+
+            d = {'id': idx, 'geometry': geometry}
+            gdf = GeoDataFrame(d)
+            self.entity_df = gdf
 
     @property
     def network_object(self) -> Graph:

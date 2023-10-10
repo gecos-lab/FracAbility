@@ -26,7 +26,7 @@ class BaseEntity(ABC):
 
         :param gdf: Geopandas dataframe
         """
-        self._df: GeoDataFrame
+        self._df: GeoDataFrame = GeoDataFrame()
 
         if shp is not None:
             self.entity_df = read_file(shp)

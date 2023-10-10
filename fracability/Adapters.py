@@ -38,7 +38,6 @@ def frac_vtk_rep(input_df: geopandas.GeoDataFrame) -> PolyData:
         x, y = geom.coords.xy  # get xy as an array
         z = np.zeros_like(x)  # create a zeros z array with the same dim of the x (or y)
 
-
         points = np.stack((x, y, z), axis=1)  # Stack the coordinates to a [n,3] shaped array
         # offset = np.round(points[0][0])
         pv_obj = lines_from_points(points)  # Create the corresponding vtk line with the given points
@@ -46,8 +45,10 @@ def frac_vtk_rep(input_df: geopandas.GeoDataFrame) -> PolyData:
         pv_obj.point_data['type'] = ['fracture'] * pv_obj.GetNumberOfPoints()
 
         pv_obj.cell_data['f_set'] = [set_n] * pv_obj.GetNumberOfCells()
+        pv_obj.point_data['f_set'] = [set_n] * pv_obj.GetNumberOfPoints()
 
         pv_obj.cell_data['RegionId'] = [index] * pv_obj.GetNumberOfCells()
+        pv_obj.point_data['RegionId'] = [index] * pv_obj.GetNumberOfPoints()
 
         if 'lengths' in input_df.columns:
             pv_obj.cell_data['length'] = input_df.loc[index, 'lengths']
@@ -85,8 +86,11 @@ def bound_vtk_rep(input_df: geopandas.GeoDataFrame) -> PolyData:
         pv_obj.point_data['type'] = ['boundary'] * pv_obj.GetNumberOfPoints()
 
         pv_obj.cell_data['b_group'] = [b_group] * pv_obj.GetNumberOfCells()
+        pv_obj.point_data['b_group'] = [b_group] * pv_obj.GetNumberOfPoints()
+
 
         pv_obj.cell_data['RegionId'] = [index] * pv_obj.GetNumberOfCells()
+        pv_obj.point_data['RegionId'] = [index] * pv_obj.GetNumberOfPoints()
 
 
         # line.plot()
