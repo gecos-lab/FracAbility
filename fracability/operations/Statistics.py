@@ -13,7 +13,7 @@ class NetworkData:
     It acts as a wrapper for the scipy CensoredData class
     """
 
-    def __init__(self, obj=None, include_censored=True):
+    def __init__(self, obj=None, use_censoring=True, include_censored=True):
         self._obj = obj  # fracture/fracture network object
 
         self._data: ss.CensoredData
@@ -33,10 +33,14 @@ class NetworkData:
             non_censored_lengths = entity_df.loc[entity_df['censored'] == 0, 'length'].values
             censored_lengths = entity_df.loc[entity_df['censored'] == 1, 'length'].values
 
-            if include_censored:
-                self.data = ss.CensoredData(uncensored=non_censored_lengths, right=censored_lengths)
+            if use_censoring:
+                if include_censored:
+                    self.data = ss.CensoredData(uncensored=non_censored_lengths, right=censored_lengths)
+                else:
+                    self.data = ss.CensoredData(uncensored=non_censored_lengths)
             else:
-                self.data = ss.CensoredData(uncensored=non_censored_lengths)
+                self.data = ss.CensoredData(uncensored=self.lengths)
+
 
     @property
     def data(self) -> ss.CensoredData:
@@ -274,8 +278,11 @@ class NetworkDistribution:
         k = len(self.distribution_parameters)
         n = len(self.fit_data.non_censored_lengths) + len(self.fit_data.censored_lengths)
 
-        AICc = 2 * k + LL2 + (2 * k ** 2 + 2 * k) / (n - k - 1)
-        return AICc
+        if (n - k - 1) == 0: # if n parameters + 1 = n of total fractures then the akaike is invalid i.e. the total fractures must be > than the n_parameters+1
+            return -1
+        else:
+            AICc = 2 * k + LL2 + (2 * k ** 2 + 2 * k) / (n - k - 1)
+            return AICc
 
     @property
     def BIC(self) -> float:
@@ -319,7 +326,7 @@ class NetworkFitter:
         + Do not consider censored lengths at all
 
     """
-    def __init__(self, obj=None, include_censoring=True):
+    def __init__(self, obj=None, use_censoring=True, include_censoring=True):
 
         self._net_data: NetworkData
         self._accepted_fit: list = []
@@ -327,7 +334,7 @@ class NetworkFitter:
         self._fit_dataframe: DataFrame = DataFrame(columns=['name', 'AICc', 'BIC',
                                                             'log_likelihood', 'distribution', 'params'])
 
-        self.net_data = NetworkData(obj, include_censoring)
+        self.net_data = NetworkData(obj, use_censoring, include_censoring)
 
     @property
     def net_data(self) -> NetworkData:

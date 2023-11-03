@@ -127,6 +127,29 @@ class Nodes(BaseEntity):
 
         return PI, PY, PX, PU, precise_n
 
+    @property
+    def n_censored(self) -> int:
+        """ Return the number of censored nodes"""
+        nodes = self.vtk_object['n_type']
+        unique, count = np.unique(nodes, return_counts=True)
+        count_dict = dict(zip(unique, count))
+
+        if 5 not in count_dict.keys():
+            return 0
+        else:
+            return count_dict[5]
+
+    @property
+    def n_complete(self) -> int:
+        """ Return the number of I nodes (complete fractures)"""
+
+        nodes = self.vtk_object['n_type']
+        unique, count = np.unique(nodes, return_counts=True)
+        count_dict = dict(zip(unique, count))
+
+        return count_dict[1]
+
+
     def node_origin(self, node_type: int) -> GeoSeries:
         """
         Return the node origin for the given node type (i.e. which set/sets is/are associated to the node)
@@ -177,6 +200,8 @@ class Fractures(BaseEntity):
             self._df['censored'] = 0
         if 'f_set' not in self._df.columns:
             self._df['f_set'] = self.set_n
+        if 'length' not in self._df.columns:
+            self._df['length'] = self._df['geometry'].length
 
     @property
     def vtk_object(self) -> PolyData:
@@ -290,14 +315,20 @@ class Boundary(BaseEntity):
         if not self.entity_df.empty:
             for region_id in set(obj['RegionId']):
                 region = obj.extract_points(obj['RegionId'] == region_id)
-                self.entity_df.loc[self.entity_df['id'] == region, 'geometry'] = LineString(region.points)
+                points = region.points
+                if points[0] != points[-1]:  # All boundaries must be closed
+                    points = np.append(points, [points[0]], axis=0)
+
+                self.entity_df.loc[self.entity_df['id'] == region, 'geometry'] = LineString(points)
         else:
             idx = list(set(obj['RegionId']))
             geometry = []
             for region_id in idx:
                 region = obj.extract_cells(obj['RegionId'] == region_id)
-
-                geometry.append(LineString(region.points))
+                points = region.points
+                if np.any(points[0, :] != points[-1, :]):  # All boundaries must be closed
+                    points = np.append(points, [points[0]], axis=0)
+                geometry.append(LineString(points))
 
             d = {'id': idx, 'geometry': geometry}
             gdf = GeoDataFrame(d)
@@ -401,6 +432,7 @@ class FractureNetwork(BaseEntity):
     @property
     def crs(self):
         return self.fracture_network_to_components_df().crs
+
     #  ==================== Nodes property ====================
 
     @property
@@ -543,6 +575,13 @@ class FractureNetwork(BaseEntity):
         if self._active_fractures_df is not None:
             return Fractures(self._active_fractures_df)
         return None
+
+    @property
+    def sets(self) -> list:
+        """Return the list of the number of sets"""
+
+        sets = list(set(self.fractures.entity_df['f_set'].values))
+        return sets
 
     @property
     def _fractures_components(self) -> DataFrame:
@@ -753,7 +792,7 @@ class FractureNetwork(BaseEntity):
             else:
                 self._df.loc[self._df['b_group'] == group_n, 'object'] = boundary_group
 
-    def boundary_object(self, group_n: int) -> Fractures:
+    def boundary_object(self, group_n: int) -> Boundary:
         """
         Method that returns the Node object of a given group_number
         :param group_n: Number of the group
@@ -851,6 +890,22 @@ class FractureNetwork(BaseEntity):
 
         network_object = Rep.networkx_rep(self.vtk_object(include_nodes=False))
         return network_object
+
+    @property
+    def fraction_censored(self) -> float:
+        """Get the fraction of censored fractures in the network """
+
+        n_censored = self.fractures.entity_df['censored'] == 1
+
+        total = self.fractures.entity_df['censored'] >= 0
+
+        return len(self.fractures.entity_df[n_censored])/len(self.fractures.entity_df[total])
+
+    def cut_active(self):
+        """ Cut the active fracture network with the active boundary"""
+        ...
+
+
 
     #  ==================== Plotting methods ====================
 

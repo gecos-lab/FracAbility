@@ -20,7 +20,7 @@ bounds = np.array([[x_min, y_min, 0],
                    [x_max, y_max, 0],
                    [x_max, y_min, 0]])
 
-n_fractures = 10
+n_fractures = 30
 
 res = 3
 
@@ -33,12 +33,20 @@ centers = np.array([np.random.uniform(x_min, x_max, size=n_fractures),
 
 mean_centers = np.mean(bounds, axis=0)
 
+r = ((x_max-x_min)*np.sqrt(2))/2
+
+disk = pv.Disc(mean_centers, inner=r, outer=r*0.995, c_res=100)
+
 plotter = pv.Plotter(shape=(res, res))
+plotter.background_color = 'gray'
+plotter.add_camera_orientation_widget()
+plotter.enable_image_style()
+
 data_range = np.arange(0, 20, 0.01)
 
 i = 1
-for mean in means:
-    for std in stds:
+for c, mean in enumerate(means):
+    for i, std in enumerate(stds):
         # print(f'std:{std}')
         distr = ss.norm(mean, std)
         y = distr.sf(data_range)
@@ -51,19 +59,34 @@ for mean in means:
         vertex2 = centers.copy()
         vertex2[:, 0] += random_lengths
 
-        plt.subplot(res, res, i)
-        plt.title(f'{mean}, {std}')
-        # plt.plot(mean_centers[0], mean_centers[1], 'o', markersize=500, markeredgecolor='r', mfc='none')
-        plt.axis('equal')
-        # sns.lineplot(x=data_range, y=y)
-        for v1, v2 in zip(vertex1, vertex2):
-            sns.lineplot(x=np.array([v1[0], v2[0]]), y=np.array([v1[1], v2[1]]), color='k')
-        i += 1
+        vertex1 = np.insert(vertex1, range(1, n_fractures+1, 1), [0, 0, 0], axis=0)
+        vertex2 = np.insert(vertex2, range(0, n_fractures, 1), [0, 0, 0], axis=0)
 
-plt.tight_layout()
+        complete = vertex1+vertex2
 
-plt.show()
+        conn = np.insert(np.arange(0, len(complete)), np.arange(0, len(complete), 2), 2)
+        lines = pv.PolyData(complete, lines=conn)
 
+        plotter.subplot(c, i)
+        plotter.add_mesh(lines)
+        plotter.add_mesh(disk, color='r')
+        plotter.view_xy()
+
+#         plt.subplot(res, res, i)
+#         plt.title(f'{mean}, {std}')
+#         # plt.plot(mean_centers[0], mean_centers[1], 'o', markersize=500, markeredgecolor='r', mfc='none')
+#         # plt.axis('equal')
+#         sns.lineplot(x=data_range, y=y)
+#         # for v1, v2 in zip(vertex1, vertex2):
+#         #     sns.lineplot(x=np.array([v1[0], v2[0]]), y=np.array([v1[1], v2[1]]), color='k')
+#         i += 1
+#
+# plt.tight_layout()
+#
+# plt.show()
+
+plotter.link_views()
+plotter.show()
 
 # for center, random_length in zip(centers, random_lengths):
 #

@@ -53,7 +53,7 @@ def frac_vtk_rep(input_df: geopandas.GeoDataFrame) -> PolyData:
         if 'lengths' in input_df.columns:
             pv_obj.cell_data['length'] = input_df.loc[index, 'lengths']
 
-        pv_obj.cell_data_to_point_data()
+        # pv_obj.cell_data_to_point_data()
         # line.plot()
 
         appender.AddInputData(pv_obj)  # Add the new object
@@ -148,14 +148,14 @@ def networkx_rep(input_object: PolyData) -> networkx.Graph():
     lines = network.lines  # Get the connectivity list of the object
 
     lines = np.delete(lines,
-                      np.arange(0, lines.size, 3))  # remove padding eg. [2 id1 id2 2 id3 id4 ...] -> remove the 2
+                      np.arange(0, lines.size, 3)).reshape(-1, 2)  # remove padding eg. [2 id1 id2 2 id3 id4 ...] -> remove the 2
 
     # test_types = np.array([{'type': t} for t in network['type']])
-    edges = np.c_[lines.reshape(-1, 2)]
+    # edges = np.c_[lines.reshape(-1, 2)]
 
     network = nx.Graph()  # Create a networkx graph instance
 
-    network.add_edges_from(edges)  # Add the edges
+    network.add_edges_from(lines)  # Add the edges
 
     output_obj = network
     return output_obj

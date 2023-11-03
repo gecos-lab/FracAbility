@@ -7,24 +7,24 @@ from fracability.Entities import FractureNetwork, Nodes
 from shapely.geometry import Point
 from geopandas import GeoDataFrame
 import numpy as np
-
+import time
 
 def nodes_conn(obj: FractureNetwork, inplace=True):
 
     network_obj = obj.network_object
+
     vtk_obj = obj.vtk_object(include_nodes=False)
+
     entity_df_obj = obj.fracture_network_to_components_df()
 
     fractures_vtk_obj = obj.fractures.vtk_object
 
     frac_idx = np.where(vtk_obj.point_data['type'] == 'fracture')[0]
 
-    n_nodes = vtk_obj.n_points
-
-    class_list = []
-    Y_node_origin = []
-
+    class_list = np.empty_like(frac_idx)
+    Y_node_origin = np.empty_like(frac_idx)
     node_geometry = []
+
     for node in frac_idx:  # For each node of the fractures:
 
         n_edges = network_obj.degree[node]  # Calculate number of connected nodes
@@ -38,7 +38,7 @@ def nodes_conn(obj: FractureNetwork, inplace=True):
         if n_edges == 2:  # Exclude internal and V nodes
             n_edges = -9999
 
-        elif n_edges == 3:  # Discriminate Y and U nodes
+        elif n_edges == 3:  # Discriminate Y (3 or 6) and U (5) nodes
 
             cells = vtk_obj.extract_points(node)
 
@@ -49,7 +49,7 @@ def nodes_conn(obj: FractureNetwork, inplace=True):
                 entity_df_obj.loc[index, 'censored'] = 1
 
             else:
-                if len(origin_list) > 1:
+                if len(origin_list) > 1:  # Discriminate between Y nodes between different sets (3) or same set (6)
                     n_edges = 6
                 else:
                     n_edges = 3
@@ -58,9 +58,8 @@ def nodes_conn(obj: FractureNetwork, inplace=True):
             n_edges = 4
 
         node_geometry.append(point)
-        class_list.append(n_edges)  # Append the value (number of connected nodes)
-
-        Y_node_origin.append(origin_list)
+        class_list[node] = n_edges  # Append the value (number of connected nodes)
+        Y_node_origin[node] = origin_list
 
     obj.entity_df = entity_df_obj
     class_list = np.array(class_list)
