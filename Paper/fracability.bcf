@@ -2345,25 +2345,25 @@
   </bcf:bibdata>
   <bcf:section number="0">
     <bcf:citekey order="1">terzaghiSourcesErrorJoint1965</bcf:citekey>
-    <bcf:citekey order="2">cowanHomogeneousLinesegmentProcesses1979</bcf:citekey>
-    <bcf:citekey order="3">warburtonStereologicalInterpretationJoint1980</bcf:citekey>
-    <bcf:citekey order="4">pahlEstimatingMeanLength1981</bcf:citekey>
-    <bcf:citekey order="5">laslettCensoringEdgeEffects1982</bcf:citekey>
-    <bcf:citekey order="6">kulatilakeEstimationMeanTrace1984</bcf:citekey>
-    <bcf:citekey order="7">mauldonEstimatingMeanFracture1998</bcf:citekey>
-    <bcf:citekey order="8">zhangEstimatingMeanTrace1998</bcf:citekey>
-    <bcf:citekey order="9">mauldonCircularScanlinesCircular2001</bcf:citekey>
-    <bcf:citekey order="10">rohrbaughEstimatingFractureTrace2002</bcf:citekey>
+    <bcf:citekey order="2">warburtonStereologicalInterpretationJoint1980</bcf:citekey>
+    <bcf:citekey order="3">pahlEstimatingMeanLength1981</bcf:citekey>
+    <bcf:citekey order="4">laslettSurvivalCurveMonotone1982</bcf:citekey>
+    <bcf:citekey order="5">mauldonEstimatingMeanFracture1998</bcf:citekey>
+    <bcf:citekey order="6">zhangEstimatingMeanTrace1998</bcf:citekey>
+    <bcf:citekey order="7">mauldonCircularScanlinesCircular2001</bcf:citekey>
+    <bcf:citekey order="8">rohrbaughEstimatingFractureTrace2002</bcf:citekey>
+    <bcf:citekey order="9">healyFracPaQMATLABToolbox2017</bcf:citekey>
+    <bcf:citekey order="10">baecherProgressivelyCensoredSampling1980</bcf:citekey>
     <bcf:citekey order="11">terzaghiSourcesErrorJoint1965</bcf:citekey>
-    <bcf:citekey order="12">cowanHomogeneousLinesegmentProcesses1979</bcf:citekey>
-    <bcf:citekey order="13">warburtonStereologicalInterpretationJoint1980</bcf:citekey>
-    <bcf:citekey order="14">pahlEstimatingMeanLength1981</bcf:citekey>
-    <bcf:citekey order="15">laslettCensoringEdgeEffects1982</bcf:citekey>
-    <bcf:citekey order="16">kulatilakeEstimationMeanTrace1984</bcf:citekey>
-    <bcf:citekey order="17">mauldonEstimatingMeanFracture1998</bcf:citekey>
-    <bcf:citekey order="18">zhangEstimatingMeanTrace1998</bcf:citekey>
-    <bcf:citekey order="19">mauldonCircularScanlinesCircular2001</bcf:citekey>
-    <bcf:citekey order="20">rohrbaughEstimatingFractureTrace2002</bcf:citekey>
+    <bcf:citekey order="12">warburtonStereologicalInterpretationJoint1980</bcf:citekey>
+    <bcf:citekey order="13">pahlEstimatingMeanLength1981</bcf:citekey>
+    <bcf:citekey order="14">laslettSurvivalCurveMonotone1982</bcf:citekey>
+    <bcf:citekey order="15">mauldonEstimatingMeanFracture1998</bcf:citekey>
+    <bcf:citekey order="16">zhangEstimatingMeanTrace1998</bcf:citekey>
+    <bcf:citekey order="17">mauldonCircularScanlinesCircular2001</bcf:citekey>
+    <bcf:citekey order="18">rohrbaughEstimatingFractureTrace2002</bcf:citekey>
+    <bcf:citekey order="19">healyFracPaQMATLABToolbox2017</bcf:citekey>
+    <bcf:citekey order="20">baecherProgressivelyCensoredSampling1980</bcf:citekey>
   </bcf:section>
   <!-- SORTING TEMPLATES -->
   <bcf:sortingtemplate name="nty">

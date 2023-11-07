@@ -3,7 +3,7 @@
 
 
 
-\usepackage[left=1.5cm,right=1.5cm,top=1.5cm,bottom=1cm]{geometry} %per i margini
+\usepackage[left=1.5cm,right=1.5cm,top=1.5cm,bottom=2cm]{geometry} %per i margini
 
 \usepackage[english]{babel} %per la lingua
 \usepackage{lmodern} %Il font
@@ -133,8 +133,8 @@
 
 
 
-\title{FracAbility: A python toolbox for objective statical fracture network analysis}
-\author{Gabriele Benedetti, Stefano Casiraghi, Andrea Bistacchi, Daniela Bertacchi}
+\title{FracAbility: A python toolbox for objective \\statical fracture network analysis}
+\author{Gabriele Benedetti, Stefano Casiraghi, Andrea Bistacchi and Daniela Bertacchi}
 \date{}
 
 \begin{document}
@@ -145,7 +145,12 @@
 	\rule{\textwidth}{0.1mm}
 	\begin{multicols}{2}
 			\section{Introduction}
-				In fractured rock systems, the length estimation of a given fracture family has always been of fundamental importance. In particular, applications such as rock mass strength, deformability, stability, fluid flow and many more rely on an estimation of a unbiased mean length value. Historically this question has been thoroughly researched and from the publications of \cite{terzaghiSourcesErrorJoint1965}, \cite{cowanHomogeneousLinesegmentProcesses1979}, \cite{warburtonStereologicalInterpretationJoint1980}, \cite{pahlEstimatingMeanLength1981}, \cite{laslettCensoringEdgeEffects1982}, \cite{kulatilakeEstimationMeanTrace1984}, spawned a multitude of fundamental works (\cite{mauldonEstimatingMeanFracture1998}, \cite{zhangEstimatingMeanTrace1998}, \cite{mauldonCircularScanlinesCircular2001} and \cite{rohrbaughEstimatingFractureTrace2002}) that result now in the possibility of obtaining a mean length value from circular scan areas.
+				In fractured rock systems, the length estimation of a given fracture family has always been of fundamental importance. Applications such as rock mass strength, deformability, stability, fluid flow and many more rely on an estimation of a unbiased mean length value. Historically this question has been thoroughly researched and from the publications of \cite{terzaghiSourcesErrorJoint1965}, \cite{warburtonStereologicalInterpretationJoint1980}, \cite{pahlEstimatingMeanLength1981} and \cite{laslettSurvivalCurveMonotone1982}, spawned fundamental works that culminated in the possibility of obtaining a mean length value from circular scan areas (\cite{mauldonEstimatingMeanFracture1998}, \cite{zhangEstimatingMeanTrace1998}, \cite{mauldonCircularScanlinesCircular2001} and \cite{rohrbaughEstimatingFractureTrace2002}). This helped immensely in the workflow of rock mass parametrization because it offered a method to quickly obtain the mean length both on the field and with a-posteriori analysis (for example with images). This methodology also quickly became the norm in specialized software such as FraqPaq \parencite{healyFracPaQMATLABToolbox2017} to measure for example P20 and P21 on a given outcrop. 
+				Although efficient and useful, to assure bias correction the authors tackled this problem preferring a non-parametric approach over a parametric one. This lead to the definition of an indirect relationship between the intersection of fracture traces with the circular scan area or line to the mean length of a given set. The distribution-free path was chosen because of necessity, length data acquisition was slow and tedious thus datasets were usually small. At the same time, calculating and fitting any distribution other than the exponential \parencite{baecherProgressivelyCensoredSampling1980} was done by hand. Furthermore, the demand was obtaining a correct mean value and not a precise fitted distribution. Because of these reasons the parametric approach was abandoned.
+				Nowadays the increase in data availability and computing power shifted the focus on more data driven approaches. Moreover, thanks to advances in stochastic DFN codes, integrated in commercial software such as Petrel, Move or as stand-alone projects such as DFNWorks, the need to obtain a precise distribution corrected from right censoring has suddenly increased.
+				This paper's aim is twofold, the first is to present, explore and adapt survival analysis techniques to the spatial and geological realm. The second is to apply such specialized theory in real world scenarios by creating a easily installable python package.
+				
+				
 	
 	\newpage
 	\printbibliography

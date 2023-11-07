@@ -19,103 +19,134 @@
 
 \refsection{0}
   \datalist[entry]{nty/global//global/global}
-    \entry{cowanHomogeneousLinesegmentProcesses1979}{article}{}
+    \entry{baecherProgressivelyCensoredSampling1980}{article}{}
       \name{author}{1}{}{%
-        {{un=0,uniquepart=base,hash=0f6b6bf524e49f324df17578d9004e5f}{%
-           family={Cowan},
+        {{un=0,uniquepart=base,hash=5c9fd88127287917a0498aeab71f7301}{%
+           family={Baecher},
+           familyi={B\bibinitperiod},
+           given={Gregory\bibnamedelima B.},
+           giveni={G\bibinitperiod\bibinitdelim B\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{5c9fd88127287917a0498aeab71f7301}
+      \strng{fullhash}{5c9fd88127287917a0498aeab71f7301}
+      \strng{bibnamehash}{5c9fd88127287917a0498aeab71f7301}
+      \strng{authorbibnamehash}{5c9fd88127287917a0498aeab71f7301}
+      \strng{authornamehash}{5c9fd88127287917a0498aeab71f7301}
+      \strng{authorfullhash}{5c9fd88127287917a0498aeab71f7301}
+      \field{sortinit}{B}
+      \field{sortinithash}{d7095fff47cda75ca2589920aae98399}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{year}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{issn}{0020-5958, 1573-8868}
+      \field{journaltitle}{Journal of the International Association for Mathematical Geology}
+      \field{langid}{english}
+      \field{month}{2}
+      \field{number}{1}
+      \field{title}{Progressively Censored Sampling of Rock Joint Traces}
+      \field{urlday}{6}
+      \field{urlmonth}{10}
+      \field{urlyear}{2023}
+      \field{volume}{12}
+      \field{year}{1980}
+      \field{urldateera}{ce}
+      \field{pages}{33\bibrangedash 40}
+      \range{pages}{8}
+      \verb{doi}
+      \verb 10.1007/BF01039902
+      \endverb
+      \verb{file}
+      \verb /home/gabriele/MEGA/Zotero/storage/Q9GHQZJL/baecherProgressivelyCensoredSampling1980.pdf
+      \endverb
+    \endentry
+    \entry{healyFracPaQMATLABToolbox2017}{article}{}
+      \name{author}{8}{}{%
+        {{un=0,uniquepart=base,hash=fb4b7f2188466e136432bb31e574876d}{%
+           family={Healy},
+           familyi={H\bibinitperiod},
+           given={David},
+           giveni={D\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=20f74a8a1d44ff70faeb3364f9993848}{%
+           family={Rizzo},
+           familyi={R\bibinitperiod},
+           given={Roberto\bibnamedelima E.},
+           giveni={R\bibinitperiod\bibinitdelim E\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=3a17df04432afa8383cd718d64c038b9}{%
+           family={Cornwell},
            familyi={C\bibinitperiod},
-           given={Richard},
-           giveni={R\bibinitperiod},
+           given={David\bibnamedelima G.},
+           giveni={D\bibinitperiod\bibinitdelim G\bibinitperiod},
            givenun=0}}%
-      }
-      \list{publisher}{1}{%
-        {Cambridge University Press}%
-      }
-      \strng{namehash}{0f6b6bf524e49f324df17578d9004e5f}
-      \strng{fullhash}{0f6b6bf524e49f324df17578d9004e5f}
-      \strng{bibnamehash}{0f6b6bf524e49f324df17578d9004e5f}
-      \strng{authorbibnamehash}{0f6b6bf524e49f324df17578d9004e5f}
-      \strng{authornamehash}{0f6b6bf524e49f324df17578d9004e5f}
-      \strng{authorfullhash}{0f6b6bf524e49f324df17578d9004e5f}
-      \field{sortinit}{C}
-      \field{sortinithash}{4d103a86280481745c9c897c925753c0}
-      \field{extradatescope}{labelyear}
-      \field{labeldatesource}{year}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{abstract}{A number of formulae of an integral geometric character are presented for the most general planar, homogeneous line-segment process, one in which a given segment length and orientation may depend upon (a) the point process of segment midpoints and (b) the lengths and orientations of other segments. The sense in which these formulae have a probabilistic/statistical interpretation is made precise. For the general process, two interpretations are given; one requires the theory of Palm distributions whilst the other depends upon ergodic results. When additional structure for the process is assumed, the integral geometric formulae lead to interesting, non-intuitive sampling formulae.}
-      \field{issn}{1469-8064, 0305-0041}
-      \field{journaltitle}{Mathematical Proceedings of the Cambridge Philosophical Society}
-      \field{langid}{english}
-      \field{month}{11}
-      \field{number}{3}
-      \field{title}{Homogeneous Line-Segment Processes}
-      \field{urlday}{16}
-      \field{urlmonth}{10}
-      \field{urlyear}{2023}
-      \field{volume}{86}
-      \field{year}{1979}
-      \field{urldateera}{ce}
-      \field{pages}{481\bibrangedash 489}
-      \range{pages}{9}
-      \verb{doi}
-      \verb 10.1017/S0305004100056346
-      \endverb
-      \verb{file}
-      \verb /home/gabriele/MEGA/Zotero/storage/MV92YDFT/cowanHomogeneousLinesegmentProcesses1979.pdf
-      \endverb
-    \endentry
-    \entry{kulatilakeEstimationMeanTrace1984}{article}{}
-      \name{author}{2}{}{%
-        {{un=0,uniquepart=base,hash=e9b68748a44b5f564ca5f1e24219fafa}{%
-           family={Kulatilake},
-           familyi={K\bibinitperiod},
-           given={P.\bibnamedelimi H.\bibnamedelimi S.\bibnamedelimi W.},
-           giveni={P\bibinitperiod\bibinitdelim H\bibinitperiod\bibinitdelim S\bibinitperiod\bibinitdelim W\bibinitperiod},
+        {{un=0,uniquepart=base,hash=9974da935e66743c22ca1de1c43502af}{%
+           family={Farrell},
+           familyi={F\bibinitperiod},
+           given={Natalie\bibnamedelima J.C.},
+           giveni={N\bibinitperiod\bibinitdelim J\bibinitperiod},
            givenun=0}}%
-        {{un=0,uniquepart=base,hash=ba0c32e3283f90cecd6a48d8e7299d70}{%
-           family={Wu},
+        {{un=0,uniquepart=base,hash=d25627871e81c62d881660f1cdaf7ca4}{%
+           family={Watkins},
            familyi={W\bibinitperiod},
-           given={T.\bibnamedelimi H.},
-           giveni={T\bibinitperiod\bibinitdelim H\bibinitperiod},
+           given={Hannah},
+           giveni={H\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=b800dda87ffbe122c86808374096ff53}{%
+           family={Timms},
+           familyi={T\bibinitperiod},
+           given={Nick\bibnamedelima E.},
+           giveni={N\bibinitperiod\bibinitdelim E\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=c4de5ae8906d1d06c322d37fe05b49da}{%
+           family={{Gomez-Rivas}},
+           familyi={G\bibinitperiod},
+           given={Enrique},
+           giveni={E\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=d01760295ade9079a627d15c7644cda0}{%
+           family={Smith},
+           familyi={S\bibinitperiod},
+           given={Michael},
+           giveni={M\bibinitperiod},
            givenun=0}}%
       }
-      \strng{namehash}{6de1c4ad79672d965cc07e0ab4b88724}
-      \strng{fullhash}{6de1c4ad79672d965cc07e0ab4b88724}
-      \strng{bibnamehash}{6de1c4ad79672d965cc07e0ab4b88724}
-      \strng{authorbibnamehash}{6de1c4ad79672d965cc07e0ab4b88724}
-      \strng{authornamehash}{6de1c4ad79672d965cc07e0ab4b88724}
-      \strng{authorfullhash}{6de1c4ad79672d965cc07e0ab4b88724}
-      \field{sortinit}{K}
-      \field{sortinithash}{c02bf6bff1c488450c352b40f5d853ab}
+      \strng{namehash}{003bd6bbc26604ae5237c91fca5b2a28}
+      \strng{fullhash}{2aa64b7c9a7b8cda28ef507956ef697d}
+      \strng{bibnamehash}{2aa64b7c9a7b8cda28ef507956ef697d}
+      \strng{authorbibnamehash}{2aa64b7c9a7b8cda28ef507956ef697d}
+      \strng{authornamehash}{003bd6bbc26604ae5237c91fca5b2a28}
+      \strng{authorfullhash}{2aa64b7c9a7b8cda28ef507956ef697d}
+      \field{sortinit}{H}
+      \field{sortinithash}{23a3aa7c24e56cfa16945d55545109b5}
       \field{extradatescope}{labelyear}
       \field{labeldatesource}{year}
       \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{abstract}{Trace lengths of discontinuities observed on finite exposures are biased due to sampling errors. These errors should be corrected in estimating mean trace length. A technique, which takes into account the sampling errors, is proposed for estimating the mean trace length on infinite, vertical sections from the observations made on finite, rectangular, vertical exposures. The method is applicable to discontinuities whose orientation is described by a probability distribution function. The method requires that the numbers of discontinuities with both ends observed, one end observed, and both ends censored be known. The lengths of observed traces and the density function of trace length are not required. The derivation assumes that midpoints of traces are uniformly distributed in the vertical plane. Also independence between trace length and orientation is assumed. Data on a Pennsylvania shale in Ohio, U. S. A., were used as an example.}
-      \field{issn}{1434-453X}
-      \field{journaltitle}{Rock Mechanics and Rock Engineering}
+      \field{labeltitlesource}{shorttitle}
+      \field{abstract}{The patterns of fractures in deformed rocks are rarely uniform or random. Fracture orientations, sizes, and spatial distributions often exhibit some kind of order. In detail, relationships may exist among the different fracture attributes, e.g. small fractures dominated by one orientation, larger fractures by another. These relationships are important because the mechanical (e.g. strength, anisotropy) and transport (e.g. fluids, heat) properties of rock depend on these fracture attributes and patterns. This paper describes FracPaQ, a new open source, cross-platform toolbox to quantify fracture patterns, including distributions in fracture attributes and their spatial variation.}
+      \field{issn}{01918141}
+      \field{journaltitle}{Journal of Structural Geology}
       \field{langid}{english}
-      \field{month}{10}
-      \field{number}{4}
-      \field{title}{Estimation of Mean Trace Length of Discontinuities}
-      \field{urlday}{10}
-      \field{urlmonth}{10}
+      \field{month}{2}
+      \field{shorttitle}{{{FracPaQ}}}
+      \field{title}{{{FracPaQ}}: {{A MATLAB}}\texttrademark{} Toolbox for the Quantification of Fracture Patterns}
+      \field{urlday}{22}
+      \field{urlmonth}{3}
       \field{urlyear}{2023}
-      \field{volume}{17}
-      \field{year}{1984}
+      \field{volume}{95}
+      \field{year}{2017}
       \field{urldateera}{ce}
-      \field{pages}{215\bibrangedash 232}
-      \range{pages}{18}
+      \field{pages}{1\bibrangedash 16}
+      \range{pages}{16}
       \verb{doi}
-      \verb 10.1007/BF01032335
+      \verb 10.1016/j.jsg.2016.12.003
       \endverb
       \verb{file}
-      \verb /home/gabriele/MEGA/Zotero/storage/5YQG482U/kulatilakeEstimationMeanTrace1984.pdf
+      \verb /home/gabriele/MEGA/Zotero/storage/7HEYFN3G/healyFracPaQMATLABToolbox2017.pdf
       \endverb
-      \keyw{Civil Engineer,Density Function,Distribution Function,Probability Distribution,Shale}
     \endentry
-    \entry{laslettCensoringEdgeEffects1982}{article}{}
+    \entry{laslettSurvivalCurveMonotone1982}{article}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=c2d2a616788d29147f01da41e7557114}{%
            family={Laslett},
@@ -136,28 +167,26 @@
       \field{labeldatesource}{year}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
-      \field{abstract}{This paper reviews techniques for correcting for bias incurred when incomplete observations form part of a data set. The similarities and differences between biases due to censoring and edge effects are emphasized, the latter being of importance when the distribution of joint traces is estimated from an exposure. A new technique for analyzing line transect data is presented, and a new analysis of published data on joint trace lengths given.}
-      \field{issn}{1573-8868}
-      \field{journaltitle}{Journal of the International Association for Mathematical Geology}
-      \field{langid}{english}
+      \field{abstract}{Several situations involving survival data are examined, in which the nonparametric maximum likelihood estimator is not the Kaplan-Meier estimator. Cases covered are inclusion of initial observations in field studies, estimation of the length distribution from convex window sampling of line segment processes in two dimensions, and estimation of a survival curve with monotone density. The first two cases are nonstandard because survival and censoring are not independent, and thus form simple tractable variable-sum models (Williams \&amp; Lagakos, 1977).}
+      \field{issn}{0006-3444}
+      \field{journaltitle}{Biometrika}
       \field{month}{4}
-      \field{number}{2}
-      \field{title}{Censoring and Edge Effects in Areal and Line Transect Sampling of Rock Joint Traces}
-      \field{urlday}{17}
+      \field{number}{1}
+      \field{title}{The Survival Curve under Monotone Density Constraints with Applications to Two-Dimensional Line Segment Processes}
+      \field{urlday}{16}
       \field{urlmonth}{10}
       \field{urlyear}{2023}
-      \field{volume}{14}
+      \field{volume}{69}
       \field{year}{1982}
       \field{urldateera}{ce}
-      \field{pages}{125\bibrangedash 140}
-      \range{pages}{16}
+      \field{pages}{153\bibrangedash 160}
+      \range{pages}{8}
       \verb{doi}
-      \verb 10.1007/BF01083948
+      \verb 10.1093/biomet/69.1.153
       \endverb
       \verb{file}
-      \verb /home/gabriele/MEGA/Zotero/storage/SYCTSAZN/laslettCensoringEdgeEffects1982.pdf
+      \verb /home/gabriele/MEGA/Zotero/storage/RTYMFHEN/laslettSurvivalCurveMonotone1982.pdf;/home/gabriele/MEGA/Zotero/storage/VY2SBH2K/242720.html
       \endverb
-      \keyw{areal sampling,censoring,edge effects,joint traces,line transect sampling}
     \endentry
     \entry{mauldonEstimatingMeanFracture1998}{article}{}
       \name{author}{1}{}{%
@@ -481,7 +510,7 @@
       \verb 10.1007/s006030050022
       \endverb
       \verb{file}
-      \verb /home/gabriele/MEGA/Zotero/storage/WMKJZPQJ/Zhang and Einstein - 1998 - Estimating the Mean Trace Length of Rock Discontin.pdf
+      \verb /home/gabriele/MEGA/Zotero/storage/WMKJZPQJ/zhangEstimatingMeanTrace1998.pdf
       \endverb
       \keyw{Exponential Distribution,Orientation Distribution,Rock Mass,Sampling Bias,Theoretical Solution}
     \endentry
