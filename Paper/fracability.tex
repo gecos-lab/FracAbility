@@ -1,0 +1,155 @@
+\documentclass[11pt]{article}
+%-----------------------PACCHETTI------------------------------
+
+
+
+\usepackage[left=1.5cm,right=1.5cm,top=1.5cm,bottom=1cm]{geometry} %per i margini
+
+\usepackage[english]{babel} %per la lingua
+\usepackage{lmodern} %Il font
+
+\usepackage{dblfloatfix}
+
+\usepackage{booktabs}
+
+\usepackage{graphicx} %per le immagini
+
+\usepackage{titlesec} %per il format dei titoli
+
+\usepackage{blindtext} %per avere testo di riempimento
+
+\usepackage{wrapfig} %per mettere immagini nel testo
+
+\usepackage{enumitem} %per le liste
+
+\usepackage{float} %per posizionare bene le figure dove voglio io
+
+\usepackage[font=small,labelfont=bf]{caption,subcaption} %per mettere le didascalie
+
+\usepackage[bottom]{footmisc} %per il margine delle note
+
+\usepackage{pgffor} %per avere il loop usato nel comando \subplot
+
+
+
+\usepackage{titleps}
+
+\usepackage{amsmath} %per le formule matematiche
+
+\usepackage{imakeidx} %per l'indice
+
+\usepackage{tablefootnote}
+
+
+\usepackage{multirow} %per occupare più righe all'interno di una tabella
+\usepackage{multicol}
+
+\usepackage[flushleft]{threeparttable}
+
+\setlength{\marginparwidth}{2cm}
+
+\usepackage[prependcaption,textsize=tiny]{todonotes} % per scrivere note nel documento
+
+\usepackage{textcomp}
+
+\usepackage{titling}
+\usepackage{varwidth}
+
+\newcommand{\myparagraph}[1]{\paragraph{#1}\mbox{}}
+
+\newcommand{\hypertext}[2]{\href{#1}{\textcolor{cyan}{\underline{#2}}}}
+
+\usepackage[backend=biber,citestyle=authoryear,maxbibnames=99,maxcitenames=2,uniquelist=false]{biblatex} %per la bibliografia
+\DeclareFieldFormat[article, book,thesis,inproceedings,misc]{title}{#1}
+\DeclareFieldFormat[book,thesis,inproceedings,misc]{date}{(#1)}
+\DeclareNameAlias{default}{family-given}
+\renewcommand*{\revsdnamepunct}{}
+\DefineBibliographyExtras{italian}{%
+	\renewcommand*{\finalnamedelim}{\addcomma\addspace}%
+}
+
+
+\urlstyle{rm}
+\addbibresource{/home/gabriele/STORAGE/knowledgebase/Zotero/bibliography.bib}
+
+
+%---------------------- FORMAT GLOBALE ---------------------------------------
+
+\titleformat{\section}{\normalfont\large\bfseries}{\thesection.}{0.3em}{}
+\titleformat{\subsection}{\normalfont\large\itshape}{\thesubsection.}{0.3em}{}
+
+
+\setlength{\abovecaptionskip}{5pt} %posizione default delle didascalie
+
+\setlength{\footnotemargin}{5pt} %margine delle note
+
+\setcounter{secnumdepth}{3}
+
+\renewcommand{\thefootnote}{\textbf{\alph{footnote}} }
+%\renewcommand{\familydefault}{\sfdefault}
+
+
+\newpagestyle{main}{%
+	
+	\headrule%
+	\sethead{~\sectiontitle}{}{}
+	\setfoot{}{\thepage}{}
+	
+	
+}
+
+
+\newpagestyle{last}{%
+	
+	\headrule%
+	\sethead{~Final remarks and references}{}{}
+	\setfoot{}{\thepage}{}
+	
+	
+}
+
+\newpagestyle{appendix}{%
+	
+	\headrule%
+	\sethead{Appendix \textbf{\thesection}: ~\sectiontitle}{}{}
+	\setfoot{}{\thepage}{}
+	
+	
+}
+
+\pagestyle{main}
+
+
+
+%----------------COMANDI PERSONALI-------------------------------
+
+
+%\newcommand{\textapprox}{\raisebox{0.5ex}{\texttildelow}}
+
+%comando le figure nel testo es. [Fig.1]
+
+\newcommand{\reffig}[1]{\textbf{[Fig.\ref{#1}]}}
+\newcommand{\reftab}[1]{\textbf{[Tab.\ref{#1}]}}
+
+
+
+\title{FracAbility: A python toolbox for objective statical fracture network analysis}
+\author{Gabriele Benedetti, Stefano Casiraghi, Andrea Bistacchi, Daniela Bertacchi}
+\date{}
+
+\begin{document}
+	\maketitle
+	\section*{Abstract}
+	\textit{When analysing fractured rock outcrops, fracture trace connectivity and length statistics analysis are of fundamental importance. Both properties are intertwined since to correctly treat the latter the former must be conducted. Of particular importance is the right censoring bias effect of the interpretational boundary on the fracture length statistics. Past literature mainly focused on the unbiased estimation of fracture length data mean, and with some additional steps variance, of a population adopting a non-parametric approach. However, the technology improved and necessities shifted. Now it is possible to quickly obtain dense length datasets with thousands of measurements and the emergence of stochastic DFNs has shown the need to correctly fit different types of distributions and highlighted an absence of works on this topic. 
+	FracAbility is a new open-source Python package capable to both analyse the topology of any fracture network and fit many length distributions corrected from right censoring bias using survival analysis. In this paper, the theory, applications and challenges of this useful statistical approach are explored and applied both on synthetic and real case studies. The results show how life testing analysis can be used to correctly and stably estimate distribution parameters up to 80\% of censored length measurements. Moreover, the proposed approach can also be applied to any length based dataset affected by censoring, thus offering the possibility to correct also spacing and height distributions. Finally, it is shown that the correction is independent from the orientation of the network, boundary or outcrop.}
+	\rule{\textwidth}{0.1mm}
+	\begin{multicols}{2}
+			\section{Introduction}
+				In fractured rock systems, the length estimation of a given fracture family has always been of fundamental importance. In particular, applications such as rock mass strength, deformability, stability, fluid flow and many more rely on an estimation of a unbiased mean length value. Historically this question has been thoroughly researched and from the publications of \cite{terzaghiSourcesErrorJoint1965}, \cite{cowanHomogeneousLinesegmentProcesses1979}, \cite{warburtonStereologicalInterpretationJoint1980}, \cite{pahlEstimatingMeanLength1981}, \cite{laslettCensoringEdgeEffects1982}, \cite{kulatilakeEstimationMeanTrace1984}, spawned a multitude of fundamental works (\cite{mauldonEstimatingMeanFracture1998}, \cite{zhangEstimatingMeanTrace1998}, \cite{mauldonCircularScanlinesCircular2001} and \cite{rohrbaughEstimatingFractureTrace2002}) that result now in the possibility of obtaining a mean length value from circular scan areas.
+	
+	\newpage
+	\printbibliography
+	\end{multicols}
+	
+
+\end{document}

@@ -1,0 +1,15 @@
+[0] Config.pm:307> INFO - This is Biber 2.17
+[1] Config.pm:310> INFO - Logfile is 'fracability.blg'
+[96] biber:340> INFO - === Tue Nov  7, 2023, 12:38:29
+[112] Biber.pm:418> INFO - Reading 'fracability.bcf'
+[176] Biber.pm:972> INFO - Found 10 citekeys in bib section 0
+[191] Biber.pm:4383> INFO - Processing section 0
+[201] Biber.pm:4574> INFO - Looking for bibtex file '/home/gabriele/STORAGE/knowledgebase/Zotero/bibliography.bib' for section 0
+[245] bibtex.pm:1713> INFO - LaTeX decoding ...
+[885] bibtex.pm:1518> INFO - Found BibTeX data source '/home/gabriele/STORAGE/knowledgebase/Zotero/bibliography.bib'
+[1016] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[1016] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
+[1017] Biber.pm:4203> INFO - Sorting list 'nty/global//global/global' of type 'entry' with template 'nty' and locale 'en-US'
+[1017] Biber.pm:4209> INFO - No sort tailoring available for locale 'en-US'
+[1031] bbl.pm:654> INFO - Writing 'fracability.bbl' with encoding 'UTF-8'
+[1044] bbl.pm:757> INFO - Output to fracability.bbl

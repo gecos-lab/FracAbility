@@ -1,0 +1,491 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.2 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{0}
+  \datalist[entry]{nty/global//global/global}
+    \entry{cowanHomogeneousLinesegmentProcesses1979}{article}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=0f6b6bf524e49f324df17578d9004e5f}{%
+           family={Cowan},
+           familyi={C\bibinitperiod},
+           given={Richard},
+           giveni={R\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{publisher}{1}{%
+        {Cambridge University Press}%
+      }
+      \strng{namehash}{0f6b6bf524e49f324df17578d9004e5f}
+      \strng{fullhash}{0f6b6bf524e49f324df17578d9004e5f}
+      \strng{bibnamehash}{0f6b6bf524e49f324df17578d9004e5f}
+      \strng{authorbibnamehash}{0f6b6bf524e49f324df17578d9004e5f}
+      \strng{authornamehash}{0f6b6bf524e49f324df17578d9004e5f}
+      \strng{authorfullhash}{0f6b6bf524e49f324df17578d9004e5f}
+      \field{sortinit}{C}
+      \field{sortinithash}{4d103a86280481745c9c897c925753c0}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{year}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{A number of formulae of an integral geometric character are presented for the most general planar, homogeneous line-segment process, one in which a given segment length and orientation may depend upon (a) the point process of segment midpoints and (b) the lengths and orientations of other segments. The sense in which these formulae have a probabilistic/statistical interpretation is made precise. For the general process, two interpretations are given; one requires the theory of Palm distributions whilst the other depends upon ergodic results. When additional structure for the process is assumed, the integral geometric formulae lead to interesting, non-intuitive sampling formulae.}
+      \field{issn}{1469-8064, 0305-0041}
+      \field{journaltitle}{Mathematical Proceedings of the Cambridge Philosophical Society}
+      \field{langid}{english}
+      \field{month}{11}
+      \field{number}{3}
+      \field{title}{Homogeneous Line-Segment Processes}
+      \field{urlday}{16}
+      \field{urlmonth}{10}
+      \field{urlyear}{2023}
+      \field{volume}{86}
+      \field{year}{1979}
+      \field{urldateera}{ce}
+      \field{pages}{481\bibrangedash 489}
+      \range{pages}{9}
+      \verb{doi}
+      \verb 10.1017/S0305004100056346
+      \endverb
+      \verb{file}
+      \verb /home/gabriele/MEGA/Zotero/storage/MV92YDFT/cowanHomogeneousLinesegmentProcesses1979.pdf
+      \endverb
+    \endentry
+    \entry{kulatilakeEstimationMeanTrace1984}{article}{}
+      \name{author}{2}{}{%
+        {{un=0,uniquepart=base,hash=e9b68748a44b5f564ca5f1e24219fafa}{%
+           family={Kulatilake},
+           familyi={K\bibinitperiod},
+           given={P.\bibnamedelimi H.\bibnamedelimi S.\bibnamedelimi W.},
+           giveni={P\bibinitperiod\bibinitdelim H\bibinitperiod\bibinitdelim S\bibinitperiod\bibinitdelim W\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=ba0c32e3283f90cecd6a48d8e7299d70}{%
+           family={Wu},
+           familyi={W\bibinitperiod},
+           given={T.\bibnamedelimi H.},
+           giveni={T\bibinitperiod\bibinitdelim H\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{6de1c4ad79672d965cc07e0ab4b88724}
+      \strng{fullhash}{6de1c4ad79672d965cc07e0ab4b88724}
+      \strng{bibnamehash}{6de1c4ad79672d965cc07e0ab4b88724}
+      \strng{authorbibnamehash}{6de1c4ad79672d965cc07e0ab4b88724}
+      \strng{authornamehash}{6de1c4ad79672d965cc07e0ab4b88724}
+      \strng{authorfullhash}{6de1c4ad79672d965cc07e0ab4b88724}
+      \field{sortinit}{K}
+      \field{sortinithash}{c02bf6bff1c488450c352b40f5d853ab}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{year}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{Trace lengths of discontinuities observed on finite exposures are biased due to sampling errors. These errors should be corrected in estimating mean trace length. A technique, which takes into account the sampling errors, is proposed for estimating the mean trace length on infinite, vertical sections from the observations made on finite, rectangular, vertical exposures. The method is applicable to discontinuities whose orientation is described by a probability distribution function. The method requires that the numbers of discontinuities with both ends observed, one end observed, and both ends censored be known. The lengths of observed traces and the density function of trace length are not required. The derivation assumes that midpoints of traces are uniformly distributed in the vertical plane. Also independence between trace length and orientation is assumed. Data on a Pennsylvania shale in Ohio, U. S. A., were used as an example.}
+      \field{issn}{1434-453X}
+      \field{journaltitle}{Rock Mechanics and Rock Engineering}
+      \field{langid}{english}
+      \field{month}{10}
+      \field{number}{4}
+      \field{title}{Estimation of Mean Trace Length of Discontinuities}
+      \field{urlday}{10}
+      \field{urlmonth}{10}
+      \field{urlyear}{2023}
+      \field{volume}{17}
+      \field{year}{1984}
+      \field{urldateera}{ce}
+      \field{pages}{215\bibrangedash 232}
+      \range{pages}{18}
+      \verb{doi}
+      \verb 10.1007/BF01032335
+      \endverb
+      \verb{file}
+      \verb /home/gabriele/MEGA/Zotero/storage/5YQG482U/kulatilakeEstimationMeanTrace1984.pdf
+      \endverb
+      \keyw{Civil Engineer,Density Function,Distribution Function,Probability Distribution,Shale}
+    \endentry
+    \entry{laslettCensoringEdgeEffects1982}{article}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=c2d2a616788d29147f01da41e7557114}{%
+           family={Laslett},
+           familyi={L\bibinitperiod},
+           given={G.\bibnamedelimi M.},
+           giveni={G\bibinitperiod\bibinitdelim M\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{c2d2a616788d29147f01da41e7557114}
+      \strng{fullhash}{c2d2a616788d29147f01da41e7557114}
+      \strng{bibnamehash}{c2d2a616788d29147f01da41e7557114}
+      \strng{authorbibnamehash}{c2d2a616788d29147f01da41e7557114}
+      \strng{authornamehash}{c2d2a616788d29147f01da41e7557114}
+      \strng{authorfullhash}{c2d2a616788d29147f01da41e7557114}
+      \field{sortinit}{L}
+      \field{sortinithash}{7c47d417cecb1f4bd38d1825c427a61a}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{year}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{This paper reviews techniques for correcting for bias incurred when incomplete observations form part of a data set. The similarities and differences between biases due to censoring and edge effects are emphasized, the latter being of importance when the distribution of joint traces is estimated from an exposure. A new technique for analyzing line transect data is presented, and a new analysis of published data on joint trace lengths given.}
+      \field{issn}{1573-8868}
+      \field{journaltitle}{Journal of the International Association for Mathematical Geology}
+      \field{langid}{english}
+      \field{month}{4}
+      \field{number}{2}
+      \field{title}{Censoring and Edge Effects in Areal and Line Transect Sampling of Rock Joint Traces}
+      \field{urlday}{17}
+      \field{urlmonth}{10}
+      \field{urlyear}{2023}
+      \field{volume}{14}
+      \field{year}{1982}
+      \field{urldateera}{ce}
+      \field{pages}{125\bibrangedash 140}
+      \range{pages}{16}
+      \verb{doi}
+      \verb 10.1007/BF01083948
+      \endverb
+      \verb{file}
+      \verb /home/gabriele/MEGA/Zotero/storage/SYCTSAZN/laslettCensoringEdgeEffects1982.pdf
+      \endverb
+      \keyw{areal sampling,censoring,edge effects,joint traces,line transect sampling}
+    \endentry
+    \entry{mauldonEstimatingMeanFracture1998}{article}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=bd52cf7535d65cc129fc3d3de9cfc428}{%
+           family={Mauldon},
+           familyi={M\bibinitperiod},
+           given={M.},
+           giveni={M\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{bd52cf7535d65cc129fc3d3de9cfc428}
+      \strng{fullhash}{bd52cf7535d65cc129fc3d3de9cfc428}
+      \strng{bibnamehash}{bd52cf7535d65cc129fc3d3de9cfc428}
+      \strng{authorbibnamehash}{bd52cf7535d65cc129fc3d3de9cfc428}
+      \strng{authornamehash}{bd52cf7535d65cc129fc3d3de9cfc428}
+      \strng{authorfullhash}{bd52cf7535d65cc129fc3d3de9cfc428}
+      \field{sortinit}{M}
+      \field{sortinithash}{4625c616857f13d17ce56f7d4f97d451}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{year}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{Although window samples of fracture traces are widely recognized to be length-biased and censored, they are often the best source of data for inferring statistical parameters of fracture sets. This paper presents new estimators for mean fracture trace length and density that correct for the e¨ects of bias and censoring. A stereological estimator of mean trace length is derived for parallel traces in a rectangular sampling window, an end-point estimator of mean trace length is derived for windows with arbitrary convex boundaries and for arbitrary trace length distributions, and an end-point estimator of trace density is derived for windows with arbitrary convex boundaries and for arbitrary trace length and trace orientation distributions. Results for rectangular and circular windows are obtained as special cases of the general solutions for arbitrary convex windows. When applied to circular windows, the end-point estimator of mean trace length is, in addition, independent of the trace orientation distribution. The estimators are easily determined from ®eld data. The endpoint estimator of trace density requires knowing only the area of the window and the number of end-points inside the window. The end-point estimator of mean trace length, when applied to circular windows, requires, in addition, the number of end-points outside the window (of those traces that intersect the window) and the stereological estimator of mean trace length requires only the apparent mean trace length and the height of the window.}
+      \field{issn}{0723-2632, 1434-453X}
+      \field{journaltitle}{Rock Mechanics and Rock Engineering}
+      \field{langid}{english}
+      \field{month}{11}
+      \field{number}{4}
+      \field{title}{Estimating {{Mean Fracture Trace Length}} and {{Density}} from {{Observations}} in {{Convex Windows}}}
+      \field{urlday}{12}
+      \field{urlmonth}{6}
+      \field{urlyear}{2023}
+      \field{volume}{31}
+      \field{year}{1998}
+      \field{urldateera}{ce}
+      \field{pages}{201\bibrangedash 216}
+      \range{pages}{16}
+      \verb{doi}
+      \verb 10.1007/s006030050021
+      \endverb
+      \verb{file}
+      \verb /home/gabriele/MEGA/Zotero/storage/5AABGEWG/mauldonEstimatingMeanFracture1998.pdf
+      \endverb
+    \endentry
+    \entry{mauldonCircularScanlinesCircular2001}{article}{}
+      \name{author}{3}{}{%
+        {{un=0,uniquepart=base,hash=bd52cf7535d65cc129fc3d3de9cfc428}{%
+           family={Mauldon},
+           familyi={M\bibinitperiod},
+           given={M.},
+           giveni={M\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=319286c4e6cfaafa2cf71dc12919c6ed}{%
+           family={Dunne},
+           familyi={D\bibinitperiod},
+           given={W.M.},
+           giveni={W\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=a5b30b209e09c8670b5cdddecc0c5456}{%
+           family={Rohrbaugh},
+           familyi={R\bibinitperiod},
+           given={M.B.},
+           giveni={M\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{e6b2b681ec34f56482e17c4e070dc364}
+      \strng{fullhash}{5c04364c5a576d207cad90b57fcf5e29}
+      \strng{bibnamehash}{5c04364c5a576d207cad90b57fcf5e29}
+      \strng{authorbibnamehash}{5c04364c5a576d207cad90b57fcf5e29}
+      \strng{authornamehash}{e6b2b681ec34f56482e17c4e070dc364}
+      \strng{authorfullhash}{5c04364c5a576d207cad90b57fcf5e29}
+      \field{sortinit}{M}
+      \field{sortinithash}{4625c616857f13d17ce56f7d4f97d451}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{year}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{shorttitle}
+      \field{abstract}{We introduce new estimators for fracture trace intensity, trace density and mean trace length that exploit the use of circles as ef®cient sampling tools. A fracture trace is the commonly observed surface expression of a fracture, i.e. the intersection of a fracture with an exposed surface such as a rock pavement or a mine drive wall. Trace intensity, trace density and mean trace length estimators are derived and shown to form a self-consistent set of two-dimensional fracture abundance measures. The intensity estimator n/4r uses the number, n, of intersections between fracture traces and a circular scanline of radius r. The density estimator m/2p r2 uses the number, m, of trace endpoints inside a circular window. The mean trace length estimator (n/m)pr/2 uses the ratio of the number of trace intersections on the circle to the number of endpoints in the circle.}
+      \field{issn}{01918141}
+      \field{journaltitle}{Journal of Structural Geology}
+      \field{langid}{english}
+      \field{month}{2}
+      \field{number}{2-3}
+      \field{shorttitle}{Circular Scanlines and Circular Windows}
+      \field{title}{Circular Scanlines and Circular Windows: New Tools for Characterizing the Geometry of Fracture Traces}
+      \field{urlday}{6}
+      \field{urlmonth}{10}
+      \field{urlyear}{2023}
+      \field{volume}{23}
+      \field{year}{2001}
+      \field{urldateera}{ce}
+      \field{pages}{247\bibrangedash 258}
+      \range{pages}{12}
+      \verb{doi}
+      \verb 10.1016/S0191-8141(00)00094-8
+      \endverb
+      \verb{file}
+      \verb /home/gabriele/MEGA/Zotero/storage/9UMM3GZP/mauldonCircularScanlinesCircular2001.pdf
+      \endverb
+    \endentry
+    \entry{pahlEstimatingMeanLength1981}{article}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=9d66cf5ecdf1cf2b2917c1dc512633d6}{%
+           family={Pahl},
+           familyi={P\bibinitperiod},
+           given={P.\bibnamedelimi J.},
+           giveni={P\bibinitperiod\bibinitdelim J\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{9d66cf5ecdf1cf2b2917c1dc512633d6}
+      \strng{fullhash}{9d66cf5ecdf1cf2b2917c1dc512633d6}
+      \strng{bibnamehash}{9d66cf5ecdf1cf2b2917c1dc512633d6}
+      \strng{authorbibnamehash}{9d66cf5ecdf1cf2b2917c1dc512633d6}
+      \strng{authornamehash}{9d66cf5ecdf1cf2b2917c1dc512633d6}
+      \strng{authorfullhash}{9d66cf5ecdf1cf2b2917c1dc512633d6}
+      \field{sortinit}{P}
+      \field{sortinithash}{ff3bcf24f47321b42cb156c2cc8a8422}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{year}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{A technique is proposed for estimating the mean trace length of discontinuities observed in mine drive walls. The method is distribution-free, i.e. independent of the assumed functional form of the statistical distribution of trace lengths, and no knowledge of the actual lengths of the observed traces is required. Under the very general assumption that trace midpoints are randomly and homogeneously distributed, all that needs to be known about each trace observed is whether it is censored (at one or both ends) or not. The method is restricted to a set of parallel traces of arbitrary direction. It is shown that, if the joint survey imposes a cut off at some length below which traces are ignored (i.e. truncation of small traces), the method provides an exact solution if the trace length distribution can be assumed to be exponential. The technique is illustrated by data from the Dolphin Mine of King Island Scheelite in Tasmania, Australia. In order to derive confidence limits for the sampling estimate of the trace length mean, it is necessary to assume that trace midpoints are distributed as a Poisson field; this requires that the distribution of spacings between traces conforms to the exponential model.}
+      \field{issn}{0148-9062}
+      \field{journaltitle}{International Journal of Rock Mechanics and Mining Sciences \& Geomechanics Abstracts}
+      \field{month}{6}
+      \field{number}{3}
+      \field{title}{Estimating the Mean Length of Discontinuity Traces}
+      \field{urlday}{9}
+      \field{urlmonth}{10}
+      \field{urlyear}{2023}
+      \field{volume}{18}
+      \field{year}{1981}
+      \field{urldateera}{ce}
+      \field{pages}{221\bibrangedash 228}
+      \range{pages}{8}
+      \verb{doi}
+      \verb 10.1016/0148-9062(81)90976-1
+      \endverb
+      \verb{file}
+      \verb /home/gabriele/MEGA/Zotero/storage/TY44KGZN/pahlEstimatingMeanLength1981.pdf;/home/gabriele/MEGA/Zotero/storage/3YVR8RSW/0148906281909761.html
+      \endverb
+    \endentry
+    \entry{rohrbaughEstimatingFractureTrace2002}{article}{}
+      \name{author}{3}{}{%
+        {{un=0,uniquepart=base,hash=a5b30b209e09c8670b5cdddecc0c5456}{%
+           family={Rohrbaugh},
+           familyi={R\bibinitperiod},
+           given={M.B.},
+           giveni={M\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=319286c4e6cfaafa2cf71dc12919c6ed}{%
+           family={Dunne},
+           familyi={D\bibinitperiod},
+           given={W.M.},
+           giveni={W\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=bd52cf7535d65cc129fc3d3de9cfc428}{%
+           family={Mauldon},
+           familyi={M\bibinitperiod},
+           given={M},
+           giveni={M\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{1c9a83db0451844c9bf74d7dcc0e4506}
+      \strng{fullhash}{b3d0d3928ecf0f0cf0e792d3bb8c7786}
+      \strng{bibnamehash}{b3d0d3928ecf0f0cf0e792d3bb8c7786}
+      \strng{authorbibnamehash}{b3d0d3928ecf0f0cf0e792d3bb8c7786}
+      \strng{authornamehash}{1c9a83db0451844c9bf74d7dcc0e4506}
+      \strng{authorfullhash}{b3d0d3928ecf0f0cf0e792d3bb8c7786}
+      \field{sortinit}{R}
+      \field{sortinithash}{5e1c39a9d46ffb6bebd8f801023a9486}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{year}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{Fracture characterization protocols that reduce sampling bias are likely to yield higher quality input for exploration and development decisions when dealing with naturally fractured reservoirs. A new set of estimators for fracture density, intensity, and mean trace length corrects for sampling biases and provides a useful integrated description for bulk aspects of a fracture network. These estimators are based on counts of intersections between fracture traces and circular scan lines and of trace terminations in circular windows. Application to synthetic fracture patterns with known parameters validates the use of the new estimators, which are then applied to natural fault trace maps from seismic volumes and joint trace maps from rock pavements. The new estimators are distribution independent and eliminate the effects of orientation, censoring, and length biases, which limit the effectiveness of other sampling techniques. Estimator accuracy improves as sample size increases, particularly for larger circles that exceed a fracture-defined block size. Estimator accuracy for mean trace length improves when the sample exceeds threshold count values for fracture terminations based on guidance from the analysis of similar synthetic patterns. These new estimators also provide both inputs and independent checks of predictions for fracture-generator programs used to model fracture populations in a rock volume.}
+      \field{issn}{0149-1423}
+      \field{journaltitle}{AAPG Bulletin}
+      \field{langid}{english}
+      \field{title}{Estimating Fracture Trace Intensity, Density, and Mean Length Using Circular Scan Lines and Windows}
+      \field{urlday}{6}
+      \field{urlmonth}{10}
+      \field{urlyear}{2023}
+      \field{volume}{86}
+      \field{year}{2002}
+      \field{urldateera}{ce}
+      \verb{doi}
+      \verb 10.1306/61EEDE0E-173E-11D7-8645000102C1865D
+      \endverb
+      \verb{file}
+      \verb /home/gabriele/MEGA/Zotero/storage/2JCY3D5X/rohrbaughEstimatingFractureTrace2002.pdf
+      \endverb
+    \endentry
+    \entry{terzaghiSourcesErrorJoint1965}{article}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=c1a67aededc5c506424b253fd6ee63ff}{%
+           family={Terzaghi},
+           familyi={T\bibinitperiod},
+           given={{\relax RD}},
+           giveni={_\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{c1a67aededc5c506424b253fd6ee63ff}
+      \strng{fullhash}{c1a67aededc5c506424b253fd6ee63ff}
+      \strng{bibnamehash}{c1a67aededc5c506424b253fd6ee63ff}
+      \strng{authorbibnamehash}{c1a67aededc5c506424b253fd6ee63ff}
+      \strng{authornamehash}{c1a67aededc5c506424b253fd6ee63ff}
+      \strng{authorfullhash}{c1a67aededc5c506424b253fd6ee63ff}
+      \field{sortinit}{T}
+      \field{sortinithash}{9af77f0292593c26bde9a56e688eaee9}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{year}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{issn}{0016-8505, 1751-7656}
+      \field{journaltitle}{Géotechnique}
+      \field{langid}{english}
+      \field{month}{9}
+      \field{number}{3}
+      \field{title}{Sources of {{Error}} in {{Joint Surveys}}}
+      \field{urlday}{23}
+      \field{urlmonth}{10}
+      \field{urlyear}{2021}
+      \field{volume}{15}
+      \field{year}{1965}
+      \field{urldateera}{ce}
+      \field{pages}{287\bibrangedash 304}
+      \range{pages}{18}
+      \verb{doi}
+      \verb 10.1680/geot.1965.15.3.287
+      \endverb
+      \verb{file}
+      \verb /home/gabriele/MEGA/Zotero/storage/DXSBHJ94/terzaghiSourcesErrorJoint1965.pdf
+      \endverb
+    \endentry
+    \entry{warburtonStereologicalInterpretationJoint1980}{article}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=8048a6c362a47565f6b38aa87f838760}{%
+           family={Warburton},
+           familyi={W\bibinitperiod},
+           given={P.M.},
+           giveni={P\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{8048a6c362a47565f6b38aa87f838760}
+      \strng{fullhash}{8048a6c362a47565f6b38aa87f838760}
+      \strng{bibnamehash}{8048a6c362a47565f6b38aa87f838760}
+      \strng{authorbibnamehash}{8048a6c362a47565f6b38aa87f838760}
+      \strng{authornamehash}{8048a6c362a47565f6b38aa87f838760}
+      \strng{authorfullhash}{8048a6c362a47565f6b38aa87f838760}
+      \field{sortinit}{W}
+      \field{sortinithash}{4315d78024d0cea9b57a0c6f0e35ed0d}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{year}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{issn}{01489062}
+      \field{journaltitle}{International Journal of Rock Mechanics and Mining Sciences \& Geomechanics Abstracts}
+      \field{langid}{english}
+      \field{month}{8}
+      \field{number}{4}
+      \field{title}{A Stereological Interpretation of Joint Trace Data}
+      \field{urlday}{6}
+      \field{urlmonth}{10}
+      \field{urlyear}{2023}
+      \field{volume}{17}
+      \field{year}{1980}
+      \field{urldateera}{ce}
+      \field{pages}{181\bibrangedash 190}
+      \range{pages}{10}
+      \verb{doi}
+      \verb 10.1016/0148-9062(80)91084-0
+      \endverb
+      \verb{file}
+      \verb /home/gabriele/MEGA/Zotero/storage/RPYGKIPV/warburtonStereologicalInterpretationJoint1980.pdf
+      \endverb
+    \endentry
+    \entry{zhangEstimatingMeanTrace1998}{article}{}
+      \name{author}{2}{}{%
+        {{un=0,uniquepart=base,hash=6d96d6fbd106e2ffd88ad23ce0119654}{%
+           family={Zhang},
+           familyi={Z\bibinitperiod},
+           given={L.},
+           giveni={L\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=789001499c6505ddf44c09f5b8092e9b}{%
+           family={Einstein},
+           familyi={E\bibinitperiod},
+           given={H.\bibnamedelimi H.},
+           giveni={H\bibinitperiod\bibinitdelim H\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{2e4829046717b6f2fa6c1fe4d8960852}
+      \strng{fullhash}{2e4829046717b6f2fa6c1fe4d8960852}
+      \strng{bibnamehash}{2e4829046717b6f2fa6c1fe4d8960852}
+      \strng{authorbibnamehash}{2e4829046717b6f2fa6c1fe4d8960852}
+      \strng{authornamehash}{2e4829046717b6f2fa6c1fe4d8960852}
+      \strng{authorfullhash}{2e4829046717b6f2fa6c1fe4d8960852}
+      \field{sortinit}{Z}
+      \field{sortinithash}{96892c0b0a36bb8557c40c49813d48b3}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{year}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{Rock discontinuities appear as traces on exposures such as natural outcrops or tunnel walls. Discontinuity size which has important effects on rock mass behavior is related to trace length.}
+      \field{issn}{1434-453X}
+      \field{journaltitle}{Rock Mechanics and Rock Engineering}
+      \field{langid}{english}
+      \field{month}{11}
+      \field{number}{4}
+      \field{title}{Estimating the {{Mean Trace Length}} of {{Rock Discontinuities}}}
+      \field{urlday}{7}
+      \field{urlmonth}{11}
+      \field{urlyear}{2023}
+      \field{volume}{31}
+      \field{year}{1998}
+      \field{urldateera}{ce}
+      \field{pages}{217\bibrangedash 235}
+      \range{pages}{19}
+      \verb{doi}
+      \verb 10.1007/s006030050022
+      \endverb
+      \verb{file}
+      \verb /home/gabriele/MEGA/Zotero/storage/WMKJZPQJ/Zhang and Einstein - 1998 - Estimating the Mean Trace Length of Rock Discontin.pdf
+      \endverb
+      \keyw{Exponential Distribution,Orientation Distribution,Rock Mass,Sampling Bias,Theoretical Solution}
+    \endentry
+  \enddatalist
+\endrefsection
+\endinput
+
