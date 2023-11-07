@@ -18,11 +18,9 @@ def lognorm_parameters(target_mean, target_std):
     return m_normal, np.sqrt(var_normal)
 
 
-lamb = 5
-
 distr1 = norm(loc=0, scale=1)
-distr2 = expon(loc=10, scale=5)
-distr3 = norm(loc=5, scale=5)
+distr2 = expon(loc=0, scale=5)
+distr3 = expon(loc=0, scale=5)
 
 
 test_data1 = distr1.rvs(size=1000)
@@ -35,7 +33,7 @@ range3 = np.linspace(min(test_data3), max(test_data3))
 
 fit1 = norm.fit(test_data1)
 fit2 = expon.fit(test_data2, floc=0)
-fit3 = norm.fit(test_data3)
+fit3 = expon.fit(test_data3)
 
 print(fit1)
 print(fit2)
@@ -43,12 +41,12 @@ print(fit3)
 
 pdf1 = norm.pdf(range1, *fit1)
 pdf2 = expon.pdf(range2, *fit2)
-pdf3 = norm.pdf(range3, *fit3)
+pdf3 = expon.pdf(range3, *fit3)
 
-sns.histplot(test_data1, stat='density')
+# sns.histplot(test_data1, stat='density')
 sns.histplot(test_data2, stat='density')
 sns.histplot(test_data3, stat='density')
-sns.lineplot(x=range1, y=pdf1)
+# sns.lineplot(x=range1, y=pdf1)
 sns.lineplot(x=range2, y=pdf2)
 sns.lineplot(x=range3, y=pdf3)
 
