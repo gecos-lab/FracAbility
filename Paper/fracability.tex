@@ -24,7 +24,7 @@
 
 \usepackage{float} %per posizionare bene le figure dove voglio io
 
-\usepackage[font=small,labelfont=bf]{caption,subcaption} %per mettere le didascalie
+\usepackage[font=small,labelfont=bf, figurename=Figure, labelsep=period]{caption,subcaption} %per mettere le didascalie
 
 \usepackage[bottom]{footmisc} %per il margine delle note
 
@@ -89,38 +89,10 @@
 %\renewcommand{\familydefault}{\sfdefault}
 
 
-\newpagestyle{main}{%
-	
-	\headrule%
-	\sethead{~\sectiontitle}{}{}
-	\setfoot{}{\thepage}{}
-	
-	
-}
-
-
-\newpagestyle{last}{%
-	
-	\headrule%
-	\sethead{~Final remarks and references}{}{}
-	\setfoot{}{\thepage}{}
-	
-	
-}
-
-\newpagestyle{appendix}{%
-	
-	\headrule%
-	\sethead{Appendix \textbf{\thesection}: ~\sectiontitle}{}{}
-	\setfoot{}{\thepage}{}
-	
-	
-}
-
-\pagestyle{main}
 
 
 
+\def \imgfolder {./images/}
 %----------------COMANDI PERSONALI-------------------------------
 
 
@@ -128,8 +100,8 @@
 
 %comando le figure nel testo es. [Fig.1]
 
-\newcommand{\reffig}[1]{\textbf{[Fig.\ref{#1}]}}
-\newcommand{\reftab}[1]{\textbf{[Tab.\ref{#1}]}}
+\newcommand{\reffig}[1]{Fig. \ref{#1}}
+\newcommand{\reftab}[1]{Tab. \ref{#1}}
 
 
 
@@ -140,21 +112,44 @@
 \begin{document}
 	\maketitle
 	\section*{Abstract}
-	\textit{When analysing fractured rock outcrops, fracture trace connectivity and length statistics analysis are of fundamental importance. Both properties are intertwined since to correctly treat the latter the former must be conducted. Of particular importance is the right censoring bias effect of the interpretational boundary on the fracture length statistics. Past literature mainly focused on the unbiased estimation of fracture length data mean, and with some additional steps variance, of a population adopting a non-parametric approach. However, the technology improved and necessities shifted. Now it is possible to quickly obtain dense length datasets with thousands of measurements and the emergence of stochastic DFNs has shown the need to correctly fit different types of distributions and highlighted an absence of works on this topic. 
-	FracAbility is a new open-source Python package capable to both analyse the topology of any fracture network and fit many length distributions corrected from right censoring bias using survival analysis. In this paper, the theory, applications and challenges of this useful statistical approach are explored and applied both on synthetic and real case studies. The results show how life testing analysis can be used to correctly and stably estimate distribution parameters up to 80\% of censored length measurements. Moreover, the proposed approach can also be applied to any length based dataset affected by censoring, thus offering the possibility to correct also spacing and height distributions. Finally, it is shown that the correction is independent from the orientation of the network, boundary or outcrop.}
+	
 	\rule{\textwidth}{0.1mm}
-	\begin{multicols}{2}
-			\section{Introduction}
-				In fractured rock systems, the length estimation of a given fracture family has always been of fundamental importance. Applications such as rock mass strength, deformability, stability, fluid flow and many more rely on an estimation of a unbiased mean length value. Historically this question has been thoroughly researched and from the publications of \cite{terzaghiSourcesErrorJoint1965}, \cite{warburtonStereologicalInterpretationJoint1980}, \cite{pahlEstimatingMeanLength1981} and \cite{laslettSurvivalCurveMonotone1982}, spawned fundamental works that culminated in the possibility of obtaining a mean length value from circular scan areas (\cite{mauldonEstimatingMeanFracture1998}, \cite{zhangEstimatingMeanTrace1998}, \cite{mauldonCircularScanlinesCircular2001} and \cite{rohrbaughEstimatingFractureTrace2002}). This helped immensely in the workflow of rock mass parametrization because it offered a method to quickly obtain the mean length both on the field and with a-posteriori analysis (for example with images). This methodology also quickly became the norm in specialized software such as FraqPaq \parencite{healyFracPaQMATLABToolbox2017} to measure for example P20 and P21 on a given outcrop. 
-				Although efficient and useful, to assure bias correction the authors tackled this problem preferring a non-parametric approach over a parametric one. This lead to the definition of an indirect relationship between the intersection of fracture traces with the circular scan area or line to the mean length of a given set. The distribution-free path was chosen because of necessity, length data acquisition was slow and tedious thus datasets were usually small. At the same time, calculating and fitting any distribution other than the exponential \parencite{baecherProgressivelyCensoredSampling1980} was done by hand. Furthermore, the demand was obtaining a correct mean value and not a precise fitted distribution. Because of these reasons the parametric approach was abandoned.
-				Nowadays the increase in data availability and computing power shifted the focus on more data driven approaches. Moreover, thanks to advances in stochastic DFN codes, integrated in commercial software such as Petrel, Move or as stand-alone projects such as DFNWorks, the need to obtain a precise distribution corrected from right censoring has suddenly increased.
-				This paper's aim is twofold, the first is to present, explore and adapt survival analysis techniques to the spatial and geological realm. The second is to apply such specialized theory in real world scenarios by creating a easily installable python package.
-				
+
+	\section{Introduction}
+		In fractured rock systems, the length estimation of a given fracture family has always been of fundamental importance. Applications such as rock mass strength, deformability, stability, fluid flow and many more rely on an estimation of a unbiased mean length value. Historically this question has been thoroughly researched and from the publications of \cite{terzaghiSourcesErrorJoint1965}, \cite{warburtonStereologicalInterpretationJoint1980}, \cite{pahlEstimatingMeanLength1981} and \cite{laslettSurvivalCurveMonotone1982}, spawned fundamental works that culminated in the possibility of obtaining a mean length value from circular scan areas (\cite{mauldonEstimatingMeanFracture1998}, \cite{zhangEstimatingMeanTrace1998}, \cite{mauldonCircularScanlinesCircular2001} and \cite{rohrbaughEstimatingFractureTrace2002}). This helped immensely in the workflow of rock mass parametrization because it offered a method to quickly obtain the mean length both on the field and with a-posteriori analysis (for example with images). This methodology also quickly became the norm in specialized software such as FraqPaq \parencite{healyFracPaQMATLABToolbox2017} to measure for example P20 and P21 on a given outcrop. 
+		Although efficient and useful, to ensure bias correction the authors tackled this problem preferring a non-parametric approach over a parametric one. This led to the definition of an indirect relationship between the intersection of fracture traces with the circular scan area or line to the mean length of a given set. The distribution-free path was chosen because of necessity, length data acquisition was slow and tedious thus datasets were usually small. At the same time, calculating and fitting any distribution other than the exponential \parencite{baecherProgressivelyCensoredSampling1980} was done by hand. Furthermore, the demand was obtaining a correct mean value and not a precisely fitted distribution. Because of these reasons the parametric approach was abandoned.
+		Nowadays the increase in data availability and computing power shifted the focus on more data driven approaches. Moreover, thanks to advances in stochastic DFN codes, integrated in commercial software such as Petrel, Move or as stand-alone projects such as DFNWorks, the need to obtain a precise distribution corrected from right censoring has suddenly increased.
+		This paper's aim is twofold, the first is to present, explore and adapt survival analysis techniques to the spatial and geological realm. The second is to apply such specialized theory in real world scenarios by creating an easily installable python package that can be used both in scripts but also in a terminal interface directly in GIS environments.
+		
+	\section{Geological background}
+	
+	\subsection{Fracture networks}
+	
+	Fracture networks are an ensemble of intersecting semi-linear traces resulting from the intersection between a fracture surface with a plane (citation?) i.e., the outcrop. Fracture networks are characterized both by topological relationships and geometrical properties \parencite{nybergNetworkGTGISTool2018} and can be thus divided as shown in \reffig{fig: fn_struct}:
+	
+	
+	\begin{figure}
+		\includegraphics[width=\textwidth]{images/frac_net.png}
+		\caption{Structure of a fracture network}\label{fig: fn_struct}
+	\end{figure}
+	
+	\subsection{DFNs}
+	
+	\section{Statistical background}
+	
+	\subsection{Survival analysis}
+	\subsection{Censoring}
+	
+	
+	\section{Methods}
+	
+	\subsection{Dimension shift}
+	\subsection{Effects on the distribution estimation}
+	\subsection{Testing techniques}
 				
 	
 	\newpage
 	\printbibliography
-	\end{multicols}
 	
 
 \end{document}

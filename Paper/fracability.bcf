@@ -2354,16 +2354,18 @@
     <bcf:citekey order="8">rohrbaughEstimatingFractureTrace2002</bcf:citekey>
     <bcf:citekey order="9">healyFracPaQMATLABToolbox2017</bcf:citekey>
     <bcf:citekey order="10">baecherProgressivelyCensoredSampling1980</bcf:citekey>
-    <bcf:citekey order="11">terzaghiSourcesErrorJoint1965</bcf:citekey>
-    <bcf:citekey order="12">warburtonStereologicalInterpretationJoint1980</bcf:citekey>
-    <bcf:citekey order="13">pahlEstimatingMeanLength1981</bcf:citekey>
-    <bcf:citekey order="14">laslettSurvivalCurveMonotone1982</bcf:citekey>
-    <bcf:citekey order="15">mauldonEstimatingMeanFracture1998</bcf:citekey>
-    <bcf:citekey order="16">zhangEstimatingMeanTrace1998</bcf:citekey>
-    <bcf:citekey order="17">mauldonCircularScanlinesCircular2001</bcf:citekey>
-    <bcf:citekey order="18">rohrbaughEstimatingFractureTrace2002</bcf:citekey>
-    <bcf:citekey order="19">healyFracPaQMATLABToolbox2017</bcf:citekey>
-    <bcf:citekey order="20">baecherProgressivelyCensoredSampling1980</bcf:citekey>
+    <bcf:citekey order="11">nybergNetworkGTGISTool2018</bcf:citekey>
+    <bcf:citekey order="12">terzaghiSourcesErrorJoint1965</bcf:citekey>
+    <bcf:citekey order="13">warburtonStereologicalInterpretationJoint1980</bcf:citekey>
+    <bcf:citekey order="14">pahlEstimatingMeanLength1981</bcf:citekey>
+    <bcf:citekey order="15">laslettSurvivalCurveMonotone1982</bcf:citekey>
+    <bcf:citekey order="16">mauldonEstimatingMeanFracture1998</bcf:citekey>
+    <bcf:citekey order="17">zhangEstimatingMeanTrace1998</bcf:citekey>
+    <bcf:citekey order="18">mauldonCircularScanlinesCircular2001</bcf:citekey>
+    <bcf:citekey order="19">rohrbaughEstimatingFractureTrace2002</bcf:citekey>
+    <bcf:citekey order="20">healyFracPaQMATLABToolbox2017</bcf:citekey>
+    <bcf:citekey order="21">baecherProgressivelyCensoredSampling1980</bcf:citekey>
+    <bcf:citekey order="22">nybergNetworkGTGISTool2018</bcf:citekey>
   </bcf:section>
   <!-- SORTING TEMPLATES -->
   <bcf:sortingtemplate name="nty">
