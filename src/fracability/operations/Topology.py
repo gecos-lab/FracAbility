@@ -1,13 +1,10 @@
-
-from vtkmodules.vtkFiltersCore import vtkConnectivityFilter
-
-from fracability.Entities import FractureNetwork, Nodes
+from src.fracability.Entities import FractureNetwork, Nodes
 
 
 from shapely.geometry import Point
 from geopandas import GeoDataFrame
 import numpy as np
-import time
+
 
 def nodes_conn(obj: FractureNetwork, inplace=True):
 

@@ -1,8 +1,7 @@
-from fracability.examples import example_fracture_network
+from src.fracability.examples import example_fracture_network
 import pytest
-from fracability.Plotters import *
-from fracability.Entities import FractureNetwork
-from fracability.operations.Statistics import NetworkFitter
+from src.fracability.Entities import FractureNetwork
+from src.fracability.operations.Statistics import NetworkFitter
 import matplotlib.pyplot as plt
 
 

@@ -1,8 +1,7 @@
-from fracability.examples import example_fracture_network
+from src.fracability.examples import example_fracture_network
 import pytest
-from fracability import Entities
-from fracability.operations.Topology import *
-from fracability.operations.Geometry import tidy_intersections
+from src.fracability import Entities
+from src.fracability.operations.Geometry import tidy_intersections
 
 @pytest.fixture(scope="session", autouse=True)
 def environment_var():

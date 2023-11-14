@@ -1,14 +1,7 @@
-from pyvista import PolyData
-import time
+from src.fracability.AbstractClasses import BaseEntity
+from src.fracability.utils.shp_operations import int_node
 
-from vtkmodules.vtkFiltersCore import vtkConnectivityFilter, vtkAppendPolyData
-
-from fracability.AbstractClasses import BaseEntity
-from fracability.utils.shp_operations import int_node
-
-import numpy as np
 from copy import deepcopy
-from halo import Halo
 
 
 # @Halo(text='Calculating intersections', spinner='line', placement='right')

@@ -1,7 +1,6 @@
-from fracability.examples import example_fracture_network
+from src.fracability.examples import example_fracture_network
 import pytest
-from fracability.operations.Geometry import *
-from fracability import Entities
+from src.fracability import Entities
 
 @pytest.fixture(scope="session", autouse=True)
 def environment_var():

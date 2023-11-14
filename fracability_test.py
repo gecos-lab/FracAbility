@@ -1,13 +1,12 @@
 import matplotlib.pyplot as plt
 from vtkmodules.vtkFiltersModeling import vtkCookieCutter
 
-from fracability import Entities
-from fracability.Plotters import matplot_stats_summary
-from fracability.operations.Geometry import tidy_intersections
-from fracability.operations.Statistics import NetworkFitter
-from fracability.operations.Topology import nodes_conn
+from src.fracability import Entities
+from src.fracability.operations.Geometry import tidy_intersections
+from src.fracability.operations import NetworkFitter
+from src.fracability.operations.Topology import nodes_conn
 
-from fracability.examples import example_fracture_network
+from src.fracability.examples import example_fracture_network
 
 import geopandas as gpd
 import numpy as np
@@ -52,12 +51,12 @@ for i, scale in enumerate(scales):
 
     fractures_cut = pv.PolyData(cookie.GetOutput())
 
-    fractures = Entities.Fractures(set_n=i+1)
+    fractures = Entities.Fractures(set_n=i + 1)
     fractures.vtk_object = fractures_cut
 
     fracture_net.add_fractures(fractures)
 
-    boundary = Entities.Boundary(group_n=i+1)
+    boundary = Entities.Boundary(group_n=i + 1)
     boundary.vtk_object = window
 
     fracture_net.add_boundaries(boundary)

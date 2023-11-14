@@ -1,7 +1,6 @@
 import pandas as pd
 import geopandas as gpd
-import inspect
-from fracability import DATADIR
+from src.fracability import DATADIR
 
 
 def fracture_net_components():

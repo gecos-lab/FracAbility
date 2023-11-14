@@ -1,13 +1,12 @@
 import networkx
 import pytest
-import geopandas as gpd
 import pyvista
 
 import os
 import glob
 
-from fracability.Entities import Nodes, Fractures, Boundary, FractureNetwork
-from fracability.examples import example_fracture_network
+from src.fracability.Entities import Nodes, Fractures, Boundary, FractureNetwork
+from src.fracability.examples import example_fracture_network
 
 
 class TestNodes:
@@ -227,7 +226,8 @@ class TestFractureNetwork:
         assert not fracture_net.nodes.entity_df.empty
         assert not fracture_net.fractures.entity_df.empty
         assert not fracture_net.boundaries.entity_df.empty
-        assert fracture_net.fracture_network_to_components_df().equals(example_fracture_network.fracture_net_components())
+        assert fracture_net.fracture_network_to_components_df().equals(
+            example_fracture_network.fracture_net_components())
 
     def test_create_fn_add(self):
 
@@ -240,7 +240,8 @@ class TestFractureNetwork:
         assert not pytest.fracture_net.nodes.entity_df.empty
         assert not pytest.fracture_net.fractures.entity_df.empty
         assert not pytest.fracture_net.boundaries.entity_df.empty
-        assert pytest.fracture_net.fracture_network_to_components_df().equals(example_fracture_network.fracture_net_components())
+        assert pytest.fracture_net.fracture_network_to_components_df().equals(
+            example_fracture_network.fracture_net_components())
 
     def test_activate_nodes(self):
         pytest.fracture_net.activate_nodes([1, 4])

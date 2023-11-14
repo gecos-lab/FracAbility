@@ -10,17 +10,14 @@ import matplotlib.pyplot as plt
 from scipy import stats as ss
 import pyvista as pv
 import numpy as np
-from vtkmodules.vtkFiltersCore import vtkAppendPolyData
 from vtkmodules.vtkFiltersModeling import vtkCookieCutter
 
-from fracability import Entities
-from fracability.Plotters import matplot_stats_summary
-from fracability.operations.Geometry import tidy_intersections
-from fracability.operations.Statistics import NetworkFitter
-from fracability.operations.Topology import nodes_conn
+from src.fracability import Entities
+from src.fracability.operations.Geometry import tidy_intersections
+from src.fracability.operations import NetworkFitter
+from src.fracability.operations.Topology import nodes_conn
 
 from numpy.random import Generator, PCG64
-import time
 
 
 def lognorm_parameters(target_mean, target_std):
