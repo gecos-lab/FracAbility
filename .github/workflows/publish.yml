@@ -5,6 +5,11 @@ on:
 jobs:
   pypi:
     runs-on: ubuntu-latest
+    # Specifying a GitHub environment is optional, but strongly encouraged
+    environment: release
+    permissions:
+      # IMPORTANT: this permission is mandatory for trusted publishing
+      id-token: write
     steps:
       - name: Checkout
         uses: actions/checkout@v3
