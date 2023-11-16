@@ -1,8 +1,3 @@
-[project.urls]
-"Documentation" = "https://github.com/gbene/FracAbility/tree/main/docs"
-"Bug Tracker" = "https://github.com/gbene/FracAbility/issues"
-"Changelog" = "https://github.com/gbene/FracAbility/releases"
-
 [build-system]
 requires = ["setuptools>=45", "setuptools_scm[toml]>=6.2"]
 build-backend = "setuptools.build_meta"
