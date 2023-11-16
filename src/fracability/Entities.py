@@ -15,6 +15,7 @@ from pyvista import PolyData, DataSet
 from networkx import Graph
 import fracability.Plotters as plts
 
+import fracability.Adapters as Rep
 from fracability.AbstractClasses import BaseEntity
 
 
