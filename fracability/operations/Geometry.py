@@ -1,5 +1,5 @@
-from src.fracability.AbstractClasses import BaseEntity
-from src.fracability.utils.shp_operations import int_node
+from fracability.AbstractClasses import BaseEntity
+from fracability.utils.shp_operations import int_node
 
 from copy import deepcopy
 

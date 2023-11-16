@@ -1,12 +1,12 @@
 import matplotlib.pyplot as plt
 from vtkmodules.vtkFiltersModeling import vtkCookieCutter
 
-from src.fracability import Entities
-from src.fracability.operations.Geometry import tidy_intersections
-from src.fracability.operations import NetworkFitter
-from src.fracability.operations.Topology import nodes_conn
+from fracability import Entities
+from fracability.operations.Geometry import tidy_intersections
+from fracability.operations.Statistics import NetworkFitter
+from fracability.operations.Topology import nodes_conn
 
-from src.fracability.examples import example_fracture_network
+from fracability.examples import example_fracture_network
 
 import geopandas as gpd
 import numpy as np

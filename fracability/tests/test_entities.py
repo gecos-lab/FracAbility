@@ -5,8 +5,8 @@ import pyvista
 import os
 import glob
 
-from src.fracability.Entities import Nodes, Fractures, Boundary, FractureNetwork
-from src.fracability.examples import example_fracture_network
+from fracability.Entities import Nodes, Fractures, Boundary, FractureNetwork
+from fracability.examples import example_fracture_network
 
 
 class TestNodes:

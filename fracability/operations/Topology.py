@@ -1,4 +1,4 @@
-from src.fracability.Entities import FractureNetwork, Nodes
+from fracability.Entities import FractureNetwork, Nodes
 
 
 from shapely.geometry import Point

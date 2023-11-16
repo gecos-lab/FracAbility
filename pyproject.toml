@@ -1,3 +1,14 @@
+[project.urls]
+
+# The changelog, really useful for ongoing users of your project
+changelog = "https://github.com/gbene/FracAbility/releases"
+
+# Bugs/issues/feature requests
+tracker = "https://github.com/gbene/FracAbility/issues"
+
+# Docs
+documentation = "https://github.com/gbene/FracAbility/tree/main/docs"
+
 [build-system]
 requires = ["setuptools>=45", "setuptools_scm[toml]>=6.2"]
 build-backend = "setuptools.build_meta"

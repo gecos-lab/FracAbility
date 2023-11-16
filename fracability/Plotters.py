@@ -46,7 +46,7 @@ import pandas as pd
 import seaborn as sns
 from pyvista import Plotter
 import ternary
-from src.fracability.operations.Statistics import NetworkDistribution
+from fracability.operations.Statistics import NetworkDistribution
 import numpy as np
 
 

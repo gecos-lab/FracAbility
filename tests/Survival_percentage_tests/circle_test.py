@@ -12,10 +12,10 @@ import scipy.stats as ss
 import numpy as np
 from vtkmodules.vtkFiltersModeling import vtkCookieCutter
 
-from src.fracability import Entities
-from src.fracability.operations.Geometry import tidy_intersections
-from src.fracability.operations import NetworkFitter
-from src.fracability.operations.Topology import nodes_conn
+from fracability import Entities
+from fracability.operations.Geometry import tidy_intersections
+from fracability.operations.Statistics import NetworkFitter
+from fracability.operations.Topology import nodes_conn
 
 
 p1 = np.array([636956.8988181990571320, 4518449.8742292737588286, 0])

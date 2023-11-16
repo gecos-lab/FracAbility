@@ -12,10 +12,10 @@ import pyvista as pv
 import numpy as np
 from vtkmodules.vtkFiltersModeling import vtkCookieCutter
 
-from src.fracability import Entities
-from src.fracability.operations.Geometry import tidy_intersections
-from src.fracability.operations import NetworkFitter
-from src.fracability.operations.Topology import nodes_conn
+from fracability import Entities
+from fracability.operations.Geometry import tidy_intersections
+from fracability.operations.Statistics import NetworkFitter
+from fracability.operations.Topology import nodes_conn
 
 from numpy.random import Generator, PCG64
 

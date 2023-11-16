@@ -11,7 +11,7 @@ from vtkmodules.vtkFiltersCore import vtkAppendPolyData
 import networkx as nx
 from vtkmodules.vtkFiltersGeometry import vtkGeometryFilter
 
-from src.fracability.operations.Cleaners import connect_dots
+from fracability.operations.Cleaners import connect_dots
 
 
 #  =============== VTK representations ===============

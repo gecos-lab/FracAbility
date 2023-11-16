@@ -13,9 +13,9 @@ from pandas import DataFrame
 from shapely.geometry import MultiLineString, Polygon, LineString, Point
 from pyvista import PolyData, DataSet
 from networkx import Graph
-from src import fracability as plts, fracability as Rep
+import fracability.Plotters as plts
 
-from src.fracability.AbstractClasses import BaseEntity
+from fracability.AbstractClasses import BaseEntity
 
 
 class Nodes(BaseEntity):
