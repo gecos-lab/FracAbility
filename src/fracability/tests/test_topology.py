@@ -2,6 +2,8 @@ from fracability.examples import example_fracture_network
 import pytest
 from fracability import Entities
 from fracability.operations.Geometry import tidy_intersections
+from fracability.operations.Topology import nodes_conn
+
 
 @pytest.fixture(scope="session", autouse=True)
 def environment_var():
@@ -24,8 +26,7 @@ def test_nodes_conn():
     nodes_conn(frac_net)
     control_topology = example_fracture_network.fracture_net_control_topology()['complete']
 
-    print(control_topology)
-    print(frac_net.nodes.entity_df)
+    # frac_net.nodes.entity_df.to_csv('subset_network_control_topology.csv', sep=',', index=False)
 
     assert not frac_net.nodes.entity_df.empty
     assert frac_net.nodes.entity_df.equals(control_topology)

@@ -30,7 +30,7 @@ def nodes_conn(obj: FractureNetwork, inplace=True):
 
         cells = fractures_vtk_obj.extract_points(node)
 
-        origin_list = ';'.join([str(int(c)) for c in set(cells['f_set'])])
+        origin_list = ''.join([str(int(c)) for c in set(cells['f_set'])])
 
         if n_edges == 2:  # Exclude internal and V nodes
             n_edges = -9999
@@ -59,8 +59,6 @@ def nodes_conn(obj: FractureNetwork, inplace=True):
         Y_node_origin[node] = origin_list
 
     obj.entity_df = entity_df_obj
-    class_list = np.array(class_list)
-    n_origin_array = np.array(Y_node_origin)
     node_geometry = np.array(node_geometry)
 
     classes = [1, 3, 4, 5, 6]
@@ -73,7 +71,7 @@ def nodes_conn(obj: FractureNetwork, inplace=True):
 
             node_geometry_set = node_geometry[node_index]
             class_list_set = class_list[node_index]
-            n_origin_array_set = n_origin_array[node_index]
+            n_origin_array_set = Y_node_origin[node_index]
 
             entity_df = GeoDataFrame({'type': 'node', 'n_type': class_list_set, 'n_origin': n_origin_array_set,
                                       'geometry': node_geometry_set}, crs=entity_df_obj.crs)

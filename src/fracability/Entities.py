@@ -1,6 +1,6 @@
 """
-In general, it would be good to give the possibility to trat separately sets of fractures/different types of nodes/
-boundary and then everything together to consider the network as a compostion of single entities and not as a single
+In general, it would be good to give the possibility to treat separately sets of fractures/different types of nodes/
+boundary and then everything together to consider the network as a composition of single entities and not as a single
 entity.
 
 """
@@ -211,6 +211,9 @@ class Fractures(BaseEntity):
 
     @vtk_object.setter
     def vtk_object(self, obj: DataSet):
+        if 'RegionId' not in obj.array_names:
+            regions_ids = np.arange(0, obj.n_cells)
+            obj['RegionId'] = regions_ids
 
         if not self.entity_df.empty:
             for region_id in set(obj['RegionId']):
