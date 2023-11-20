@@ -84,7 +84,7 @@ We are planning to make this package available using pip and conda.
 
 For usage details please refer to the documentation:
 
-[![View - Online docs](https://img.shields.io/badge/View-Online_docs-blue?style=for-the-badge)](/ "Go to online documentation")
+[![View - Online docs](https://img.shields.io/badge/View-Online_docs-blue?style=for-the-badge)](https://fracability.readthedocs.io/en/latest/index.html "Go to online documentation")
 
 [![view - Documentation](https://img.shields.io/badge/view-Documentation-blue?style=for-the-badge)](/docs/ "Go to project documentation")
 
