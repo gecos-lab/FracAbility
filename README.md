@@ -65,20 +65,11 @@ in function of time and not space, accomplishes exactly this.
 
 ## Installation 🔧
 
-We are planning to make this package available using pip and conda.
+To install fracability pip can be used:
 
-<details>
-  <summary>Main dependencies</summary>
-
-[![dependency - shapely](https://img.shields.io/badge/dependency-shapely==2.0.1-blue)](https://pypi.org/project/shapely)
-[![dependency - vtk](https://img.shields.io/badge/dependency-vtk==9.2.6-blue)](https://pypi.org/project/vtk)
-
-[![dependency - scipy](https://img.shields.io/badge/dependency-scipy==1.11-blue)](https://pypi.org/project/scipy)
-[![dependency - networkx](https://img.shields.io/badge/dependency-networkx==3.1-blue)](https://pypi.org/project/networkx)
-
-
-</details>
-
+```bash
+pip install fracability
+```
 
 ## Documentation
 
