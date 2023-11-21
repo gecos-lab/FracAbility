@@ -65,7 +65,6 @@ class Nodes(BaseEntity):
         for index, point in enumerate(obj.points):
             self.entity_df.loc[self.entity_df['id'] == index, 'geometry'] = Point(point)
 
-    @property
     def network_object(self) -> Graph:
         network_obj = Rep.networkx_rep(self.vtk_object)
         return network_obj
@@ -232,7 +231,6 @@ class Fractures(BaseEntity):
             self.entity_df = gdf
 
 
-    @property
     def network_object(self) -> Graph:
         network_obj = Rep.networkx_rep(self.vtk_object)
         return network_obj
@@ -342,7 +340,6 @@ class Boundary(BaseEntity):
             gdf = GeoDataFrame(d)
             self.entity_df = gdf
 
-    @property
     def network_object(self) -> Graph:
         network_obj = Rep.networkx_rep(self.vtk_object)
         return network_obj

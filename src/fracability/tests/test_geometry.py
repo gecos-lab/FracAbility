@@ -1,6 +1,8 @@
 from fracability.examples import example_fracture_network
 import pytest
 from fracability import Entities
+from fracability.operations.Geometry import tidy_intersections, calculate_seg_length
+
 
 @pytest.fixture(scope="session", autouse=True)
 def environment_var():
@@ -23,14 +25,31 @@ def test_tidy_intersections():
 
     assert isinstance(tidy_intersections(frac_net, inplace=False), Entities.FractureNetwork)
     assert tidy_intersections(frac_net, inplace=False).fracture_network_to_components_df().equals(control_df['complete'])
+
+    assert isinstance(frac_net.clean_network(inplace=False), Entities.FractureNetwork)
+    assert frac_net.clean_network(inplace=False).fracture_network_to_components_df().equals(
+        control_df['complete'])
+
     frac_net.deactivate_boundaries()
     assert isinstance(tidy_intersections(frac_net, inplace=False), Entities.FractureNetwork)
     assert tidy_intersections(frac_net, inplace=False).fracture_network_to_components_df().equals(control_df['nb'])
+
+    assert isinstance(frac_net.clean_network(inplace=False), Entities.FractureNetwork)
+    assert frac_net.clean_network(inplace=False).fracture_network_to_components_df().equals(
+        control_df['nb'])
+
     frac_net.activate_boundaries()
     frac_net.activate_fractures([2])
     assert isinstance(tidy_intersections(frac_net, inplace=False), Entities.FractureNetwork)
     assert tidy_intersections(frac_net, inplace=False).fracture_network_to_components_df().equals(control_df['ns1'])
+
+    assert isinstance(frac_net.clean_network(inplace=False), Entities.FractureNetwork)
+    assert frac_net.clean_network(inplace=False).fracture_network_to_components_df().equals(
+        control_df['ns1'])
+
     frac_net.activate_fractures()
+
+
 
 
 def test_calculate_length():
