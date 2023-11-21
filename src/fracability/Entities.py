@@ -106,22 +106,22 @@ class Nodes(BaseEntity):
         if I_nodes + tot_Y_nodes == 0:
             PI = 0
         else:
-            PI = 100 * I_nodes / (I_nodes + tot_Y_nodes)
+            PI = 100 * I_nodes / (I_nodes + tot_Y_nodes + X_nodes)
 
         if tot_Y_nodes + X_nodes == 0:
             PY = 0
         else:
-            PY = 100 * tot_Y_nodes / (tot_Y_nodes + X_nodes)
+            PY = 100 * tot_Y_nodes / (I_nodes + tot_Y_nodes + X_nodes)
 
         if I_nodes + X_nodes == 0:
             PX = 0
         else:
-            PX = 100 * X_nodes / (I_nodes + X_nodes)
+            PX = 100 * X_nodes / (I_nodes + tot_Y_nodes + X_nodes)
 
         if I_nodes + U_nodes == 0:
             PU = 0
         else:
-            PU = 100 * U_nodes / (I_nodes + U_nodes)
+            PU = 100 * U_nodes / (I_nodes + tot_Y_nodes + X_nodes)
 
         precise_n = 4 * (1 - PI / 100) / (1 - PX / 100)
 
@@ -149,7 +149,6 @@ class Nodes(BaseEntity):
 
         return count_dict[1]
 
-
     def node_origin(self, node_type: int) -> GeoSeries:
         """
         Return the node origin for the given node type (i.e. which set/sets is/are associated to the node)
@@ -158,10 +157,10 @@ class Nodes(BaseEntity):
         """
         return self.entity_df.loc[self.entity_df['n_type'] == node_type, 'n_origin']
 
-    def matplot(self, markersize=7, return_ax=False):
+    def mat_plot(self, markersize=7, return_ax=False):
         plts.matplot_nodes(self, markersize, return_ax)
 
-    def vtkplot(self, markersize=7, return_plot=False):
+    def vtk_plot(self, markersize=7, return_plot=False):
         plts.vtkplot_nodes(self, markersize, return_plot)
 
     def ternary_plot(self):
@@ -235,10 +234,10 @@ class Fractures(BaseEntity):
         network_obj = Rep.networkx_rep(self.vtk_object)
         return network_obj
 
-    def matplot(self):
+    def mat_plot(self):
         plts.matplot_fractures(self)
 
-    def vtkplot(self, linewidth=1, color='white', color_set=False, return_plot=False, display_property: str = None):
+    def vtk_plot(self, linewidth=1, color='white', color_set=False, return_plot=False, display_property: str = None):
 
         plts.vtkplot_fractures(self, linewidth, color, color_set, return_plot, display_property=display_property)
 
@@ -344,10 +343,10 @@ class Boundary(BaseEntity):
         network_obj = Rep.networkx_rep(self.vtk_object)
         return network_obj
 
-    def matplot(self):
+    def mat_plot(self):
         plts.matplot_boundaries(self)
 
-    def vtkplot(self):
+    def vtk_plot(self):
         plts.vtkplot_boundaries(self)
 
 
@@ -390,7 +389,6 @@ class FractureNetwork(BaseEntity):
             self.add_nodes(nodes)
             self.add_fractures(fractures)
             self.add_boundaries(boundaries)
-
 
     @property
     def entity_df(self):
@@ -534,7 +532,6 @@ class FractureNetwork(BaseEntity):
 
         node_geometry = np.array(list(node_dict.keys()))
         class_list, node_origin = zip(*node_dict.values())
-        print(node_geometry)
         for c in classes:
 
             node_index = np.where(np.array(class_list) == c)[0]
@@ -964,13 +961,9 @@ class FractureNetwork(BaseEntity):
 
         return len(self.fractures.entity_df[n_censored])/len(self.fractures.entity_df[total])
 
-    def cut_active(self):
-        """ Cut the active fracture network with the active boundary"""
-        ...
-
     #  ==================== Plotting methods ====================
 
-    def vtkplot(self,
+    def vtk_plot(self,
                 markersize=5,
                 linewidth=[2, 2],
                 color=['white', 'white'],
@@ -983,7 +976,7 @@ class FractureNetwork(BaseEntity):
 
         plts.vtkplot_frac_net(self, markersize, linewidth, color, color_set, return_plot)
 
-    def matplot(self,
+    def mat_plot(self,
                 markersize=5,
                 linewidth=[2, 2],
                 color=['black', 'blue'],
@@ -995,7 +988,7 @@ class FractureNetwork(BaseEntity):
         """
         plts.matplot_frac_net(self, markersize, linewidth, color, color_set, return_ax)
 
-    def plot_ternary(self):
+    def ternary_plot(self):
         """
         Method used to plot the ternary diagram of the fracture network
         :return:

@@ -97,14 +97,14 @@ class BaseEntity(ABC):
         pass
 
     @abstractmethod
-    def matplot(self):
+    def mat_plot(self):
         """
         Plot entity using matplotlib backend
         :return:
         """
 
     @abstractmethod
-    def vtkplot(self):
+    def vtk_plot(self):
         """
         Plot entity using vtk backend
         :return:
