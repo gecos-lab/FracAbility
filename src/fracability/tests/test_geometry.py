@@ -50,8 +50,6 @@ def test_tidy_intersections():
     frac_net.activate_fractures()
 
 
-
-
 def test_calculate_length():
 
     set_1 = Entities.Fractures(shp=pytest.shp_path['set_1'], set_n=1)
