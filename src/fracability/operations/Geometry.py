@@ -3,15 +3,42 @@ from fracability.utils.shp_operations import int_node
 
 from copy import deepcopy
 
+from pyvista import PolyData
+from vtkmodules.vtkFiltersCore import vtkCleanPolyData
+
+
+def connect_dots(vtk_obj: PolyData) -> PolyData:
+
+    """Method used to clean intersection in vtk objects (for example merge two overlapping nodes)"""
+
+    p = 100000  # Scaling factor needed for the vtk function to work properly
+    vtk_obj.points *= p
+    clean = vtkCleanPolyData()
+    clean.AddInputData(vtk_obj)
+    clean.ToleranceIsAbsoluteOn()
+    clean.ConvertLinesToPointsOff()
+    clean.ConvertPolysToLinesOff()
+    clean.ConvertStripsToPolysOff()
+    clean.Update()
+
+    output_obj = PolyData(clean.GetOutput())
+    output_obj.points /= p  # Rescale back the points
+
+    return output_obj
+
 
 # @Halo(text='Calculating intersections', spinner='line', placement='right')
 def tidy_intersections(obj, buffer=0.05, inplace: bool = True):
+    """Method used to tidy shapefile intersections between fractures in a fracture or fracture network object."""
 
     if obj.name == 'FractureNetwork':
         gdf = obj.fracture_network_to_components_df()
         gdf = gdf.loc[gdf['type'] != 'node']
-    else:
+    elif obj.name == 'Fractures':
         gdf = obj.entity_df.copy()
+    else:
+        print('Cannot tidy intersection for nodes or only boundaries')
+        return
 
     df_buffer = gdf.buffer(buffer)
 
@@ -44,6 +71,7 @@ def tidy_intersections(obj, buffer=0.05, inplace: bool = True):
 
 
 def calculate_seg_length(obj: BaseEntity, inplace: bool = True):
+    """Method used to calculate and set fracture lengths when absent"""
 
     if obj.name == 'FractureNetwork':
         gdf = obj.fracture_network_to_components_df()

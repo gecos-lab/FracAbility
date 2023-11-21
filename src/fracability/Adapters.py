@@ -1,5 +1,14 @@
+"""
 
-# THIS NEEDS A DO-OVER
+Collection of methods used to pass from a geopandas dataframe to a polydata or from
+polydata to networkx. Each method is fit so that it plots nodes, fractures, boundary or the fracture network
+
+TODO:
+    + Add a adapter abstract class in the AbstractClasses.
+    + Use as input gpd for all
+    + Use multiblock instead of appender for the fracture network
+
+"""
 
 import geopandas
 import networkx
@@ -11,7 +20,7 @@ from vtkmodules.vtkFiltersCore import vtkAppendPolyData
 import networkx as nx
 from vtkmodules.vtkFiltersGeometry import vtkGeometryFilter
 
-from fracability.operations.Cleaners import connect_dots
+from fracability.operations.Geometry import connect_dots
 
 
 #  =============== VTK representations ===============

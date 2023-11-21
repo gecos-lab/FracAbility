@@ -40,7 +40,7 @@ class TestNodes:
         assert 'n_type' in vtk_obj.array_names
 
     def test_network_object(self):
-        assert isinstance(pytest.nodes.network_object, networkx.Graph)
+        assert isinstance(pytest.nodes.network_object(), networkx.Graph)
 
     def test_save_csv(self):
         cwd = os.getcwd()
@@ -117,7 +117,7 @@ class TestFractures:
         assert 'RegionId' in vtk_obj.array_names
 
     def test_network_object(self):
-        assert isinstance(pytest.fractures.network_object, networkx.Graph)
+        assert isinstance(pytest.fractures.network_object(), networkx.Graph)
 
     def test_crs(self):
         assert pytest.fractures.crs is not None
@@ -168,7 +168,7 @@ class TestBoundary:
         assert 'RegionId' in vtk_obj.array_names
 
     def test_network_object(self):
-        assert isinstance(pytest.boundaries.network_object, networkx.Graph)
+        assert isinstance(pytest.boundaries.network_object(), networkx.Graph)
 
     def test_save_csv(self):
         cwd = os.getcwd()
@@ -310,7 +310,7 @@ class TestFractureNetwork:
         assert 'node' not in vtk_obj['type']
 
     def test_network_object(self):
-        assert isinstance(pytest.fracture_net.network_object, networkx.Graph)
+        assert isinstance(pytest.fracture_net.network_object(), networkx.Graph)
 
     def test_save_csv(self):
         cwd = os.getcwd()

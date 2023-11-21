@@ -34,6 +34,10 @@ class BaseEntity(ABC):
             self.entity_df = gdf
 
     @property
+    def name(self):
+        return self.__class__.__name__
+
+    @property
     @abstractmethod
     def entity_df(self) -> GeoDataFrame:
         """

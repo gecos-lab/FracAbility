@@ -3,6 +3,7 @@ import pyperclip
 import numpy as np
 import pyvista as pv
 
+
 def report():
     """ Method used to create a report using scooby and copy it in the clipboard"""
     core = ['fracability', 'pyvista', 'vtk', 'numpy', 'geopandas', 'shapely']

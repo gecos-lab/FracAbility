@@ -1,14 +1,25 @@
-from fracability.Entities import FractureNetwork, Nodes
-
-
 from shapely.geometry import Point
 from geopandas import GeoDataFrame
 import numpy as np
 
 
-def nodes_conn(obj: FractureNetwork, inplace=True):
+def nodes_conn(obj):
 
-    network_obj = obj.network_object
+    """
+    Define the topology of a network using networkx.degree. With this method also censored fractures are defined and
+    node origin are calculated. By node origin we define which entities are related to the given node e.g.:
+        + I node with node origin x -> related to a fracture of set x
+        + Y node with node origin xy -> related to the intersection of fractures of set x and y
+        + Y node with node origin x -> related to the intersection of fractures of the same set x
+        + Y node with node origin xyz -> triple intersection, makes no sense -> problem in the geometry
+        + X node with node origin xy -> related to the intersection of fractures of set x and y
+        + X node with node origin wxyz -> quadruple intersection, makes no sense -> problem in the geometry
+
+    :param obj: Fractures or FractureNetwork object
+    :return: list of shapely geometry points, a list of corresponding node classes and a list of node origin
+    """
+
+    network_obj = obj.network_object()
 
     vtk_obj = obj.vtk_object(include_nodes=False)
 
@@ -18,9 +29,7 @@ def nodes_conn(obj: FractureNetwork, inplace=True):
 
     frac_idx = np.where(vtk_obj.point_data['type'] == 'fracture')[0]
 
-    class_list = np.empty_like(frac_idx)
-    Y_node_origin = np.empty_like(frac_idx)
-    node_geometry = []
+    node_dict = {}
 
     for node in frac_idx:  # For each node of the fractures:
 
@@ -30,7 +39,7 @@ def nodes_conn(obj: FractureNetwork, inplace=True):
 
         cells = fractures_vtk_obj.extract_points(node)
 
-        origin_list = ''.join([str(int(c)) for c in set(cells['f_set'])])
+        node_origin = ''.join([str(int(c)) for c in set(cells['f_set'])])
 
         if n_edges == 2:  # Exclude internal and V nodes
             n_edges = -9999
@@ -46,7 +55,7 @@ def nodes_conn(obj: FractureNetwork, inplace=True):
                 entity_df_obj.loc[index, 'censored'] = 1
 
             else:
-                if len(origin_list) > 1:  # Discriminate between Y nodes between different sets (3) or same set (6)
+                if len(node_origin) > 1:  # Discriminate between Y nodes between different sets (3) or same set (6)
                     n_edges = 6
                 else:
                     n_edges = 3
@@ -54,31 +63,11 @@ def nodes_conn(obj: FractureNetwork, inplace=True):
         elif n_edges > 4:
             n_edges = 4
 
-        node_geometry.append(point)
-        class_list[node] = n_edges  # Append the value (number of connected nodes)
-        Y_node_origin[node] = origin_list
+        node_dict[point] = (n_edges, node_origin)
 
     obj.entity_df = entity_df_obj
-    node_geometry = np.array(node_geometry)
 
-    classes = [1, 3, 4, 5, 6]
-
-    for c in classes:
-
-        node_index = np.where(class_list == c)[0]
-
-        if node_index.any():
-
-            node_geometry_set = node_geometry[node_index]
-            class_list_set = class_list[node_index]
-            n_origin_array_set = Y_node_origin[node_index]
-
-            entity_df = GeoDataFrame({'type': 'node', 'n_type': class_list_set, 'n_origin': n_origin_array_set,
-                                      'geometry': node_geometry_set}, crs=entity_df_obj.crs)
-
-            nodes = Nodes(gdf=entity_df, node_type=c)
-
-            obj.add_nodes(nodes)
+    return node_dict
 
 
 # def find_backbone(obj: FractureNetwork) -> PolyData:

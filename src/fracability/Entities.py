@@ -17,6 +17,7 @@ import fracability.Plotters as plts
 
 import fracability.Adapters as Rep
 from fracability.AbstractClasses import BaseEntity
+from fracability.operations import Geometry, Topology
 
 
 class Nodes(BaseEntity):
@@ -315,6 +316,10 @@ class Boundary(BaseEntity):
     @vtk_object.setter
     def vtk_object(self, obj: DataSet):
 
+        if 'RegionId' not in obj.array_names:
+            regions_ids = np.arange(0, obj.n_cells)
+            obj['RegionId'] = regions_ids
+
         if not self.entity_df.empty:
             for region_id in set(obj['RegionId']):
                 region = obj.extract_points(obj['RegionId'] == region_id)
@@ -389,9 +394,6 @@ class FractureNetwork(BaseEntity):
             self.add_fractures(fractures)
             self.add_boundaries(boundaries)
 
-    @property
-    def name(self):
-        return self.__class__.__name__
 
     @property
     def entity_df(self):
@@ -520,6 +522,40 @@ class FractureNetwork(BaseEntity):
                 self._df = pd.concat([self._df, new_df], ignore_index=True)
             else:
                 self._df.loc[self._df['n_type'] == node_type, 'object'] = nodes_group
+
+    def add_nodes_from_dict(self, node_dict, classes=None):
+        """Add nodes a dict of shapely geometry (key), classes and optionally node origin (value).
+
+        :param node_dict: Dict of shapely node geometries as keys and a tuple (class, origin). If origin is empty it will
+        be set to 0.
+        :param classes: List of node classes that are needed to be added. If none are provided all the classes are used
+        [1, 3, 4, 5, 6]
+
+        """
+        if classes is None:
+            classes = [1, 3, 4, 5, 6]
+
+        node_geometry = np.array(list(node_dict.keys()))
+        class_list, node_origin = zip(*node_dict.values())
+        print(node_geometry)
+        for c in classes:
+
+            node_index = np.where(np.array(class_list) == c)[0]
+
+            if node_index.any():
+
+                node_geometry_set = node_geometry[node_index]
+                class_list_set = np.array(class_list)[node_index]
+                node_origin_set = np.array(node_origin)[node_index]
+                if node_origin_set.size == 0:
+                    node_origin_set = np.zeros_like(node_index)
+
+                entity_df = GeoDataFrame({'type': 'node', 'n_type': class_list_set, 'n_origin': node_origin_set,
+                                          'geometry': node_geometry_set}, crs=self.crs)
+
+                nodes = Nodes(gdf=entity_df, node_type=c)
+
+                self.add_nodes(nodes)
 
     def nodes_object(self, node_type: int) -> Nodes:
         """
@@ -884,7 +920,6 @@ class FractureNetwork(BaseEntity):
         vtk_obj = Rep.fracture_network_vtk_rep(self.fracture_network_to_components_df(), include_nodes=include_nodes)
         return vtk_obj
 
-    @property
     def network_object(self) -> Graph:
         """
         Method used to return a networkx Graph representation of the fracture network
@@ -893,6 +928,34 @@ class FractureNetwork(BaseEntity):
 
         network_object = Rep.networkx_rep(self.vtk_object(include_nodes=False))
         return network_object
+
+    def clean_network(self, buffer = 0.05, inplace=True):
+        """Tidy the intersection of the active entities in the fracture network. A buffer is applied to all the
+        geometries to ensure intersection in a given radius.
+
+        :param buffer: Applied buffer to the geometries of the entity.
+        :param inplace: If true automatically replace the network with the clean one, if false then return the clean
+         geopandas dataframe. Default is True
+         """
+
+        if inplace:
+            Geometry.tidy_intersections(self)
+        else:
+            return Geometry.tidy_intersections(self, inplace=False)
+
+    def calculate_topology(self, clean_network=True):
+        """
+        Calculate the topology of the network and add the calculated nodes to the network.
+
+        :param clean_network: If true, before calculating the topology the network is cleaned with the clean_network.
+        Default is True
+
+        """
+        if clean_network is True:
+            self.clean_network()
+
+        node_dict = Topology.nodes_conn(self)
+        self.add_nodes_from_dict(node_dict)
 
     @property
     def fraction_censored(self) -> float:
@@ -907,8 +970,6 @@ class FractureNetwork(BaseEntity):
     def cut_active(self):
         """ Cut the active fracture network with the active boundary"""
         ...
-
-
 
     #  ==================== Plotting methods ====================
 
@@ -943,6 +1004,8 @@ class FractureNetwork(BaseEntity):
         :return:
         """
         plts.matplot_ternary(self)
+
+    #  ==================== Output methods ====================
 
     def save_csv(self, path: str, sep: str = ',', index: bool = False):
         """

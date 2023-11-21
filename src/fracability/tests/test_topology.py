@@ -21,12 +21,10 @@ def test_nodes_conn():
     frac_net.add_fractures(set_2)
     frac_net.add_boundaries(bounds)
 
-    tidy_intersections(frac_net)
-
-    nodes_conn(frac_net)
+    frac_net.calculate_topology()
     control_topology = example_fracture_network.fracture_net_control_topology()['complete']
 
     # frac_net.nodes.entity_df.to_csv('subset_network_control_topology.csv', sep=',', index=False)
-
+    frac_net.vtkplot()
     assert not frac_net.nodes.entity_df.empty
     assert frac_net.nodes.entity_df.equals(control_topology)
