@@ -6,6 +6,5 @@
     </content>
     <orderEntry type="jdk" jdkName="fracability" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="test_reti" />
   </component>
 </module>
