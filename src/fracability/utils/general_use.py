@@ -28,11 +28,11 @@ def centers_to_lines(center_coords, lengths, frac_dir, assign_id=True) -> pv.Pol
     xyz1 = center_coords.copy()
     xyz2 = center_coords.copy()
 
-    xyz1[:, 0] = center_coords[:, 0] + half_lengths * np.cos(np.deg2rad(frac_dir))
-    xyz2[:, 0] = center_coords[:, 0] + half_lengths * np.cos(np.deg2rad((frac_dir + 180) % 360))
+    xyz1[:, 0] = center_coords[:, 0] + half_lengths * np.sin(np.deg2rad(frac_dir))
+    xyz2[:, 0] = center_coords[:, 0] + half_lengths * np.sin(np.deg2rad((frac_dir + 180) % 360))
 
-    xyz1[:, 1] = center_coords[:, 1] + half_lengths * np.sin(np.deg2rad(frac_dir))
-    xyz2[:, 1] = center_coords[:, 1] + half_lengths * np.sin(np.deg2rad((frac_dir + 180) % 360))
+    xyz1[:, 1] = center_coords[:, 1] + half_lengths * np.cos(np.deg2rad(frac_dir))
+    xyz2[:, 1] = center_coords[:, 1] + half_lengths * np.cos(np.deg2rad((frac_dir + 180) % 360))
 
     xyz_complete = np.array([[i, j] for i, j in zip(xyz1, xyz2)]).reshape(-1, 3)
     conn = np.insert(np.arange(0, len(xyz_complete)), np.arange(0, len(xyz_complete), 2), 2)

@@ -236,6 +236,7 @@ def vtkplot_nodes(entity,
 
     """
     plotter = Plotter()
+    plotter.background_color = 'gray'
     plotter.view_xy()
     plotter.enable_image_style()
 
