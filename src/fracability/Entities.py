@@ -229,7 +229,6 @@ class Fractures(BaseEntity):
             gdf = GeoDataFrame(d)
             self.entity_df = gdf
 
-
     def network_object(self) -> Graph:
         network_obj = Rep.networkx_rep(self.vtk_object)
         return network_obj

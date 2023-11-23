@@ -59,8 +59,8 @@ def frac_vtk_rep(input_df: geopandas.GeoDataFrame) -> PolyData:
         pv_obj.cell_data['RegionId'] = [index] * pv_obj.GetNumberOfCells()
         pv_obj.point_data['RegionId'] = [index] * pv_obj.GetNumberOfPoints()
 
-        if 'lengths' in input_df.columns:
-            pv_obj.cell_data['length'] = input_df.loc[index, 'lengths']
+        if 'length' in input_df.columns:
+            pv_obj.cell_data['length'] = input_df.loc[index, 'length']
 
         # pv_obj.cell_data_to_point_data()
         # line.plot()
@@ -96,7 +96,6 @@ def bound_vtk_rep(input_df: geopandas.GeoDataFrame) -> PolyData:
 
         pv_obj.cell_data['b_group'] = [b_group] * pv_obj.GetNumberOfCells()
         pv_obj.point_data['b_group'] = [b_group] * pv_obj.GetNumberOfPoints()
-
 
         pv_obj.cell_data['RegionId'] = [index] * pv_obj.GetNumberOfCells()
         pv_obj.point_data['RegionId'] = [index] * pv_obj.GetNumberOfPoints()
