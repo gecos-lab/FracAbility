@@ -60,8 +60,18 @@ def nodes_conn(obj):
                 else:
                     n_edges = 3
 
+        elif n_edges == 4:
+            cells = vtk_obj.extract_points(node)
+            if 'boundary' in cells['type']:
+                n_edges = 5
+                index = vtk_obj.point_data['RegionId'][node]
+                entity_df_obj.loc[index, 'censored'] = 1
+            else:
+                n_edges = 4
+
         elif n_edges > 4:
-            n_edges = 4
+
+            n_edges = -9999
 
         node_dict[point] = (n_edges, node_origin)
 

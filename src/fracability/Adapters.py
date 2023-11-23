@@ -7,6 +7,7 @@ TODO:
     + Add a adapter abstract class in the AbstractClasses.
     + Use as input gpd for all
     + Use multiblock instead of appender for the fracture network
+    + Try and find a way to crate vtk object directly from polygon and not from lines of polygon
 
 """
 

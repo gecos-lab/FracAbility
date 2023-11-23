@@ -460,7 +460,7 @@ def matplot_stats_pdf(network_distribution: NetworkDistribution,
 
     sns.lineplot(x=x_vals, y=y_vals, color='r', label=f'{name} pdf')
     if histogram:
-        sns.histplot(x_vals, stat='density', bins=50)
+        sns.histplot(x_vals, stat='density')
 
     plt.xlabel('length [m]')
     plt.title('PDF')

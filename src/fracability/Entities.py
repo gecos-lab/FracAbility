@@ -177,11 +177,15 @@ class Fractures(BaseEntity):
 
     def __init__(self, gdf: GeoDataFrame = None, shp: str = None, set_n: int = None):
 
-        self.set_n = set_n
+        self._set_n = set_n
         if shp is not None:
             super().__init__(shp=shp)
         else:
             super().__init__(gdf=gdf)
+
+    @property
+    def set_n(self):
+        return self._set_n
 
     @property
     def entity_df(self):
