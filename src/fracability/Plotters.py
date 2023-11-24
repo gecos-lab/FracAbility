@@ -308,6 +308,7 @@ def vtkplot_fractures(entity,
     """
 
     plotter = Plotter()
+    plotter.background_color = 'gray'
     plotter.view_xy()
     plotter.enable_image_style()
 
@@ -359,6 +360,7 @@ def vtkplot_boundaries(entity,
     :return: If return_plot is true a matplotlib axis is returned
     """
     plotter = Plotter()
+    plotter.background_color = 'gray'
     plotter.view_xy()
     plotter.enable_image_style()
 
@@ -398,10 +400,10 @@ def vtkplot_frac_net(entity,
 
     """
     plotter = Plotter()
+    plotter.background_color = 'gray'
     plotter.view_xy()
     plotter.add_camera_orientation_widget()
     plotter.enable_image_style()
-    plotter.background_color = 'gray'
 
     nodes = entity.nodes
     fractures = entity.fractures
