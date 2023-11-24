@@ -5,16 +5,15 @@ polydata to networkx. Each method is fit so that it plots nodes, fractures, boun
 
 TODO:
     + Add a adapter abstract class in the AbstractClasses.
-    + Use as input gpd for all
-    + Use multiblock instead of appender for the fracture network
-    + Try and find a way to crate vtk object directly from polygon and not from lines of polygon
+    + Use multiblock instead of appender for fracture network (or all?)?
+    + Try and find a way to crate boundary vtk object directly from polygon and not from lines of polygon
 
 """
 
 import geopandas
 import networkx
 import numpy as np
-from pyvista import PolyData, lines_from_points
+from pyvista import PolyData, lines_from_points, MultiBlock
 
 from vtkmodules.vtkFiltersCore import vtkAppendPolyData
 
@@ -50,21 +49,19 @@ def frac_vtk_rep(input_df: geopandas.GeoDataFrame) -> PolyData:
 
         points = np.stack((x, y, z), axis=1)  # Stack the coordinates to a [n,3] shaped array
         # offset = np.round(points[0][0])
-        pv_obj = lines_from_points(points)  # Create the corresponding vtk line with the given points
-        pv_obj.cell_data['type'] = ['fracture'] * pv_obj.GetNumberOfCells()
-        pv_obj.point_data['type'] = ['fracture'] * pv_obj.GetNumberOfPoints()
+        if len(points) != 0:  # Avoid empty geometries
+            pv_obj = lines_from_points(points)  # Create the corresponding vtk line with the given points
+            pv_obj.cell_data['type'] = ['fracture'] * pv_obj.GetNumberOfCells()
+            pv_obj.point_data['type'] = ['fracture'] * pv_obj.GetNumberOfPoints()
 
-        pv_obj.cell_data['f_set'] = [set_n] * pv_obj.GetNumberOfCells()
-        pv_obj.point_data['f_set'] = [set_n] * pv_obj.GetNumberOfPoints()
+            pv_obj.cell_data['f_set'] = [set_n] * pv_obj.GetNumberOfCells()
+            pv_obj.point_data['f_set'] = [set_n] * pv_obj.GetNumberOfPoints()
 
-        pv_obj.cell_data['RegionId'] = [index] * pv_obj.GetNumberOfCells()
-        pv_obj.point_data['RegionId'] = [index] * pv_obj.GetNumberOfPoints()
+            pv_obj.cell_data['RegionId'] = [index] * pv_obj.GetNumberOfCells()
+            pv_obj.point_data['RegionId'] = [index] * pv_obj.GetNumberOfPoints()
 
-        if 'length' in input_df.columns:
-            pv_obj.cell_data['length'] = input_df.loc[index, 'length']
-
-        # pv_obj.cell_data_to_point_data()
-        # line.plot()
+            if 'length' in input_df.columns:
+                pv_obj.cell_data['length'] = input_df.loc[index, 'length']
 
         appender.AddInputData(pv_obj)  # Add the new object
 
@@ -158,9 +155,6 @@ def networkx_rep(input_object: PolyData) -> networkx.Graph():
 
     lines = np.delete(lines,
                       np.arange(0, lines.size, 3)).reshape(-1, 2)  # remove padding eg. [2 id1 id2 2 id3 id4 ...] -> remove the 2
-
-    # test_types = np.array([{'type': t} for t in network['type']])
-    # edges = np.c_[lines.reshape(-1, 2)]
 
     network = nx.Graph()  # Create a networkx graph instance
 
