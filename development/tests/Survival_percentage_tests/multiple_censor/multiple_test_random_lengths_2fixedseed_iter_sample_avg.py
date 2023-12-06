@@ -67,10 +67,10 @@ def lognorm_parameters(target_mean, target_std):
 distr = ss.norm
 mean = 10
 std = 4
-n_lines = 1000
-n_iterations = 100  # Number of iterations
+n_lines = 500
+n_iterations = 10  # Number of iterations
 seed = 12345
-n_windows = 50  # number of windows used to censor the values
+n_windows = 25  # number of windows used to censor the values
 
 
 numpy_randomGen = Generator(PCG64(seed))
@@ -80,6 +80,7 @@ iter_mean_everything_list = np.empty((n_iterations, n_windows))
 iter_mean_nocensor_list = np.empty((n_iterations, n_windows))
 iter_mean_censor_list = np.empty((n_iterations, n_windows))
 iter_percentage_censoring_list = np.empty((n_iterations, n_windows))
+iter_pvalues_list = np.empty((n_iterations, n_windows))
 
 mu_l, std_l = lognorm_parameters(mean, std)
 
@@ -90,6 +91,7 @@ for i in range(n_iterations):
     mean_everything_list = []  # list of means for fitting all the data
     mean_nocensor_list = []  # list of means for fitting excluding censored data
     mean_censor_list = []  # list of means for fitting using censoring
+    p_value_list = []
     lengths = distr.rvs(scale=std, loc=mean, size=n_lines)
     sample_mean = np.mean(lengths)
     # lengths[np.where(lengths < 0)] *= -1  # flip to positive negative ends
@@ -149,7 +151,20 @@ for i in range(n_iterations):
 
         params_cens = distr.fit(ss_dataset)
         fitted_cens = distr(*params_cens)
+        rand_data_cens = fitted_cens.rvs(size=n_lines)
         mean_censor_list.append(fitted_cens.mean()-sample_mean)
+
+        # print(distr(mean, std).cdf)
+        ecdf_cens = ss.ecdf(rand_data_cens)
+        ecdf_data = ss.ecdf(dataset['og'].values)
+        # ax3 = plt.subplot()
+        # ecdf_cens.cdf.plot(ax3)
+        # ecdf_data.cdf.plot(ax3)
+        # plt.show()
+
+        stat, pvalue = ss.kstest(rand_data_cens, dataset['og'].values)
+        p_value_list.append(pvalue)
+        # print(pvalue)
 
         dataset['modified'] = dataset['og']  # Reset the values
         dataset['censored'] = 0  # Reset the censoring flag
@@ -158,6 +173,7 @@ for i in range(n_iterations):
     iter_mean_nocensor_list[i, :] = mean_nocensor_list
     iter_mean_censor_list[i, :] = mean_censor_list
     iter_percentage_censoring_list[i, :] = percentage_censoring_list
+    iter_pvalues_list[i, :] = p_value_list
 
 
 fig, ax = plt.subplots()
@@ -167,20 +183,34 @@ mean_of_means_everything = np.mean(iter_mean_everything_list, axis=0)
 mean_of_means_nocensor = np.mean(iter_mean_nocensor_list, axis=0)
 mean_of_means_censor = np.mean(iter_mean_censor_list, axis=0)
 mean_of_percentage = np.mean(iter_percentage_censoring_list, axis=0)
+mean_of_pvalue = np.mean(iter_pvalues_list, axis=0)
 
 # print(iter_percentage_censoring_list)
 # print(mean_of_percentage)
 
+crit_pvalues_idx = np.where(mean_of_pvalue < 0.05)[0]
+
+ax2 = ax.twinx()
+ax2.plot(mean_of_percentage, mean_of_pvalue, color='k', alpha=0.2)
 
 for i in range(n_iterations):
+    # print(crit_pvalues_idx)
     if i == 0:
         ax.plot(iter_percentage_censoring_list[i], iter_mean_everything_list[i], color='r', alpha=0.2, label='Fit all the data')
         ax.plot(iter_percentage_censoring_list[i], iter_mean_nocensor_list[i], color='b', alpha=0.2, label='Fit only complete data')
         ax.plot(iter_percentage_censoring_list[i], iter_mean_censor_list[i], color='g', alpha=0.2, label='Fit using survival')
+        ax.axvline(x=iter_percentage_censoring_list[i, crit_pvalues_idx[-1]], color='k', alpha=0.2, label='pvalue')
+        # ax2.plot(iter_percentage_censoring_list[i], iter_pvalues_list[i], color='k', alpha=0.2)
+
     else:
         ax.plot(iter_percentage_censoring_list[i], iter_mean_everything_list[i], color='r', alpha=0.2)
         ax.plot(iter_percentage_censoring_list[i], iter_mean_nocensor_list[i], color='b', alpha=0.2)
         ax.plot(iter_percentage_censoring_list[i], iter_mean_censor_list[i], color='g', alpha=0.2)
+        ax.axvline(x=iter_percentage_censoring_list[i, crit_pvalues_idx[-1]], color='k', alpha=0.2)
+
+        # ax2.plot(iter_percentage_censoring_list[i], iter_pvalues_list[i], color='k', alpha=0.2)
+
+
 
 
 # ax.plot(mean_of_percentage, mean_of_means_everything, color='r', label='Fit all the data')
@@ -190,9 +220,11 @@ for i in range(n_iterations):
 # ax.hlines(y=mean, xmin=0, xmax=100,
 #            colors='k', label='True mean')
 # ax.fill_between(mean_of_percentage, mean-std, mean+std, alpha=0.2)
-
+plt.suptitle('Survival analysis estimation performance')
+plt.title(f'{n_lines} data points drawn from normal (10,4). {n_iterations} iterations')
 ax.set_xlabel('% censored')
 ax.set_ylabel('Estimated mean - Sample mean')
 ax.set_ylim([-(mean+std+3), mean+std+3])
 ax.legend()
+# ax2.set_ylabel('Pvalue')
 plt.show()
