@@ -191,7 +191,8 @@ mean_of_pvalue = np.mean(iter_pvalues_list, axis=0)
 crit_pvalues_idx = np.where(mean_of_pvalue < 0.05)[0]
 
 ax2 = ax.twinx()
-ax2.plot(mean_of_percentage, mean_of_pvalue, color='k', alpha=0.2)
+ax2.plot(mean_of_percentage, mean_of_pvalue, color='k')
+ax.axvline(x=mean_of_percentage[crit_pvalues_idx[-1]], color='k', label='pvalue')
 
 for i in range(n_iterations):
     # print(crit_pvalues_idx)
@@ -199,15 +200,15 @@ for i in range(n_iterations):
         ax.plot(iter_percentage_censoring_list[i], iter_mean_everything_list[i], color='r', alpha=0.2, label='Fit all the data')
         ax.plot(iter_percentage_censoring_list[i], iter_mean_nocensor_list[i], color='b', alpha=0.2, label='Fit only complete data')
         ax.plot(iter_percentage_censoring_list[i], iter_mean_censor_list[i], color='g', alpha=0.2, label='Fit using survival')
-        ax.axvline(x=iter_percentage_censoring_list[i, crit_pvalues_idx[-1]], color='k', alpha=0.2, label='pvalue')
+        # ax.axvline(x=iter_percentage_censoring_list[i, crit_pvalues_idx[-1]], color='k', alpha=0.2, label='pvalue')
         # ax2.plot(iter_percentage_censoring_list[i], iter_pvalues_list[i], color='k', alpha=0.2)
 
     else:
         ax.plot(iter_percentage_censoring_list[i], iter_mean_everything_list[i], color='r', alpha=0.2)
         ax.plot(iter_percentage_censoring_list[i], iter_mean_nocensor_list[i], color='b', alpha=0.2)
         ax.plot(iter_percentage_censoring_list[i], iter_mean_censor_list[i], color='g', alpha=0.2)
-        ax.axvline(x=iter_percentage_censoring_list[i, crit_pvalues_idx[-1]], color='k', alpha=0.2)
-
+        # ax.axvline(x=iter_percentage_censoring_list[i, crit_pvalues_idx[-1]], color='k', alpha=0.2)
+        #
         # ax2.plot(iter_percentage_censoring_list[i], iter_pvalues_list[i], color='k', alpha=0.2)
 
 
@@ -226,5 +227,5 @@ ax.set_xlabel('% censored')
 ax.set_ylabel('Estimated mean - Sample mean')
 ax.set_ylim([-(mean+std+3), mean+std+3])
 ax.legend()
-# ax2.set_ylabel('Pvalue')
+ax2.set_ylabel('Pvalue')
 plt.show()
