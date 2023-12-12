@@ -19,19 +19,23 @@ class BaseEntity(ABC):
     4. Fracture Networks
     """
 
-    def __init__(self, gdf: GeoDataFrame = None, shp: str = None):
+    def __init__(self, gdf: GeoDataFrame = None, csv: str = None, shp: str = None):
         """
         Init the entity. If a geopandas dataframe is specified then it is
         set as the source entity df.
 
         :param gdf: Geopandas dataframe
+        :param csv: Path of a csv
         """
         self._df: GeoDataFrame = GeoDataFrame()
-
-        if shp is not None:
-            self.entity_df = read_file(shp)
-        elif gdf is not None:
+        if gdf is not None:
             self.entity_df = gdf
+        elif csv is not None:
+            self.entity_df = read_file(csv, GEOM_POSSIBLE_NAMES="geometry", KEEP_GEOM_COLUMNS="NO")
+        elif shp is not None:
+            self.entity_df = read_file(shp)
+
+
 
     @property
     def name(self):
@@ -204,7 +208,7 @@ class BaseEntity(ABC):
         :return:
         """
 
-        self.entity_df.to_csv(path, sep=sep, index=index)
+        self.entity_df.to_csv(f'{self.name}_{path}', sep=sep, index=index)
 
     def save_shp(self, path: str):
         """

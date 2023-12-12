@@ -7,7 +7,7 @@ entity.
 import os.path
 
 import numpy as np
-from geopandas import GeoDataFrame, GeoSeries
+from geopandas import GeoDataFrame, GeoSeries, read_file
 import pandas as pd
 from pandas import DataFrame
 from shapely.geometry import MultiLineString, Polygon, LineString, Point
@@ -25,13 +25,24 @@ class Nodes(BaseEntity):
     Node base entity, represents all the nodes in the network.
     """
 
-    def __init__(self, gdf: GeoDataFrame = None, shp: str = None, node_type: int = -9999):
+    def __init__(self, gdf: GeoDataFrame = None, csv: str = None, shp: str = None, node_type: int = -9999):
+        """
+        Init for node entity. Different inputs can be used. Geopandas dataframe, csv or shapefile. The csv needs to be
+        structured in such a way to be compatible with the Nodes entity.
+
+        :param gdf: Geopandas dataframe
+        :param csv: Path of a csv
+        :param shp: Path of the shapefile
+        :param node_type: Node type (I,Y,X,U)
+        """
 
         self.node_type = node_type
-        if shp is not None:
-            super().__init__(shp=shp)
-        else:
+        if gdf is not None:
             super().__init__(gdf=gdf)
+        elif csv is not None:
+            super().__init__(csv=csv)
+        elif shp is not None:
+            super().__init__(shp=shp)
 
     @property
     def entity_df(self) -> GeoDataFrame:
@@ -171,17 +182,27 @@ class Fractures(BaseEntity):
     """
     Base entity for fractures
 
-    + Add method to activate different sets
     + Add method to plot rose diagram
     """
 
-    def __init__(self, gdf: GeoDataFrame = None, shp: str = None, set_n: int = None):
+    def __init__(self, gdf: GeoDataFrame = None, csv: str = None, shp: str = None, set_n: int = None):
+        """
+        Init for Fractures entity. Different inputs can be used. Geopandas dataframe, csv or shapefile. The csv needs to be
+        structured in such a way to be compatible with the Nodes entity.
+
+        :param gdf: Geopandas dataframe
+        :param csv: Path of a csv
+        :param shp: Path of the shapefile
+        :param set_n: Fracture set number
+        """
 
         self._set_n = set_n
-        if shp is not None:
-            super().__init__(shp=shp)
-        else:
+        if gdf is not None:
             super().__init__(gdf=gdf)
+        elif csv is not None:
+            super().__init__(csv=csv)
+        elif shp is not None:
+            super().__init__(shp=shp)
 
     @property
     def set_n(self):
@@ -237,6 +258,33 @@ class Fractures(BaseEntity):
         network_obj = Rep.networkx_rep(self.vtk_object)
         return network_obj
 
+    # def simplify_lines(self, tolerance: float, max_points: int = None, preserve_topology: bool = True):
+    #     """
+    #     Method used to simplify lines in a fracture entity. The coordinates of the new simplified geometry will be
+    #     no more than the tolerance distance from the original. If max_points is None then all lines will be simplified.
+    #     If max points is specified then only lines that have more points that max_points wil be simplified.
+    #
+    #     :param tolerance: Maximum distance of a point between the new and old geometry
+    #     :param max_points: Maximum tolerated points in a line over which the simplification is run
+    #     :param preserve_topology: Bool flag to ensure that the topology is preserved.
+    #     If set to False, self intersecting geometries may occur
+    #     """
+    #
+    #     df = self.entity_df.copy()
+    #     if max_points is None:
+    #         df['geometry'] = df['geometry'].simplify(tolerance=tolerance, preserve_topology=preserve_topology)
+    #
+    #     else:
+    #         new_geom = []
+    #         for i, row in df.iterrows():
+    #             line = row['geometry']
+    #             if len(line.coords) > tolerance:
+    #                 new_geom.append(line.simplify(tolerance=tolerance,
+    #                                               preserve_topology=preserve_topology))
+    #         df['geometry'] = new_geom
+    #
+    #     self.entity_df = df
+
     def mat_plot(self):
         plts.matplot_fractures(self)
 
@@ -250,13 +298,26 @@ class Boundary(BaseEntity):
     """
     Base entity for boundaries
     """
-    def __init__(self, gdf: GeoDataFrame = None, shp: str = None, group_n: int = 1):
+    def __init__(self, gdf: GeoDataFrame = None, csv: str = None, shp: str = None, group_n: int = 1):
+        """
+        Init for Boundary entity. Different inputs can be used. Geopandas dataframe, csv or shapefile. The csv needs to be
+        structured in such a way to be compatible with the Nodes entity.
+
+        :param gdf: Geopandas dataframe
+        :param csv: Path of a csv
+        :param shp: Path of the shapefile
+        :param group_n: Boundary group number
+        """
 
         self.group_n = group_n
-        if shp is not None:
-            super().__init__(shp=shp)
-        else:
+
+        if gdf is not None:
             super().__init__(gdf=gdf)
+        elif csv is not None:
+            super().__init__(csv=csv)
+        elif shp is not None:
+            super().__init__(shp=shp)
+
 
     @property
     def entity_df(self):
@@ -380,9 +441,20 @@ class FractureNetwork(BaseEntity):
 
     """
 
-    def __init__(self, gdf: GeoDataFrame = None):
+    def __init__(self, gdf: GeoDataFrame = None, csv: str = None):
+        """
+        Init for fracture network entity. Different inputs can be used. Geopandas dataframe, csv or shapefile.
+        The csv needs to be structured in such a way to be compatible with the Nodes entity.
+
+        :param gdf: Geopandas dataframe
+        :param csv: Path of a csv
+        """
+
         self.column_names = ['type', 'object', 'n_type', 'f_set', 'b_group', 'active']
         self._df: DataFrame = DataFrame(columns=self.column_names)
+
+        if csv is not None:
+            gdf = read_file(csv, GEOM_POSSIBLE_NAMES="geometry", KEEP_GEOM_COLUMNS="NO")
 
         if gdf is not None:
             nodes = Nodes(gdf.loc[gdf['type'] == 'node'])
@@ -408,7 +480,7 @@ class FractureNetwork(BaseEntity):
 
             for node_type in types:
                 nodes = Nodes(gdf=nodes.loc[nodes['n_type'] == node_type], node_type=node_type)
-                if self.is_set_active(node_type):
+                if self.is_type_active(node_type):
                     self.add_nodes(nodes)
 
         fractures = gpd.loc[gpd['type'] == 'fracture']
@@ -883,14 +955,14 @@ class FractureNetwork(BaseEntity):
 
     #  ==================== Generic methods ====================
 
-    def fracture_network_to_components_df(self) -> GeoDataFrame:
+    def fracture_network_to_components_df(self) -> DataFrame:
 
         """
         Method used to return the fracture network as a single geopandas dataframe.
         :return: Geopandas DataFrame of the whole fracture network
         """
 
-        gdf = GeoDataFrame()
+        gdf = DataFrame()
 
         nodes = self._active_nodes_df
 
@@ -904,6 +976,11 @@ class FractureNetwork(BaseEntity):
 
         gdf = pd.concat([gdf, boundaries], ignore_index=True)
 
+        if 'n_type' in gdf.columns:
+            gdf['n_type'] = gdf['n_type'].fillna(-9999).astype('int64')
+        gdf['f_set'] = gdf['f_set'].fillna(-9999).astype('int64')
+        gdf['censored'] = gdf['censored'].fillna(-9999).astype('int64')
+        gdf['b_group'] = gdf['b_group'].fillna(-9999).astype('int64')
         return gdf
 
     def vtk_object(self, include_nodes: bool = True) -> PolyData:
@@ -1009,7 +1086,7 @@ class FractureNetwork(BaseEntity):
         :return:
         """
 
-        self.fracture_network_to_components_df().to_csv(path, sep=sep, index=index)
+        self.fracture_network_to_components_df().to_csv(f'Fracture_net_{path}', sep=sep, index=index)
 
     def save_shp(self, path: str):
         """

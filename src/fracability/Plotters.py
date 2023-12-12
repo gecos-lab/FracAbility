@@ -258,7 +258,7 @@ def vtkplot_nodes(entity,
 
     nodes = entity.vtk_object
 
-    class_names = [class_dict[i] for i in nodes['n_type']]
+    class_names = [class_dict[int(i)] for i in nodes['n_type']]
 
     used_tags = list(set(class_names))
     used_tags.sort()
