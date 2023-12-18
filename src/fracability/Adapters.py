@@ -14,6 +14,7 @@ import geopandas
 import networkx
 import numpy as np
 from pyvista import PolyData, lines_from_points, MultiBlock
+from shapely.geometry import MultiLineString
 
 from vtkmodules.vtkFiltersCore import vtkAppendPolyData
 

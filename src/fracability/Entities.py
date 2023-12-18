@@ -214,7 +214,15 @@ class Fractures(BaseEntity):
 
     @entity_df.setter
     def entity_df(self, gdf: GeoDataFrame):
+        multiline_list = []
+        for index, geom in zip(gdf.index, gdf['geometry']):  # For each geometry in the df
 
+            if isinstance(geom, MultiLineString):
+                multiline_list.append(index)
+                continue
+        print(f'Multilines found, removing from database. If necessary correct them: {np.array(multiline_list)+1}')
+
+        gdf.drop(multiline_list,inplace=True)
         self._df = gdf
         self._df.reset_index(inplace=True, drop=True)
 

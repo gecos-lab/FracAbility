@@ -3,22 +3,21 @@ from fracability.operations import Statistics
 from fracability import Plotters
 
 
-
-# fracture_set1 = Entities.Fractures(shp='/home/gabriele/STORAGE/projects/FracAbility/development/tests/test_data/Gozo/Set_1_clipped_DFN_test.shp', set_n=1)
-# boundary = Entities.Boundary(shp='/home/gabriele/STORAGE/projects/FracAbility/development/tests/test_data/Gozo/Interpretation_boundary_DFN_test.shp', group_n=1)
-fracture_set1 = Entities.Fractures(csv='Fractures_gozo_result.csv')
-boundary = Entities.Boundary(csv='Boundary_gozo_result.csv')
-nodes = Entities.Nodes(csv='Nodes_gozo_result.csv')
-fracture_net = Entities.FractureNetwork(csv='Fracture_net_gozo_result.csv')
+fracture_set1 = Entities.Fractures(shp='/home/gabriele/STORAGE/projects/FracAbility/development/tests/test_data/Gozo/Set_2_clipped.shp', set_n=1)
+boundary = Entities.Boundary(shp='/home/gabriele/STORAGE/projects/FracAbility/development/tests/test_data/Gozo/Interpretation_boundary.shp', group_n=1)
+# fracture_set1 = Entities.Fractures(csv='Fractures_gozo_result.csv')
+# boundary = Entities.Boundary(csv='Boundary_gozo_result.csv')
+# nodes = Entities.Nodes(csv='Nodes_gozo_result.csv')
+# fracture_net = Entities.FractureNetwork(csv='Fracture_net_gozo_result.csv')
 
 
 fracture_set1.vtk_plot()
-boundary.vtk_plot()
-nodes.vtk_plot()
+# boundary.vtk_plot()
+# nodes.vtk_plot()
 
 # print(fracture_net.fracture_network_to_components_df())
 
-fracture_net.vtk_plot()
+# fracture_net.vtk_plot()
 
 # fracture_net = Entities.FractureNetwork()
 
