@@ -220,7 +220,8 @@ class Fractures(BaseEntity):
             if isinstance(geom, MultiLineString):
                 multiline_list.append(index)
                 continue
-        print(f'Multilines found, removing from database. If necessary correct them: {np.array(multiline_list)+1}')
+        if len(multiline_list)>0:
+            print(f'Multilines found, removing from database. If necessary correct them: {np.array(multiline_list)+1}')
 
         gdf.drop(multiline_list,inplace=True)
         self._df = gdf

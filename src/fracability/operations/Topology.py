@@ -38,8 +38,10 @@ def nodes_conn(obj):
         point = Point(vtk_obj.points[node])
 
         cells = fractures_vtk_obj.extract_points(node)
-
-        node_origin = ''.join([str(int(c)) for c in set(cells['f_set'])])
+        if cells.number_of_cells == 0:
+            node_origin = -9999
+        else:
+            node_origin = ''.join([str(int(c)) for c in set(cells['f_set'])])
 
         if n_edges == 2:  # Exclude internal and V nodes
             n_edges = -9999
