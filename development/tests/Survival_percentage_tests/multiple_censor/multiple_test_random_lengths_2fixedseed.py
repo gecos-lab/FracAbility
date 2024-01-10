@@ -60,7 +60,7 @@ mean_everything_list = []  # list of means for fitting all the data
 mean_nocensor_list = []  # list of means for fitting excluding censored data
 mean_censor_list = []  # list of means for fitting using censoring
 
-n_windows = 10  # number of windows used to censor the values
+n_windows = 50  # number of windows used to censor the values
 
 lengths = ss.norm.rvs(loc=mean, scale=std, size=n_lines)
 lengths[np.where(lengths < 0)] *= -1  # flip to positive negative ends
@@ -120,15 +120,16 @@ for shift in shift_window:
 
 
 fig, ax = plt.subplots()
-ax.plot(percentage_censoring_list, mean_everything_list, color='r', label='all')
+# ax.plot(percentage_censoring_list, mean_everything_list, color='r', label='all')
 ax.plot(percentage_censoring_list, mean_nocensor_list, color='b', label='no cens')
-ax.plot(percentage_censoring_list, mean_censor_list, color='g', label='cens')
+# ax.plot(percentage_censoring_list, mean_censor_list, color='g', label='cens')
 ax.hlines(y=mean, xmin=min(percentage_censoring_list), xmax=max(percentage_censoring_list),
-           colors='k', label='True mean')
+          colors='k', label='True mean')
 
 ax.fill_between(percentage_censoring_list, mean-std, mean+std, alpha=0.2)
 
 ax.set_xlabel('% censored')
 ax.set_ylabel('Mean')
 ax.legend()
+ax.set_title('Normal distribution test')
 plt.show()

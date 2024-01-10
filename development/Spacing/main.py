@@ -132,17 +132,24 @@ split_scanlines_df = gpd.GeoDataFrame(geometry=split_scanlines_list)
 
 valid_scanlines = Entities.Fractures(gdf=split_scanlines_df, set_n=1)
 
+# plotter = pv.Plotter()
+# plotter.add_mesh(fractures.vtk_object, color='white')
+# plotter.add_mesh(boundary.vtk_object, color='red')
+# plotter.add_mesh(valid_scanlines.vtk_object, color='yellow')
+# plotter.add_camera_orientation_widget()
+# plotter.show()
+
 frac_net = Entities.FractureNetwork()
 frac_net.add_fractures(valid_scanlines)
-# frac_net.add_fractures(scanlines)
+frac_net.add_fractures(scanlines)
 frac_net.add_boundaries(boundary)
 
-print(len(frac_net.fractures.entity_df['length']))
-frac_net.calculate_topology()
+# print(len(frac_net.fractures.entity_df['length']))
 # frac_net.vtk_plot()
+frac_net.calculate_topology()
 
 # print(frac_net.fraction_censored)
 #
-fitter = Statistics.NetworkFitter(frac_net)
+fitter = Statistics.NetworkFitter(frac_net, include_censoring=False)
 fitter.fit('lognorm')
 matplot_stats_summary(fitter.get_fitted_distribution('lognorm'))

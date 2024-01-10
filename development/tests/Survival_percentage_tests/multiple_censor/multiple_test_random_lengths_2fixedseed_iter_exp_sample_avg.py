@@ -65,12 +65,12 @@ def lognorm_parameters(target_mean, target_std):
 
 
 distr = ss.expon
-mean = 100
+mean = 10
 std = mean
 n_lines = 1000
-n_iterations = 100  # Number of iterations
+n_iterations = 50  # Number of iterations
 seed = 12345
-n_windows = 50  # number of windows used to censor the values
+n_windows = 25  # number of windows used to censor the values
 
 
 numpy_randomGen = Generator(PCG64(seed))
@@ -188,7 +188,8 @@ for i in range(n_iterations):
 # ax.hlines(y=mean, xmin=0, xmax=100,
 #            colors='k', label='True mean')
 # ax.fill_between(mean_of_percentage, mean-std, mean+std, alpha=0.2)
-
+plt.suptitle('Survival analysis estimation performance')
+plt.title(f'{n_lines} data points drawn from exponential (10,10). {n_iterations} iterations')
 ax.set_xlabel('% censored')
 ax.set_ylabel('Estimated mean - Sample mean')
 ax.set_ylim([-(mean+std+3), mean+std+3])
