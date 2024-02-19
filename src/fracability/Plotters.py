@@ -574,6 +574,8 @@ def matplot_stats_table(network_distribution: NetworkDistribution,
         5. Mode
         6. 5th percentile
         7. 95th percentile
+        8. Total number of fractures
+        9. % censored
 
     Parameters
     -----------
@@ -611,6 +613,12 @@ def matplot_stats_table(network_distribution: NetworkDistribution,
     text_b5_th = f'{np.round(network_data.b5, dec)}'
     text_b95_th = f'{np.round(network_data.b95, dec)}'
 
+    text_totalf = f'{network_data.total_n_fractures}'
+    text_perc_censor = f'{np.round(network_data.censoring_percentage, dec)}'
+
+    general_stats_df = pd.DataFrame(data=[[text_totalf, text_perc_censor]],
+                                    columns=['Total number of fractures', '% censored'])
+
     stats_df = pd.DataFrame(data=[[text_mean_th, text_mean],
                                   [text_median_th, text_median],
                                   [text_mode_th, text_mode],
@@ -623,6 +631,10 @@ def matplot_stats_table(network_distribution: NetworkDistribution,
     if not vertical:
         stats_df = stats_df.transpose()
 
+    plt.table(cellText=general_stats_df.values,
+              colLabels=general_stats_df.columns,
+              # colWidths=[0.3, 0.3],
+              loc='upper center',cellLoc='center')
     plt.table(cellText=stats_df.values,
               rowLabels=stats_df.index,
               colLabels=stats_df.columns,

@@ -7,7 +7,7 @@ from networkx import Graph
 import scipy.stats as ss
 import numpy as np
 from copy import deepcopy
-
+from shapely import remove_repeated_points
 
 class BaseEntity(ABC):
     """
@@ -219,7 +219,11 @@ class BaseEntity(ABC):
         if not self.entity_df.empty:
             self.entity_df.to_file(path, crs=self.crs)
 
+    def remove_double_points(self):
 
+        for line, geom in enumerate(self.entity_df.geometry):
+
+            self.entity_df.loc[line, 'geometry'] = remove_repeated_points(geom, tolerance=0.000001)
 class BaseOperator(ABC):
     """
     Abstract class for Operators such as:

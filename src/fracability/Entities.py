@@ -10,7 +10,7 @@ import numpy as np
 from geopandas import GeoDataFrame, GeoSeries, read_file
 import pandas as pd
 from pandas import DataFrame
-from shapely.geometry import MultiLineString, Polygon, LineString, Point
+from shapely.geometry import MultiLineString, Polygon, LineString, Point, MultiPoint
 from pyvista import PolyData, DataSet
 from networkx import Graph
 import fracability.Plotters as plts
@@ -57,7 +57,8 @@ class Nodes(BaseEntity):
         """
 
         self._df = gdf
-
+        if 'original_line_id' not in self._df.columns:
+            self._df['original_line_id'] = np.array(gdf.index.values+1)
         if 'type' not in self._df.columns:
             self._df['type'] = 'node'
         if 'n_type' not in self._df.columns:
@@ -220,13 +221,14 @@ class Fractures(BaseEntity):
             if isinstance(geom, MultiLineString):
                 multiline_list.append(index)
                 continue
-        if len(multiline_list)>0:
+        if len(multiline_list) > 0:
             print(f'Multilines found, removing from database. If necessary correct them: {np.array(multiline_list)+1}')
 
-        gdf.drop(multiline_list,inplace=True)
-        self._df = gdf
+        gdf.drop(multiline_list, inplace=True)
+        self._df = gdf.copy()
         self._df.reset_index(inplace=True, drop=True)
-
+        if 'original_line_id' not in self._df.columns:
+            self._df['original_line_id'] = np.array(gdf.index.values+1)
         if 'type' not in self._df.columns:
             self._df['type'] = 'fracture'
         if 'censored' not in self._df.columns:
@@ -235,6 +237,9 @@ class Fractures(BaseEntity):
             self._df['f_set'] = self.set_n
         if 'length' not in self._df.columns:
             self._df['length'] = self._df['geometry'].length
+
+        self.remove_double_points()
+        self.check_geometries()
 
     @property
     def vtk_object(self) -> PolyData:
@@ -266,6 +271,29 @@ class Fractures(BaseEntity):
     def network_object(self) -> Graph:
         network_obj = Rep.networkx_rep(self.vtk_object)
         return network_obj
+
+    def check_geometries(self, remove_dup=True, save_shp=False):
+        """
+        Method used to check if the geometries are correct i.e.:
+        + No repeating points
+        + No overlaps
+
+        By default, the method will return a list of geometries that need to be fixed. Additionally, a shp file can be
+        saved with only the geometries that need to be corrected.
+
+        :param remove_dup: Automatically remove duplicate points. By default, True
+        :param save_shp: Save in the same folder of the input shp with only the geometries that need to be
+        corrected. False by default
+        """
+
+        overlaps_list = []
+
+        for line, geom in enumerate(self.entity_df.geometry):
+            overlaps = self.entity_df.overlaps(geom)
+            if overlaps.any():
+                overlaps_list.append(self.entity_df.loc[line, 'original_line_id'])
+
+        print(f'Detected overlaps for set {self._set_n}: {overlaps_list}. Check geometries in gis and fix.')
 
     # def simplify_lines(self, tolerance: float, max_points: int = None, preserve_topology: bool = True):
     #     """
@@ -370,12 +398,14 @@ class Boundary(BaseEntity):
             self._df.loc[index, 'geometry'] = value
         # When PZero moves to shapely 2.0 remove the lines between the comments
         # and uncomment the two lines above
-
+        if 'original_line_id' not in self._df.columns:
+            self._df['original_line_id'] = np.array(gdf.index.values+1)
         if 'type' not in self._df.columns:
             self._df['type'] = 'boundary'
         if 'b_group' not in self._df.columns:
             self._df['b_group'] = self.group_n
 
+        self.remove_double_points()
     @property
     def vtk_object(self) -> PolyData:
 
@@ -989,7 +1019,8 @@ class FractureNetwork(BaseEntity):
             gdf['n_type'] = gdf['n_type'].fillna(-9999).astype('int64')
         gdf['f_set'] = gdf['f_set'].fillna(-9999).astype('int64')
         gdf['censored'] = gdf['censored'].fillna(-9999).astype('int64')
-        gdf['b_group'] = gdf['b_group'].fillna(-9999).astype('int64')
+        if 'b_group' in gdf.columns:
+            gdf['b_group'] = gdf['b_group'].fillna(-9999).astype('int64')
         return gdf
 
     def vtk_object(self, include_nodes: bool = True) -> PolyData:
@@ -1011,6 +1042,74 @@ class FractureNetwork(BaseEntity):
 
         network_object = Rep.networkx_rep(self.vtk_object(include_nodes=False))
         return network_object
+
+    def check_network(self, check_single=True, save_shp=None):
+        """
+        Method used to check if network-wide the geometries are correct i.e.:
+        + No repeating points
+        + No overlaps
+
+        By default, the method will return a list of geometries that need to be fixed. Additionally, a shp file can be
+        saved with only the geometries that need to be corrected.
+
+        :param remove_dup: Automatically remove duplicate points. By default, True. When false, a point shapefile where
+        double points are present will be saved
+        :param check_single: Perform check also for the single components
+        :param save_shp: Path to save the shp of the check. If check_single is true then also the results of the single
+        component check will be saved.
+        :return:
+        """
+
+        df = self.fracture_network_to_components_df()
+        df = df.loc[df['type'] != 'node']
+
+        set_n = np.array(list(set(df['f_set'])))
+
+        overlaps_list = []
+        overlaps_list_dict = {s: [] for s in set_n[set_n>0]}
+        overlaps_geometry_list = []
+        intersections_list = []
+        intersections_geometry_list = []
+
+        for line, geom in enumerate(df.geometry):
+
+            if df.loc[line, 'type'] == 'boundary':
+                mask = np.ones(df.geometry.size, dtype=bool)
+                mask[line] = False
+                sub_df = df[mask]
+                intersections = sub_df.intersects(geom)
+                touching = sub_df.touches(geom)
+                xor = intersections != touching
+                if xor.any():
+                    filtered_df = sub_df[xor]
+                    for n in set(filtered_df['f_set']):
+                        int_dict = dict()
+                        int_dict['boundary_int'] = list(filtered_df.loc[filtered_df['f_set'] == n, 'original_line_id'].values)
+                        overlaps_list_dict[n].append(int_dict)
+                    intersections_list = filtered_df['original_line_id'].values
+                    intersections_geometry_list = filtered_df['geometry'].values
+
+            else:
+                overlaps = df.overlaps(geom)
+                if overlaps.any():
+                    overlaps_list.append(df.loc[line, 'original_line_id'])
+                    overlaps_geometry_list.append(df.loc[line, 'geometry'])
+                    set_n = df.loc[line, 'f_set']
+                    overlaps_list_dict[set_n].append(df.loc[line, 'original_line_id'])
+
+        if save_shp:
+            path_frac = os.path.join(save_shp, 'frac_corr.shp')
+
+            f_out_dict = {'og_id': [*overlaps_list, *intersections_list],
+                          'geometry': [*overlaps_geometry_list, *intersections_geometry_list]}
+
+            out_df = GeoDataFrame(f_out_dict, crs=self.crs)
+            out_df.to_file(path_frac)
+
+        else:
+            print(overlaps_list_dict)
+
+
 
     def clean_network(self, buffer = 0.05, inplace=True):
         """Tidy the intersection of the active entities in the fracture network. A buffer is applied to all the

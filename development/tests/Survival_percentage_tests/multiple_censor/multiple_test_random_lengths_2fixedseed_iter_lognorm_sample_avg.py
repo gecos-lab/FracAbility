@@ -23,7 +23,7 @@ from numpy.random import Generator, PCG64
 sns.set_theme()
 
 
-def plot_survival(start_times, end_times, censoring = None):
+def plot_survival(start_times, end_times, censoring = None, name = None):
     """
     Function used to plot a survival diagram
 
@@ -47,7 +47,8 @@ def plot_survival(start_times, end_times, censoring = None):
             plt.scatter(end, i, color='r', marker='^')
             plt.scatter(start, i, color='b', marker='o')
             plt.hlines(y=i, xmin=start, xmax=end)
-    plt.show()
+    # plt.show()
+    plt.savefig(name, dpi=200)
 
 
 def lognorm_parameters(target_mean, target_std):
@@ -65,8 +66,8 @@ def lognorm_parameters(target_mean, target_std):
 
 
 distr = ss.lognorm
-mean = 10
-std = 4
+mean = 4
+std = 8
 n_lines = 1000
 n_iterations = 100  # Number of iterations
 seed = 12345
@@ -122,7 +123,7 @@ for i in range(n_iterations):
 
         n_censored = len(censored)  # number of censored values
         # print(n_censored)
-        # plot_survival(starts, ends, censoring_values)
+        # plot_survival(starts, ends, censoring_values, f"survp_{mean}_{std}.png")
 
         percentage_censored = 100*(n_censored/n_total)
         percentage_censoring_list.append(percentage_censored)
@@ -167,6 +168,8 @@ mean_of_means_nocensor = np.mean(iter_mean_nocensor_list, axis=0)
 mean_of_means_censor = np.mean(iter_mean_censor_list, axis=0)
 mean_of_percentage = np.mean(iter_percentage_censoring_list, axis=0)
 
+print(np.std(iter_mean_censor_list))
+
 # print(iter_percentage_censoring_list)
 # print(mean_of_percentage)
 
@@ -192,6 +195,10 @@ for i in range(n_iterations):
 
 ax.set_xlabel('% censored')
 ax.set_ylabel('Estimated mean - Sample mean')
-ax.set_ylim([-(mean+std+3), mean+std+3])
+ax.set_ylim([-1, mean+std+3])
+ax.set_xlim([-5, 105])
 ax.legend()
+plt.suptitle('Survival analysis estimation performance')
+plt.title(f'{n_lines} data points drawn from lognormal ({mean}, {std}). {n_iterations} iterations')
+plt.savefig(f'images/{mean}_{std}.png', dpi=200)
 plt.show()
