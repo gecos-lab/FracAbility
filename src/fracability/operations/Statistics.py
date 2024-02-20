@@ -41,7 +41,6 @@ class NetworkData:
             else:
                 self.data = ss.CensoredData(uncensored=self.lengths)
 
-
     @property
     def data(self) -> ss.CensoredData:
         """
@@ -155,6 +154,13 @@ class NetworkData:
         """
         return ss.ecdf(self.data).sf
 
+    @property
+    def total_n_fractures(self) -> int:
+        return len(self.lengths)
+
+    @property
+    def censoring_percentage(self) -> float:
+        return (len(self.censored_lengths)/self.total_n_fractures)*100
 
 class NetworkDistribution:
     """

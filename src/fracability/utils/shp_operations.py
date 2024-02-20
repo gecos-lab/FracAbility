@@ -1,9 +1,10 @@
-import geopandas
-import numpy
+
 import numpy as np
 import shapely.geometry as geom
 from shapely.affinity import scale
-from shapely.ops import split,snap
+from shapely.ops import split
+import shapely as shp
+from shapely.validation import explain_validity
 import matplotlib.pyplot as plt
 
 
@@ -28,6 +29,15 @@ def int_node(line1, line2, idx_list, gdf):
     """
     new_geom_dict = {}
     fac = 1.05
+
+    # line1_points = np.array(line1.coords)
+    # line2_points = np.array(line2.coords)
+    #
+    # unique_points1 = np.unique(line1_points, axis=0)
+    # unique_points2 = np.unique(line2_points, axis=0)
+    #
+    # line1 = geom.LineString(unique_points1)
+    # line2 = geom.LineString(unique_points2)
 
     try:
         if line1.crosses(line2):
@@ -55,7 +65,7 @@ def int_node(line1, line2, idx_list, gdf):
                 else:
                     first_seg = geom.LineString(line2.coords[:2])
                     last_seg = geom.LineString(line2.coords[-2:])
-
+                    # print(np.array(first_seg.boundary.geoms), idx_list)
                     scaled_first_segment = scale(first_seg, xfact=fac, yfact=fac, origin=first_seg.boundary.geoms[1])
                     scaled_last_segment = scale(last_seg, xfact=fac, yfact=fac, origin=last_seg.boundary.geoms[0])
                     extended_line = geom.LineString(
@@ -89,19 +99,34 @@ def int_node(line1, line2, idx_list, gdf):
 
                     break
     except IndexError:
-        print(f'Possible duplicate point found, fix geometry on gis or by using the clean_dup_points cleaner function')
+        print(f'Possible duplicate point found, fix geometry on gis')
+
+        print(np.array(idx_list)+1)
         exit()
     except ValueError:
-        print(f'lines {idx_list} overlapping, checking if single or multiple point overlap')
+        obj1_idx = gdf.loc[idx_list[0], 'original_line_id']
+        set1_idx = gdf.loc[idx_list[0], 'f_set']
+        obj2_idx = gdf.loc[idx_list[1], 'original_line_id']
+        set2_idx = gdf.loc[idx_list[1], 'f_set']
+
+        if set2_idx == -9999:
+            group2_idx = gdf.loc[idx_list[1], 'b_group']
+            print(f'lines {obj1_idx} (set {set1_idx}), {obj2_idx} (boundary group {group2_idx}) overlapping, checking if single or multiple point overlap')
+        elif set1_idx == -9999:
+            group1_idx = gdf.loc[idx_list[0], 'b_group']
+            print(f'lines {obj1_idx} (boundary group {group1_idx}), {obj2_idx} (set {set2_idx}) overlapping, checking if single or multiple point overlap')
+        else:
+            print(f'lines {obj1_idx} (set {set1_idx}), {obj2_idx} (set {set2_idx}) overlapping, checking if single or multiple point overlap')
+
         element = np.array(line1.coords)
         test_element = np.array(extended_line.coords)
         mask = np.isin(element, test_element)
 
         if len(element[mask]) == 4:
-            print('Single point overlap. Geometry is correct, continuing. ')
+            print('Single point overlap. Geometry is correct, continuing. Shp files could contain invalid geometries, run the check_network method to perform a network wide check.')
             pass
         else:
-            print('Multiple point overlap. Check and fix geometry, stopping.')
+            print('Multiple point overlap. Check and fix geometry, stopping. Shp files could contain invalid geometries, run the check_network method to perform a network wide check.')
             exit()
 
         # print(gdf.loc[idx_list[0]-5:idx_list[1]+5])
