@@ -5,7 +5,7 @@ Test survival analysis feasibility for multiple censored events.
 1. Every event starts at the same point
 2. Every event has a randomly distributed length following a lognormal distribution
 3. Every event is censored at different values following a uniform distribution that shifts to the left (removing the same
-amount each iteration). We end the shift only when 100% censoring is reached. The step follows a linear succession
+amount each iteration). We end the shift only when 100% censoring is reached. The step follows a geometric succession
 
 We test the effects of the % censoring on the fitting of a known distribution by plotting the % of censored values
 with the sample average. We run n iterations and mean them to get an overall trend. This should provide a better plot
@@ -119,9 +119,10 @@ for i in range(n_iterations):
     censoring_list_mod = censoring_list.copy() # copy of the original values that will be multiplied
 
     min_censor = min(censoring_list)  # smallest censoring event
-    k = max(ends/censoring_list)
-
-    value_range = np.linspace(1, k, 1000)
+    max_censor = max(censoring_list)
+    k = maximum_end/min_censor
+    value_range = np.geomspace(1, k, n_windows)
+    # print(value_range)
     # print(max(lengths/censoring_list))
     #
     # res = (maximum_end-min_censor)/n_windows  # quantity to remove
