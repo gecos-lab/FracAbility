@@ -2,8 +2,10 @@ from fracability import Entities
 from fracability.operations import Statistics
 from fracability import Plotters
 import geopandas as gpd
-
-
+import seaborn as sns
+import matplotlib.pyplot as plt
+import numpy as np
+import scipy.stats as ss
 # fracture_set1 = Entities.Fractures(shp='/home/gabriele/STORAGE/projects/Ivan/Fracture_interpretation_BR_03B/Fracture_network_1.shp', set_n=1)
 #
 # fracture_set2 = Entities.Fractures(shp='/home/gabriele/STORAGE/projects/Ivan/Fracture_interpretation_BR_03B/Fracture_network_2_4.shp', set_n=2)
@@ -35,7 +37,9 @@ fracture_net.add_boundaries(boundary)
 #
 #
 fracture_net.calculate_topology()
-fracture_net.vtk_plot()
+
+fracture_net.fractures.save_csv('test.csv')
+# fracture_net.vtk_plot()
 # fracture_net.ternary_plot()
 # # print(fracture_net.fracture_network_to_components_df())
 # # fracture_net.save_csv('gozo_result.csv')
@@ -47,21 +51,24 @@ fracture_net.vtk_plot()
 fitter = Statistics.NetworkFitter(fracture_net)
 # #
 fitter.fit('lognorm')
-Plotters.matplot_stats_summary(fitter.get_fitted_distribution('lognorm'))
-# fitter.fit('powerlaw')
-# Plotters.matplot_stats_summary(fitter.get_fitted_distribution('powerlaw'))
+fitter.fit('expon')
 fitter.fit('norm')
-Plotters.matplot_stats_summary(fitter.get_fitted_distribution('norm'))
-fitter.fit('gamma')
-Plotters.matplot_stats_summary(fitter.get_fitted_distribution('gamma'))
+fitter.fit('gengamma')
 fitter.fit('logistic')
-Plotters.matplot_stats_summary(fitter.get_fitted_distribution('logistic'))
-# fitter.fit('burr12')
-# Plotters.matplot_stats_summary(fitter.get_fitted_distribution('burr12'))
-# fitter.fit('burr')
-# Plotters.matplot_stats_summary(fitter.get_fitted_distribution('burr'))
-# # print(fitter.get_fitted_parameters('burr12'))
+Plotters.matplot_stats_summary(fitter.get_fitted_distribution('lognorm'))
 
-print(fitter.fit_records)
+Plotters.matplot_stats_uniform(fitter)
+# Plotters.matplot_stats_summary(fitter.get_fitted_distribution('norm'))
+# fitter.fit('gamma')
+# Plotters.matplot_stats_summary(fitter.get_fitted_distribution('gamma'))
+# fitter.fit('logistic')
+# Plotters.matplot_stats_summary(fitter.get_fitted_distribution('logistic'))
+#
+# Plotters.matplot_stats_summary(fitter.get_fitted_distribution('gengamma'))
+# # fitter.fit('burr')
+# # Plotters.matplot_stats_summary(fitter.get_fitted_distribution('burr'))
+# # # print(fitter.get_fitted_parameters('burr12'))
+#
+# print(fitter.fit_records)
 
 

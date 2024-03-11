@@ -2,8 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 start = 1
-stop = 10
-n_points = 50
+stop = 345000
+n_points = 500
 
 
 linspace = np.linspace(start, stop, n_points)

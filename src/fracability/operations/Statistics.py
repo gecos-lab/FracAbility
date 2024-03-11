@@ -202,6 +202,19 @@ class NetworkDistribution:
         return self.distribution.args
 
     @property
+    def n_distribution_parameters(self) -> int:
+        """
+        Property that returns the number of parameters of the frozen distribution. the args method returns the
+        shape parameters. This means that except for normal and logistic the loc counts as a parameter. To fix this we
+        subtract -1 to all except normal and logistic.
+        :return:
+        """
+        if self.distribution_name == 'norm' or self.distribution_name == 'logistic':
+
+            return len(self.distribution.args)
+        else:
+            return len(self.distribution_parameters)-1
+    @property
     def mean(self) -> float:
         """
         Property that returns the mean of the frozen distribution
@@ -281,8 +294,9 @@ class NetworkDistribution:
 
         LL2 = -2 * self.log_likelihood
 
-        k = len(self.distribution_parameters)
-        n = len(self.fit_data.non_censored_lengths) + len(self.fit_data.censored_lengths)
+        k = self.n_distribution_parameters
+        n = self.fit_data.total_n_fractures
+
 
         if (n - k - 1) == 0: # if n parameters + 1 = n of total fractures then the akaike is invalid i.e. the total fractures must be > than the n_parameters+1
             return -1
@@ -321,6 +335,11 @@ class NetworkDistribution:
         else:
             return np.array([0])
 
+    def cdf(self, x_values: np.array = None):
+        if x_values:
+            return self.distribution.cdf(x_values)
+        else:
+            return self.distribution.cdf(self.fit_data.lengths)
 
 class NetworkFitter:
 
@@ -355,7 +374,7 @@ class NetworkFitter:
 
         """ Return the sorted fit dataframe"""
 
-        return self._fit_dataframe.sort_values(by='BIC', ignore_index=True)
+        return self._fit_dataframe.sort_values(by='AICc', ignore_index=True)
 
     @net_data.setter
     def net_data(self, data: NetworkData):
@@ -413,6 +432,16 @@ class NetworkFitter:
         distribution = self.fit_records.loc[self.fit_records['name'] == distribution_name, 'distribution'].values[0]
 
         return distribution
+
+    def get_fitted_distribution_names(self) -> list:
+
+        """
+        get the names of the fitted NetworkDistribution object
+        :param distribution_name: name of the distribution
+        :return:
+        """
+
+        return self.fit_records['name'].values
 
     def get_fitted_parameters_list(self, distribution_names: list = None) -> list:
 

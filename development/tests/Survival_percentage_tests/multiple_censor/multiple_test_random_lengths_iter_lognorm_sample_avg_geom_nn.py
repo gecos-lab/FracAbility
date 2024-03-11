@@ -7,22 +7,16 @@ Test survival analysis feasibility for multiple censored events.
 3. Every event is censored at different values following a uniform distribution that shifts to the left (removing the same
 amount each iteration). We end the shift only when 100% censoring is reached. The step follows a geometric succession
 
+
+After each iteration we interpolate the data using nn.
 We test the effects of the % censoring on the fitting of a known distribution by plotting the % of censored values
 with the sample average. We run n iterations and mean them to get an overall trend. This should provide a better plot
 that shows the effect of censoring because we exclude the effect of random sampling on the estimation of the real mean.
 
-In general the following is done:
-
-+ generiamo n valori X1...Xn (n=1000)
-+ generiamo n valori U1...Un dalla U(0, min(Xi)) --> l'accoppiamento iniziale di (X1, U1)...(Xn, Un) mi dà il 100% dei dati censurati (i dati osservati sono solo le Ui)
-+ Si procede a step s. Definendo un fattore moltiplicativo c=1.3 (ad esempio) si moltiplica progressivamente il valore Ui in modo da incrementare i valori di U e diminuire la percentuale di censurati, fino a raggiungere zero di censoring. Quindi per esempio, se allo step s=0  ho U1 = 1, per s=1 avrò U1 = 1.3, per s=2 avrò U1 = 1.69 etc etc finchè non si raggiunge 0% di censoring. L'accoppiamento sarebbe quindi (Xi, c^(s)*Ui).
-+ Per ogni step calcolo la % di censoring.
-+ Per ogni step calcolo Delta(s)= MLECD - media delle Xi, dove MLECD è il maximum likelihood estimator per dati censurati, che stima la media della popolazione X
-+ Ad ogni step ho quindi un valore di % censoring (p) e un valore di Delta associato.
-
 """
 
 import scipy.stats as ss
+from scipy.interpolate import interp1d
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -30,6 +24,18 @@ import pandas as pd
 from numpy.random import Generator, PCG64
 import time
 sns.set_theme()
+
+
+def interp_nn(resample_points, raw_x, raw_y):
+    resample_data = np.zeros_like(resample_points)
+
+    for r, res_point in enumerate(resample_points):
+        distances = np.abs(res_point-raw_x)
+        min_dist_index = np.where(distances == distances.min())[0]
+        for idx in min_dist_index:
+            resample_data[r] = raw_y[idx]
+
+    return resample_data
 
 
 def plot_survival(start_times, end_times, censoring = None, name = None):
@@ -79,9 +85,8 @@ mean = 4.94
 std = 6.52
 n_lines = 1000
 n_iterations = 10  # Number of iterations
-seed = 12345
-n_windows = 50  # number of windows used to censor the values
-resample_line = np.arange(0, 100.1, 0.1)  # Values used to resample the mean values
+n_windows = 500  # number of windows used to censor the values
+resample_line = np.arange(0, 100.1, 0.01)  # Values used to resample the mean values
 
 
 iter_mean_everything_interpolated_list = np.empty((n_iterations, len(resample_line)))
@@ -93,7 +98,7 @@ mu_l, std_l = lognorm_parameters(mean, std)
 
 sim_dict = {}
 for i in range(n_iterations):
-    print(f'iter: {i}', end='\r')
+    print(f'iter: {i}\n')
 
     percentage_censoring_list_raw = []
     percentage_censoring_list = []
@@ -125,21 +130,21 @@ for i in range(n_iterations):
     censoring_list = ss.uniform.rvs(0, minimum_end,
                                     size=n_lines)  # Values where we censor the data
 
+    censoring_list_mod = censoring_list.copy() # copy of the original values that will be multiplied
 
     min_censor = min(censoring_list)  # smallest censoring event
-    max_censor = max(censoring_list)  # smallest censoring event
-    # print(max(lengths/censoring_list))
-    #
-    # res = (maximum_end-min_censor)/n_windows  # quantity to remove
-    # print(res)
-    steps_list = []
-    step = 0
-    while True:
+    max_censor = max(censoring_list)
+    k = maximum_end/min_censor
+    value_range = np.geomspace(1, k, n_windows)
+
+    steps_list = np.arange(len(value_range))
+    for counter, molt_factor in enumerate(value_range):
+        # print(molt_factor)
+        censoring_list_mod = censoring_list * molt_factor
         # censoring_list[censoring_list <= 0] = ends[censoring_list <= 0]/10
-        steps_list.append(step)
-        indexes = np.where(dataset['ends'] >= censoring_list)
+        indexes = np.where(dataset['ends'] >= censoring_list_mod)
         dataset.loc[dataset.index[indexes], 'censored'] = 1  # Flag the values > than the censoring value
-        dataset.loc[dataset.index[indexes], 'modified'] = censoring_list[indexes]  # Set the flagged value equal to the censoring value
+        dataset.loc[dataset.index[indexes], 'modified'] = censoring_list_mod[indexes]  # Set the flagged value equal to the censoring value
 
         censored = dataset.loc[dataset['censored'] == 1, 'modified']  # Get censored values
         uncensored = dataset.loc[dataset['censored'] == 0, 'modified']  # Get uncensored values
@@ -150,7 +155,7 @@ for i in range(n_iterations):
 
         percentage_censored = 100*(n_censored/n_total)
         percentage_censoring_list_raw.append(percentage_censored)
-        # print(percentage_censored, end='\r')
+        print(f'{counter}/{len(value_range)}: {percentage_censored}', end='\r')
 
         # Fit everything
 
@@ -205,25 +210,22 @@ for i in range(n_iterations):
 
         dataset['modified'] = dataset['og']  # Reset the values
         dataset['censored'] = 0  # Reset the censoring flag
+        # if percentage_censored < 10:
+        #     break
 
-        if percentage_censored == 0:
-            break
-        else:
-            step += 1
-            censoring_list *= 1.3
-    interpolated_values_everything = np.interp(resample_line,
+    interpolated_values_everything = interp_nn(resample_line,
                                                percentage_censoring_list[::-1],
                                                mean_everything_list[::-1])
 
     iter_mean_everything_interpolated_list[i, :] = interpolated_values_everything
 
-    interpolated_values_nocensor = np.interp(resample_line,
+    interpolated_values_nocensor = interp_nn(resample_line,
                                              percentage_censoring_list[::-1],
                                              mean_nocensor_list[::-1])
 
     iter_mean_nocensor_interpolated_list[i, :] = interpolated_values_nocensor
 
-    interpolated_values_censoring = np.interp(resample_line,
+    interpolated_values_censoring = interp_nn(resample_line,
                                               percentage_censoring_list[::-1],
                                               mean_censor_list[::-1])
 
@@ -233,25 +235,26 @@ for i in range(n_iterations):
     # ax.plot(percentage_censoring_list, mean_nocensor_list, alpha=1/n_iterations, color='b')
     # plt.plot(percentage_censoring_list_raw, mean_censor_list_raw, 'go')
     # plt.plot(percentage_censoring_list, mean_censor_list, 'bo')
-    # plt.plot(resample_line, iter_mean_censor_interpolated_list[i], 'y-')
+    # plt.plot(resample_line, iter_mean_censor_interpolated_list[i], 'yx')
+    # plt.show()
     # print(percentage_censoring_list_raw)
-    plt.plot(steps_list, percentage_censoring_list_raw, 'k-o', markersize=2)
+    plt.plot(percentage_censoring_list_raw, 'k-o', markersize=2)
     plt.xlabel('Step (s)')
     plt.ylabel('% censored (p)')
-    plt.savefig(f'images/interp/step_p_{i}.png', dpi=200)
+    # plt.savefig(f'images/interp/step_p_{i}.png', dpi=200)
     # plt.show()
     plt.close()
-    plt.plot(steps_list, mean_censor_list_raw, 'k-o', markersize=2)
+    plt.plot(mean_censor_list_raw, 'k-o', markersize=2)
     plt.xlabel('Step (s)')
     plt.ylabel('Delta')
-    plt.savefig(f'images/interp/step_d_{i}.png', dpi=200)
+    # plt.savefig(f'images/interp/step_d_{i}.png', dpi=200)
     # plt.show()
     plt.close()
     plt.plot(percentage_censoring_list_raw, mean_censor_list_raw, 'go')
     plt.plot(percentage_censoring_list_raw, mean_censor_list_raw, 'b-')
     plt.xlabel('% censoring')
     plt.ylabel('Delta')
-    plt.savefig(f'images/interp/raw_{i}.png', dpi=200)
+    # plt.savefig(f'images/interp/raw_{i}.png', dpi=200)
     # plt.show()
     plt.close()
     plt.plot(percentage_censoring_list_raw, mean_censor_list_raw, 'go')
@@ -259,13 +262,10 @@ for i in range(n_iterations):
     plt.plot(resample_line, iter_mean_censor_interpolated_list[i], 'y-')
     plt.xlabel('% censoring')
     plt.ylabel('Delta')
-    plt.savefig(f'images/interp/interp_{i}.png', dpi=200)
+    # plt.savefig(f'images/interp/interp_{i}.png', dpi=200)
     # plt.show()
     plt.close()
-    # sim_dict[i] = {'length': len(mean_everything_list), 'percentage_list': np.array(percentage_censoring_list),
-    #                'mean_ev_list': np.array(mean_everything_list),
-    #                'mean_nocens_list': np.array(mean_nocensor_list),
-    #                'mean_cens_list': np.array(mean_censor_list)}
+    print('\n')
 
 
 mean_everything_curve = np.mean(iter_mean_everything_interpolated_list, axis=0)

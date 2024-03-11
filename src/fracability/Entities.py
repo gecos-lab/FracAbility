@@ -292,8 +292,8 @@ class Fractures(BaseEntity):
             overlaps = self.entity_df.overlaps(geom)
             if overlaps.any():
                 overlaps_list.append(self.entity_df.loc[line, 'original_line_id'])
-
-        print(f'Detected overlaps for set {self._set_n}: {overlaps_list}. Check geometries in gis and fix.')
+        if len(overlaps_list) > 0:
+            print(f'Detected overlaps for set {self._set_n}: {overlaps_list}. Check geometries in gis and fix.')
 
     # def simplify_lines(self, tolerance: float, max_points: int = None, preserve_topology: bool = True):
     #     """

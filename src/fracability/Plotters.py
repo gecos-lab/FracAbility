@@ -46,9 +46,9 @@ import pandas as pd
 import seaborn as sns
 from pyvista import Plotter
 import ternary
-from fracability.operations.Statistics import NetworkDistribution
+from fracability.operations.Statistics import NetworkDistribution, NetworkFitter
 import numpy as np
-
+from scipy.stats import uniform, ecdf
 
 def matplot_nodes(entity,
                   markersize=7,
@@ -697,6 +697,37 @@ def matplot_stats_summary(network_distribution: NetworkDistribution,
 
     if show_plot:
         plt.show()
+
+
+def matplot_stats_uniform(network_fit: NetworkFitter):
+    """
+    Confront the fitted data with the standard uniform 0,1.
+
+    :param network_fit:
+    :return:
+    """
+    sns.set_theme()
+
+    fitted_list = network_fit.get_fitted_distribution_names()
+
+    fig = plt.figure(num=f'Comparison plot', figsize=(13, 7))
+
+    x_values = np.linspace(0, 1, num=1000)
+    uniform_cdf = uniform.cdf(x_values)
+    plt.title('Comparison between CDFs')
+
+    plt.plot(x_values, uniform_cdf, 'k-', label='U(0, 1)')
+
+    for fit_name in fitted_list:
+        fitter = network_fit.get_fitted_distribution(fit_name)
+        cdf = fitter.cdf()
+        cdf_freq = ecdf(cdf).cdf
+        plt.plot(cdf_freq.quantiles, cdf_freq.probabilities, '--', label=fit_name)
+
+    plt.grid(True)
+    plt.legend()
+    plt.show()
+
 
 
 def matplot_ternary(entity,

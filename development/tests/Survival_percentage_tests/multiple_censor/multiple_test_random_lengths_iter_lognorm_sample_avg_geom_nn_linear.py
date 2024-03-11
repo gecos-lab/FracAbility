@@ -5,8 +5,10 @@ Test survival analysis feasibility for multiple censored events.
 1. Every event starts at the same point
 2. Every event has a randomly distributed length following a lognormal distribution
 3. Every event is censored at different values following a uniform distribution that shifts to the left (removing the same
-amount each iteration). We end the shift only when 100% censoring is reached. The step follows a linear succession
+amount each iteration). We end the shift only when 100% censoring is reached. The step follows a geometric succession
 
+
+After each iteration we interpolate the data using nn and normal linear interpolation to confront the two.
 We test the effects of the % censoring on the fitting of a known distribution by plotting the % of censored values
 with the sample average. We run n iterations and mean them to get an overall trend. This should provide a better plot
 that shows the effect of censoring because we exclude the effect of random sampling on the estimation of the real mean.
@@ -14,6 +16,7 @@ that shows the effect of censoring because we exclude the effect of random sampl
 """
 
 import scipy.stats as ss
+from scipy.interpolate import interp1d
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -21,6 +24,18 @@ import pandas as pd
 from numpy.random import Generator, PCG64
 import time
 sns.set_theme()
+
+
+def interp_nn(resample_points, raw_x, raw_y):
+    resample_data = np.zeros_like(resample_points)
+
+    for r, res_point in enumerate(resample_points):
+        distances = np.abs(res_point-raw_x)
+        min_dist_index = np.where(distances == distances.min())[0]
+        for idx in min_dist_index:
+            resample_data[r] = raw_y[idx]
+
+    return resample_data
 
 
 def plot_survival(start_times, end_times, censoring = None, name = None):
@@ -70,9 +85,8 @@ mean = 4.94
 std = 6.52
 n_lines = 1000
 n_iterations = 10  # Number of iterations
-seed = 12345
-n_windows = 1000  # number of windows used to censor the values
-resample_line = np.arange(0, 100.1, 0.1)  # Values used to resample the mean values
+n_windows = 500  # number of windows used to censor the values
+resample_line = np.arange(0, 100.1, 0.01)  # Values used to resample the mean values
 
 
 iter_mean_everything_interpolated_list = np.empty((n_iterations, len(resample_line)))
@@ -80,11 +94,16 @@ iter_mean_nocensor_interpolated_list = np.empty((n_iterations, len(resample_line
 iter_mean_censor_interpolated_list = np.empty((n_iterations, len(resample_line)))
 iter_percentage_censoring_list = np.empty((n_iterations, n_windows))
 
+iter_mean_everything_interpolated_list_nn = iter_mean_everything_interpolated_list.copy()
+iter_mean_nocensor_interpolated_list_nn = iter_mean_nocensor_interpolated_list.copy()
+iter_mean_censor_interpolated_list_nn = iter_mean_censor_interpolated_list.copy()
+
+
 mu_l, std_l = lognorm_parameters(mean, std)
 
 sim_dict = {}
 for i in range(n_iterations):
-    print(f'iter: {i}', end='\r')
+    print(f'iter: {i}\n')
 
     percentage_censoring_list_raw = []
     percentage_censoring_list = []
@@ -119,13 +138,10 @@ for i in range(n_iterations):
     censoring_list_mod = censoring_list.copy() # copy of the original values that will be multiplied
 
     min_censor = min(censoring_list)  # smallest censoring event
-    k = max(ends/censoring_list)
+    max_censor = max(censoring_list)
+    k = maximum_end/min_censor
+    value_range = np.geomspace(1, k, n_windows)
 
-    value_range = np.linspace(1, k, 1000)
-    # print(max(lengths/censoring_list))
-    #
-    # res = (maximum_end-min_censor)/n_windows  # quantity to remove
-    # print(res)
     steps_list = np.arange(len(value_range))
     for counter, molt_factor in enumerate(value_range):
         # print(molt_factor)
@@ -152,7 +168,6 @@ for i in range(n_iterations):
         fitted_all = distr(*params_all)
         everything_diff = fitted_all.mean()-sample_mean
         mean_everything_list_raw.append(everything_diff)
-
 
         # Fit only non censored
 
@@ -220,23 +235,42 @@ for i in range(n_iterations):
 
     iter_mean_censor_interpolated_list[i, :] = interpolated_values_censoring
 
+    interpolated_values_everything_nn = interp_nn(resample_line,
+                                                  percentage_censoring_list[::-1],
+                                                  mean_everything_list[::-1])
+
+    iter_mean_everything_interpolated_list_nn[i, :] = interpolated_values_everything_nn
+
+    interpolated_values_nocensor_nn = interp_nn(resample_line,
+                                                percentage_censoring_list[::-1],
+                                                mean_nocensor_list[::-1])
+
+    iter_mean_nocensor_interpolated_list_nn[i, :] = interpolated_values_nocensor_nn
+
+    interpolated_values_censoring_nn = interp_nn(resample_line,
+                                                 percentage_censoring_list[::-1],
+                                                 mean_censor_list[::-1])
+
+    iter_mean_censor_interpolated_list_nn[i, :] = interpolated_values_censoring_nn
+
     # ax.plot(percentage_censoring_list, mean_everything_list, alpha=1/n_iterations, color='r')
     # ax.plot(percentage_censoring_list, mean_nocensor_list, alpha=1/n_iterations, color='b')
     # plt.plot(percentage_censoring_list_raw, mean_censor_list_raw, 'go')
     # plt.plot(percentage_censoring_list, mean_censor_list, 'bo')
-    # plt.plot(resample_line, iter_mean_censor_interpolated_list[i], 'y-')
+    # plt.plot(resample_line, iter_mean_censor_interpolated_list[i], 'yx')
+    # plt.show()
     # print(percentage_censoring_list_raw)
     plt.plot(percentage_censoring_list_raw, 'k-o', markersize=2)
     plt.xlabel('Step (s)')
     plt.ylabel('% censored (p)')
     # plt.savefig(f'images/interp/step_p_{i}.png', dpi=200)
-    plt.show()
+    # plt.show()
     plt.close()
     plt.plot(mean_censor_list_raw, 'k-o', markersize=2)
     plt.xlabel('Step (s)')
     plt.ylabel('Delta')
     # plt.savefig(f'images/interp/step_d_{i}.png', dpi=200)
-    plt.show()
+    # plt.show()
     plt.close()
     plt.plot(percentage_censoring_list_raw, mean_censor_list_raw, 'go')
     plt.plot(percentage_censoring_list_raw, mean_censor_list_raw, 'b-')
@@ -253,19 +287,18 @@ for i in range(n_iterations):
     # plt.savefig(f'images/interp/interp_{i}.png', dpi=200)
     # plt.show()
     plt.close()
-    # sim_dict[i] = {'length': len(mean_everything_list), 'percentage_list': np.array(percentage_censoring_list),
-    #                'mean_ev_list': np.array(mean_everything_list),
-    #                'mean_nocens_list': np.array(mean_nocensor_list),
-    #                'mean_cens_list': np.array(mean_censor_list)}
+    print('\n')
 
 
 mean_everything_curve = np.mean(iter_mean_everything_interpolated_list, axis=0)
 mean_nocensor_curve = np.mean(iter_mean_nocensor_interpolated_list, axis=0)
 mean_censoring_curve = np.mean(iter_mean_censor_interpolated_list, axis=0)
+mean_censoring_curve_nn = np.mean(iter_mean_censor_interpolated_list_nn, axis=0)
 
 std_percent_everything = np.std(iter_mean_everything_interpolated_list, axis=0)  # std for each censoring % step
 std_percent_nocensor = np.std(iter_mean_nocensor_interpolated_list, axis=0)  # std for each censoring % step
 std_percent_censor = np.std(iter_mean_censor_interpolated_list, axis=0)  # std for each censoring % step
+std_percent_censor_nn = np.std(iter_mean_censor_interpolated_list_nn, axis=0)  # std for each censoring % step
 
 
 # print(mean_censoring_curve)
@@ -273,7 +306,7 @@ std_percent_censor = np.std(iter_mean_censor_interpolated_list, axis=0)  # std f
 # # print(test)
 # print(sim_dict[1]['percentage_list'])
 # print(sim_dict[1]['mean_cens_list'])
-fig, ax = plt.subplots()
+fig, (ax1, ax2) = plt.subplots(1, 2, sharey=True, sharex=True)
 #
 # ax.fill_between(resample_line, mean_everything_curve-std_percent_everything,
 #                 mean_everything_curve+std_percent_everything,
@@ -286,16 +319,30 @@ fig, ax = plt.subplots()
 #                 alpha=0.5, color='b')
 # ax.plot(resample_line, mean_nocensor_curve, color='b', label='Fit using only complete values')
 
-ax.fill_between(resample_line, mean_censoring_curve-(3*std_percent_censor),
+ax1.fill_between(resample_line, mean_censoring_curve-(3*std_percent_censor),
                 mean_censoring_curve+(3*std_percent_censor),
                 alpha=1, color='r', label='3 sigma')
-ax.fill_between(resample_line, mean_censoring_curve-(2*std_percent_censor),
+
+ax2.fill_between(resample_line, mean_censoring_curve_nn-(3*std_percent_censor_nn),
+                mean_censoring_curve_nn+(3*std_percent_censor_nn),
+                alpha=1, color='r', label='3 sigma')
+
+ax1.fill_between(resample_line, mean_censoring_curve-(2*std_percent_censor),
                 mean_censoring_curve+(2*std_percent_censor),
                 alpha=1, color='g', label='2 sigma')
-ax.fill_between(resample_line, mean_censoring_curve-std_percent_censor,
+ax2.fill_between(resample_line, mean_censoring_curve_nn-(2*std_percent_censor_nn),
+                mean_censoring_curve_nn+(2*std_percent_censor_nn),
+                alpha=1, color='g', label='2 sigma')
+
+ax1.fill_between(resample_line, mean_censoring_curve-std_percent_censor,
                 mean_censoring_curve+std_percent_censor,
                 alpha=1, color='y', label='1 sigma')
-ax.plot(resample_line, mean_censoring_curve, color='k', label='Fit using survival')
+ax2.fill_between(resample_line, mean_censoring_curve_nn-std_percent_censor_nn,
+                mean_censoring_curve_nn+std_percent_censor_nn,
+                alpha=1, color='y', label='1 sigma')
+
+ax1.plot(resample_line, mean_censoring_curve, color='k', label='Fit using survival nn')
+ax2.plot(resample_line, mean_censoring_curve_nn, color='k', label='Fit using survival linear')
 
 inspection_value = 8.9
 inspection_value_idx = np.where(resample_line == inspection_value)[0][0]  # % value to get the mean estimation value
@@ -304,47 +351,45 @@ print(f'value at {resample_line[inspection_value_idx]}% fitting everything: {mea
 print(f'value at {resample_line[inspection_value_idx]}% fitting only complete measurements: {mean_nocensor_curve[inspection_value_idx]}')
 print(f'value at {resample_line[inspection_value_idx]}% fitting everything with survival: {mean_censoring_curve[inspection_value_idx]}')
 
-# fig, ax = plt.subplots()
-#
-#
-# mean_of_means_everything = np.mean(iter_mean_everything_list, axis=0)
-# mean_of_means_nocensor = np.mean(iter_mean_nocensor_list, axis=0)
-# mean_of_means_censor = np.mean(iter_mean_censor_list, axis=0)
-# mean_of_percentage = np.mean(iter_percentage_censoring_list, axis=0)
-#
-# print(np.std(iter_mean_censor_list))
-#
-# # print(iter_percentage_censoring_list)
-# # print(mean_of_percentage)
-#
-#
-# for i in range(n_iterations):
-#     if i == 0:
-#         ax.plot(iter_percentage_censoring_list[i], iter_mean_everything_list[i], color='r', alpha=0.2, label='Fit all the data')
-#         ax.plot(iter_percentage_censoring_list[i], iter_mean_nocensor_list[i], color='b', alpha=0.2, label='Fit only complete data')
-#         ax.plot(iter_percentage_censoring_list[i], iter_mean_censor_list[i], color='g', alpha=0.2, label='Fit using survival')
-#     else:
-#         ax.plot(iter_percentage_censoring_list[i], iter_mean_everything_list[i], color='r', alpha=0.2)
-#         ax.plot(iter_percentage_censoring_list[i], iter_mean_nocensor_list[i], color='b', alpha=0.2)
-#         ax.plot(iter_percentage_censoring_list[i], iter_mean_censor_list[i], color='g', alpha=0.2)
-#
-#
-# # ax.plot(mean_of_percentage, mean_of_means_everything, color='r', label='Fit all the data')
-# # ax.plot(mean_of_percentage, mean_of_means_nocensor, color='b', label='Fit only complete data')
-# # ax.plot(mean_of_percentage, mean_of_means_censor, color='g', label='Fit using survival')
-#
-# # ax.hlines(y=mean, xmin=0, xmax=100,
-# #            colors='k', label='True mean')
-# # ax.fill_between(mean_of_percentage, mean-std, mean+std, alpha=0.2)
-#
-ax.set_xlabel('% censored')
-ax.set_ylabel('Estimated mean - Sample mean')
-ax.set_ylim([-(mean+std+3), mean+std+3])
-ax.legend()
-plt.suptitle('Survival analysis estimation performance')
-plt.title(f'{n_lines} data points drawn from lognormal ({mean}, {std}). {n_iterations} iterations')
-plt.savefig(f'images/{mean}_{std}.png', dpi=200)
+ax1.set_xlabel('% censored')
+ax1.set_ylabel('Estimated mean - Sample mean')
+ax1.set_ylim([-(mean+std+3), mean+std+3])
+ax1.set_title(f'{n_lines} data points drawn from lognormal ({mean}, {std}). {n_iterations} iterations. Linear interpolation')
+ax1.legend()
+ax2.legend()
+ax2.set_ylim([-(mean+std+3), mean+std+3])
+ax1.set_title(f'{n_lines} data points drawn from lognormal ({mean}, {std}). {n_iterations} iterations. NN interpolation')
+
+
+plt.suptitle('Survival analysis estimation performance comparison')
+# plt.savefig(f'images/{mean}_{std}.png', dpi=200)
 plt.show()
 
-# sns.histplot(mean_censoring_curve.flatten())
-# plt.show()
+fig, ax = plt.subplots()
+
+ax.fill_between(resample_line, mean_censoring_curve-(3*std_percent_censor),
+                mean_censoring_curve+(3*std_percent_censor),
+                alpha=1, color='r', label='3 sigma')
+
+ax.fill_between(resample_line, mean_censoring_curve_nn-(3*std_percent_censor_nn),
+                mean_censoring_curve_nn+(3*std_percent_censor_nn),
+                alpha=1, color='c', label='3 sigma')
+
+ax.fill_between(resample_line, mean_censoring_curve-(2*std_percent_censor),
+                mean_censoring_curve+(2*std_percent_censor),
+                alpha=1, color='g', label='2 sigma')
+ax.fill_between(resample_line, mean_censoring_curve_nn-(2*std_percent_censor_nn),
+                mean_censoring_curve_nn+(2*std_percent_censor_nn),
+                alpha=1, color='b', label='2 sigma')
+
+ax.fill_between(resample_line, mean_censoring_curve-std_percent_censor,
+                mean_censoring_curve+std_percent_censor,
+                alpha=1, color='y', label='1 sigma')
+ax.fill_between(resample_line, mean_censoring_curve_nn-std_percent_censor_nn,
+                mean_censoring_curve_nn+std_percent_censor_nn,
+                alpha=1, color='m', label='1 sigma')
+
+ax.plot(resample_line, mean_censoring_curve, 'k--', label='Fit using survival linear')
+ax.plot(resample_line, mean_censoring_curve_nn, 'k', label='Fit using survival nn')
+ax.set_ylim([-(mean+std+3), mean+std+3])
+plt.show()
