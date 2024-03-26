@@ -13,13 +13,25 @@ class NetworkData:
     It acts as a wrapper for the scipy CensoredData class
     """
 
-    def __init__(self, obj=None, use_censoring=True, include_censored=True):
+    def __init__(self, obj=None, use_survival=True, complete_only=True):
+        """
+
+        :param obj: fracture/fracture network object
+        :param use_survival: Use survival analysis to get the distribution. If false the whole dataset is used considering all fractures complete
+        :param complete_only: When not using survival, use only the complete length values
+        """
+
         self._obj = obj  # fracture/fracture network object
 
-        self._data: ss.CensoredData
+        self._data = None  # the data
         self._lengths: np.ndarray  # array of all the lengths (both complete and censored)
+        self._non_censored_lengths: np.ndarray  # array of only complete lengths
+        self._censored_lengths: np.ndarray  # array of only censored lengths
 
         self._function_list: list = ['pdf', 'cdf', 'sf', 'hf', 'chf']  # list of possible functions
+
+        self.use_survival = use_survival
+        self.complete_only = complete_only
 
         if obj is not None:
             if self._obj.name == 'FractureNetwork':
@@ -29,20 +41,20 @@ class NetworkData:
 
             entity_df = frac_obj.entity_df
 
-            self.lengths = entity_df.loc[entity_df['censored'] >= 0, 'length'].values
-            non_censored_lengths = entity_df.loc[entity_df['censored'] == 0, 'length'].values
-            censored_lengths = entity_df.loc[entity_df['censored'] == 1, 'length'].values
+            self._lengths = entity_df['length'].values  # the entity_df['censored'] >= 0 is to avoid problems with boundary lengths
+            self._non_censored_lengths = entity_df.loc[entity_df['censored'] == 0, 'length'].values
+            self._censored_lengths = entity_df.loc[entity_df['censored'] == 1, 'length'].values
 
-            if use_censoring:
-                if include_censored:
-                    self.data = ss.CensoredData(uncensored=non_censored_lengths, right=censored_lengths)
-                else:
-                    self.data = ss.CensoredData(uncensored=non_censored_lengths)
+            if self.use_survival:
+                self.data = ss.CensoredData(uncensored=self._non_censored_lengths, right=self._censored_lengths)
             else:
-                self.data = ss.CensoredData(uncensored=self.lengths)
+                if self.complete_only:
+                    self.data = self.non_censored_lengths
+                else:
+                    self.data = self.lengths
 
     @property
-    def data(self) -> ss.CensoredData:
+    def data(self):
         """
         Property that returns or sets the CensoredData class of the fracture network
         :return:
@@ -50,24 +62,20 @@ class NetworkData:
         return self._data
 
     @data.setter
-    def data(self, data: ss.CensoredData):
+    def data(self, data):
         self._data = data
 
     @property
     def lengths(self) -> np.ndarray:
 
         """
-        This property returns or sets the complete list of length data for the fracture network
+        This property returns or sets the complete list of length data (censored and uncesored) for the fracture network
 
         :getter: Return the complete list of lengths
         :setter: Set the complete list of lengths
         """
 
         return self._lengths
-
-    @lengths.setter
-    def lengths(self, length_list: np.ndarray = None):
-        self._lengths = length_list
 
     @property
     def non_censored_lengths(self) -> np.ndarray:
@@ -79,11 +87,7 @@ class NetworkData:
         :setter: Set the list of non-censored data
         """
 
-        return self.data.__dict__['_uncensored']
-
-    @non_censored_lengths.setter
-    def non_censored_lengths(self, complete_length_list: np.ndarray = None):
-        self.data = ss.CensoredData(uncensored=complete_length_list, right=self.censored_lengths)
+        return self._non_censored_lengths
 
     @property
     def censored_lengths(self) -> np.ndarray:
@@ -96,11 +100,7 @@ class NetworkData:
         :return:
         """
 
-        return self.data.__dict__['_right']
-
-    @censored_lengths.setter
-    def censored_lengths(self, censored_length_list: np.ndarray = None):
-        self.data = ss.CensoredData(uncensored=self.non_censored_lengths, right=censored_length_list)
+        return self._censored_lengths
 
     @property
     def function_list(self) -> list:
@@ -141,10 +141,10 @@ class NetworkData:
     @property
     def ecdf(self) -> ss._survival.EmpiricalDistributionFunction:
         """
-        Property that returns the empirical cdf of the data
+        Property that returns the empirical cdf of the data using Kaplan-Meier
         :return:
         """
-        return ss.ecdf(self.data).cdf
+        return ss.ecdf(ss.CensoredData(uncensored=self.non_censored_lengths, right=self.censored_lengths)).cdf
 
     @property
     def esf(self) -> ss._survival.EmpiricalDistributionFunction:
@@ -152,7 +152,7 @@ class NetworkData:
         Property that returns the empirical sf of the data
         :return:
         """
-        return ss.ecdf(self.data).sf
+        return ss.ecdf(ss.CensoredData(uncensored=self.non_censored_lengths, right=self.censored_lengths)).sf
 
     @property
     def total_n_fractures(self) -> int:
@@ -161,6 +161,7 @@ class NetworkData:
     @property
     def censoring_percentage(self) -> float:
         return (len(self.censored_lengths)/self.total_n_fractures)*100
+
 
 class NetworkDistribution:
     """
@@ -211,9 +212,10 @@ class NetworkDistribution:
         """
         if self.distribution_name == 'norm' or self.distribution_name == 'logistic':
 
-            return len(self.distribution.args)
+            return len(self.distribution_parameters)
         else:
             return len(self.distribution_parameters)-1
+
     @property
     def mean(self) -> float:
         """
@@ -277,8 +279,16 @@ class NetworkDistribution:
         the cumulative sum of the log pdf and log sf of the fitted distribution.
         :return:
         """
-        log_f = self.log_pdf(self.fit_data.non_censored_lengths)
-        log_r = self.log_sf(self.fit_data.censored_lengths)
+        if self.fit_data.use_survival:
+            log_f = self.log_pdf(self.fit_data.non_censored_lengths)
+            log_r = self.log_sf(self.fit_data.censored_lengths)
+        else:
+            if self.fit_data.complete_only:
+                sample = self.fit_data.non_censored_lengths
+            else:
+                sample = self.fit_data.lengths
+            log_f = self.log_pdf(sample)
+            log_r = np.array([0])
 
         LL_f = log_f.sum()
         LL_rc = log_r.sum()
@@ -296,7 +306,6 @@ class NetworkDistribution:
 
         k = self.n_distribution_parameters
         n = self.fit_data.total_n_fractures
-
 
         if (n - k - 1) == 0: # if n parameters + 1 = n of total fractures then the akaike is invalid i.e. the total fractures must be > than the n_parameters+1
             return -1
@@ -341,6 +350,7 @@ class NetworkDistribution:
         else:
             return self.distribution.cdf(self.fit_data.lengths)
 
+
 class NetworkFitter:
 
     """
@@ -351,7 +361,7 @@ class NetworkFitter:
         + Do not consider censored lengths at all
 
     """
-    def __init__(self, obj=None, use_censoring=True, include_censoring=True):
+    def __init__(self, obj=None, use_survival=True, complete_only=True):
 
         self._net_data: NetworkData
         self._accepted_fit: list = []
@@ -359,7 +369,7 @@ class NetworkFitter:
         self._fit_dataframe: DataFrame = DataFrame(columns=['name', 'AICc', 'BIC',
                                                             'log_likelihood', 'distribution', 'params'])
 
-        self.net_data = NetworkData(obj, use_censoring, include_censoring)
+        self.net_data = NetworkData(obj, use_survival, complete_only)
 
     @property
     def net_data(self) -> NetworkData:
@@ -390,18 +400,10 @@ class NetworkFitter:
 
         distribution = getattr(ss, distribution_name)
 
-        if self.net_data.censored_lengths.any():
-            if distribution_name == 'norm' or distribution_name == 'logistic':
-                params = distribution.fit(self.net_data.data)
-            else:
-                params = distribution.fit(self.net_data.data, floc=0)
-
+        if distribution_name == 'norm' or distribution_name == 'logistic':
+            params = distribution.fit(self.net_data.data)
         else:
-            # if there are no censored data, use the lengths
-            if distribution_name == 'norm' or distribution_name == 'logistic':
-                params = distribution.fit(self.net_data.lengths)
-            else:
-                params = distribution.fit(self.net_data.lengths, floc=0)
+            params = distribution.fit(self.net_data.data, floc=0)
 
         distribution = NetworkDistribution(distribution, params, self.net_data)
 

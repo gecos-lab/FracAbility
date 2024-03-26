@@ -1,5 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
+from numpy import exp
+from numpy import log as ln
 import scipy.stats as ss
 import pandas as pd
 
@@ -18,7 +20,7 @@ def p_cap(n, j_index, d_list):
     """
     product = 1  # initiate product as 1 (so that the first step p1 will be product=p1
 
-    for j in j_index: # for each index in the index list
+    for j in j_index:  # for each index in the index list
         d = d_list[j]
         real_j = j+1
         p = ((n-real_j)/(n-real_j+1))**d
@@ -36,7 +38,7 @@ def KM(z_values, Z, delta_list):
     :param delta_list: list of deltas (sorted as Z)
     :return:
     """
-    # Sort Z in case it is not sorted at input
+    # Sort Z in case it is not sorted at input (also delta_list needs to be sorted in the same order of Z)
     sorted_args = np.argsort(Z)
     Z_sort = Z[sorted_args]
     delta_list_sort = delta_list[sorted_args]
@@ -56,14 +58,7 @@ def KM(z_values, Z, delta_list):
     return G
 
 
-def ln(number):
-    """
-    Natural logarithm. Function created to make it more readable the formulas
-    """
-    return np.log(number)
-
-
-data = pd.read_csv('Fractures_test.csv', index_col=0)  # Read the data
+data = pd.read_csv('Fractures_set2_out.csv', index_col=0)  # Read the data
 
 data = data.sort_values(by='length')  # sort the data by length
 
@@ -75,30 +70,48 @@ tot_n = len(lengths)
 censored = data.loc[censored_value == 1, 'length']  # Extract only the censored values
 uncensored = data.loc[censored_value == 0, 'length']  # Extract only the complete values
 
+
 data_cens = ss.CensoredData(uncensored, right=censored)  # Create the scipy CensoredData instance
 
-# Reference uniform (0,1)
 
+names = ['lognorm', 'gengamma', 'gamma', 'weibull_min', 'expon', 'logistic', 'norm']  # list of names of scipy distribution to test
 
-names = ['lognorm', 'expon', 'norm']  # list of names of scipy distribution to test
-
-data_frame = pd.DataFrame(columns=['dist_name', 'KS test', 'KG test', 'AD test'])
+data_frame = pd.DataFrame(columns=['dist_name',
+                                   'AIC', 'delta_i', 'w_i', 'weight_ratios',
+                                   'KS', 'KG', 'AD',
+                                   'AIC rank', 'KS rank', 'KG rank', 'AD rank'], dtype=float)  # Create empty final dataframe
 
 
 for i, name in enumerate(names):  # for each scipy distribution do:
 
+    data_frame.loc[i, 'dist_name'] = name
+
     dist = getattr(ss, name)
-    if name == 'norm' or 'logistic':  # for normal and logistic floc controls mu
+    if name == 'norm' or 'logistic':  # for normal and logistic floc controls mu, so it must not be set to 0
         params = dist.fit(data_cens)
     else:
         params = dist.fit(data_cens, floc=0)
     fitted_dist = dist.freeze(*params)
 
+    # Akaike 1974
+
+    max_like = fitted_dist.logpdf(uncensored).sum()+fitted_dist.logsf(censored).sum()  # The maximum likelihood SHOULD be the sum of the total sum of logpdf(uncensored) and logsf(censored) of the fitted dist (that is estimated using MLE)
+    if name == 'norm' or name == 'logistic':
+        k = len(fitted_dist.args)
+    else:
+        k = len(fitted_dist.args) - 1 # because floc is fixed to 0, it is not considered in the maximum likelyhood and so the number of optimized arguments of the distribution are - 1
+
+    AIC = (-2*max_like)+(2*k)
+
+    data_frame.loc[i, 'AIC'] = AIC
+
+    # Kim 2019
+
     Z = fitted_dist.cdf(lengths)
     G_n = KM(Z, Z, delta)
-    plt.step(Z, G_n, label=f'G_n {name}',)
+    plt.step(Z, G_n, label=f'G_n {name}')  # plot the Kaplan-Meier curves with steps.
 
-    # Kolmogorov-Smirnov test
+    ## Kolmogorov-Smirnov test
 
     complete_list_index = np.where(delta == 1)[0]
 
@@ -121,9 +134,10 @@ for i, name in enumerate(names):  # for each scipy distribution do:
     DCn_neg = max(diff_minus_list)
 
     DCn = max(DCn_pos, DCn_neg)
-    # print(f'KS {name}: {DCn}')
 
-    # Koziol and Green test
+    data_frame.loc[i, 'KS'] = DCn
+
+    ## Koziol and Green test
 
     kg_sum = 0
 
@@ -137,9 +151,9 @@ for i, name in enumerate(names):  # for each scipy distribution do:
 
     psi_sq = (tot_n*kg_sum)+tot_n/3
 
-    # print(f'Psi^2 {name}: {psi_sq}')
+    data_frame.loc[i, 'KG'] = psi_sq
 
-    # Anderson-Darling test.
+    ## Anderson-Darling test.
 
     sum1 = 0  # First sum
     sum2 = 0  # Second sum
@@ -150,11 +164,37 @@ for i, name in enumerate(names):  # for each scipy distribution do:
 
     AC_sq = (tot_n * sum1) - (2 * tot_n * sum2) - (tot_n * ln(1 - Z[-1])) - (tot_n * ln(Z[-1])) - tot_n
 
-    # print(f'AC^2 {name}: {AC_sq}')
+    data_frame.loc[i, 'AD'] = AC_sq
 
-    data_frame.loc[i] = [name, DCn, psi_sq, AC_sq]
+data_frame = data_frame.sort_values(by='AIC', ignore_index=True)
 
+
+# calculate AIC delta values (see Burnham and Anderson 2004)
+
+for i, AIC_val in enumerate(data_frame['AIC']):
+    d_i = AIC_val - data_frame['AIC'][0]
+
+    data_frame.loc[i, 'delta_i'] = d_i
+
+# calculate Akaike weights (see Burnham and Anderson 2004)
+
+total = exp(-data_frame['delta_i']/2).sum()
+
+for d, delta_i in enumerate(data_frame['delta_i']):
+    w_i = np.round(exp(-delta_i/2)/total, 10)
+
+    data_frame.loc[d, 'w_i'] = w_i
+
+data_frame['weight_ratios'] = data_frame['w_i'][0]/data_frame['w_i']
+
+data_frame['AIC rank'] = ss.rankdata(data_frame['AIC'], nan_policy='omit')
+data_frame['KS rank'] = ss.rankdata(data_frame['KS'], nan_policy='omit')
+data_frame['KG rank'] = ss.rankdata(data_frame['KG'], nan_policy='omit')
+data_frame['AD rank'] = ss.rankdata(data_frame['AD'], nan_policy='omit')
 print(data_frame)
+data_frame.to_csv('analysis_output.csv')
+
+# Plot
 
 uniform_list = np.linspace(0, 1, 100)
 cdf_uniform = ss.uniform.cdf(uniform_list)
@@ -165,39 +205,11 @@ plt.legend()
 plt.show()
 
 
-
-
-
-# diff_pos = KM_z[complete_list_index]-ecdf_Z.probabilities[complete_list_index]
-#
-# DCn_pos = max(diff_pos)
-#
-# diff_neg = ecdf_Z.probabilities[complete_list_index]-KM_z[complete_list_index]
-#
-# DCn_neg = max(diff_neg)
-#
-# print(max(DCn_pos, DCn_neg))
-
-# sns.lineplot(x=lengths, y=Z, label='fitted CDF')
-# sns.lineplot(x=lengths, y=KM_l, label='KM CDF')
-# # sns.lineplot(x=ecdf_data.quantiles, y=ecdf_data.probabilities, label='ecdf length')
-# plt.plot(lengths,Z)
-# plt.plot(lengths, KM_l)
-# plt.xlabel('length [m]')
-# plt.ylabel('Density')
-#
-# plt.title('CDF comparison')
-# plt.legend()
-# plt.show()
-
-#
-# sns.lineplot(x=z_values, y=cdf_uniform, label='U(0,1) CDF')
-# sns.lineplot(x=Z, y=KM_z, label='KM CDF')
-# sns.lineplot(x=ecdf_Z.quantiles, y=ecdf_Z.probabilities, label='ecdf Z')
-# plt.title('Uniform comparison')
-# plt.legend()
-# plt.show()
-
-
-# print(KM([Z[0]], Z, delta))
+plt.axis('off')
+plt.table(cellText=data_frame.values[:, 8:],
+          rowLabels=data_frame['dist_name'],
+          colLabels=data_frame.columns[8:],
+          loc='center'
+)
+plt.show()
 

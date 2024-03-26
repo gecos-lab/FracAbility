@@ -4,40 +4,31 @@ import scipy.stats as ss
 import pandas as pd
 import seaborn as sns
 
-l = 1
-x = np.linspace(0,1, num=100000)
-number_of_samples = 5000
-samples = np.random.exponential(l, number_of_samples)
+
+x = np.linspace(0, 1, num=1000)
+number_of_samples = 10000
+samples = np.random.standard_normal(number_of_samples)
 samples.sort()
 
+sns.histplot(samples)
+plt.title('Frequency of 1000 random samples drawn from a standard normal distribution')
+plt.show()
 
-Z = 1-np.exp(-l*samples)
-Z.sort()
-z_list = np.linspace(0, 1, num=1000)
+dist1 = ss.norm.freeze(*ss.norm.fit(samples))
+dist2 = ss.expon.freeze(*ss.expon.fit(samples))
 
-G = np.zeros_like(Z)
+cdf_1 = dist1.cdf(samples)
+cdf_2 = dist2.cdf(samples)
+ecdf1 = ss.ecdf(cdf_1).cdf
+ecdf2 = ss.ecdf(cdf_2).cdf
 
-for i, z in enumerate(Z):
-    if z < Z[0]:
-        G[i] = 0
-    elif z > Z[-1]:
-        G[i] = 1
-    else:
-        list_products = np.array([])
-        j_index = np.where(Z <= z)[0]
-        for j in j_index:
-            term = ((number_of_samples-j)/(number_of_samples-j+1))
-            list_products = np.append(list_products, term)
-        G[i] = 1-np.prod(list_products)
-
-
-
-# print(G)
-
-ecdf = ss.ecdf(Z).cdf
-ecdfG = ss.ecdf(G).cdf
-plt.plot(ecdf.quantiles, ecdf.probabilities,label='ecdf')
-plt.plot(z_list, ss.uniform.cdf(z_list), label='uniform')
-plt.plot(z_list, G, label='KM')
+sns.histplot(cdf_1, label='Normal fit')
+sns.histplot(cdf_2, label='Exponential fit')
+plt.title('Frequency histogram of the CDF for the fitted distributions ')
 plt.legend()
+plt.show()
+
+sns.lineplot(x=ecdf1.quantiles, y=ecdf1.probabilities, label='Normal fit')
+sns.lineplot(x=ecdf2.quantiles, y=ecdf2.probabilities, label='Exponential fit')
+plt.title('Empirical cumulative of the CDF for the fitted distributions ')
 plt.show()

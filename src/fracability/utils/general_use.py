@@ -45,3 +45,49 @@ def centers_to_lines(center_coords, lengths, frac_dir, assign_id=True) -> pv.Pol
     return lines
 
 
+def KM(z_values, Z, delta_list):
+
+    """
+    Calculate the Kaplan-Meier curve given an input z, data Z and list of deltas.
+    :param z_values: Input
+    :param Z: Data (sorted)
+    :param delta_list: list of deltas (sorted as Z)
+    :return:
+    """
+
+    def p_cap(n, j_index, d_list):
+        """
+        Calculate the ^p estimator (formula 2.6)
+        :param n: total number
+        :param j_index: index list
+        :param d_list: delta list
+        :return:
+        """
+        product = 1  # initiate product as 1 (so that the first step p1 will be product=p1
+
+        for j in j_index:  # for each index in the index list
+            d = d_list[j]
+            real_j = j + 1
+            p = ((n - real_j) / (n - real_j + 1)) ** d
+            product *= p
+
+        return 1 - product
+
+    # Sort Z in case it is not sorted at input (also delta_list needs to be sorted in the same order of Z)
+    sorted_args = np.argsort(Z)
+    Z_sort = Z[sorted_args]
+    delta_list_sort = delta_list[sorted_args]
+
+    G = np.ones_like(z_values)
+    n = len(Z)
+
+    for i, z in enumerate(z_values):
+        if z < Z_sort[0]:
+            G[i] = 0
+        elif z <= Z_sort[-1]:
+            j_index = np.where(Z_sort <= z)[0]  # Get the index in which the data Z is lower than z
+            G[i] = p_cap(n, j_index, delta_list_sort)  # Calculate the p_cap
+        elif z > Z_sort[-1]:
+            G[i] = 1
+
+    return G
