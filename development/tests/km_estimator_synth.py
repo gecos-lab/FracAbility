@@ -6,16 +6,21 @@ import seaborn as sns
 
 
 x = np.linspace(0, 1, num=1000)
-number_of_samples = 10000
+number_of_samples = 1000
 samples = np.random.standard_normal(number_of_samples)
 samples.sort()
 
 sns.histplot(samples)
-plt.title('Frequency of 1000 random samples drawn from a standard normal distribution')
+plt.title(f'Frequency of {number_of_samples} random samples drawn from a standard normal distribution')
 plt.show()
 
 dist1 = ss.norm.freeze(*ss.norm.fit(samples))
 dist2 = ss.expon.freeze(*ss.expon.fit(samples))
+
+sns.lineplot(x=samples, y=dist1.pdf(samples))
+plt.show()
+sns.lineplot(x=samples, y=dist2.pdf(samples))
+plt.show()
 
 cdf_1 = dist1.cdf(samples)
 cdf_2 = dist2.cdf(samples)

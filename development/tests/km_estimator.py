@@ -4,6 +4,7 @@ from numpy import exp
 from numpy import log as ln
 import scipy.stats as ss
 import pandas as pd
+import seaborn as sns
 
 import sys
 import numpy
@@ -58,13 +59,23 @@ def KM(z_values, Z, delta_list):
     return G
 
 
-data = pd.read_csv('Fractures_set2_out.csv', index_col=0)  # Read the data
+data = pd.read_csv('Fractures_Spacing_pontrelli.csv', index_col=0)  # Read the data
 
 data = data.sort_values(by='length')  # sort the data by length
 
 lengths = data['length'].values  # Length value
+
+lengths = lengths[lengths != np.nan]
+
+print(lengths)
+sns.histplot(lengths)
+plt.xlabel('Length [m]')
+plt.show()
 censored_value = data['censored'].values  # Censoring values: 0 is complete, 1 is censored
 delta = 1-censored_value  # In the formulas delta = 1 means complete while 0 means censored.
+print(delta)
+
+
 tot_n = len(lengths)
 
 censored = data.loc[censored_value == 1, 'length']  # Extract only the censored values
@@ -73,8 +84,7 @@ uncensored = data.loc[censored_value == 0, 'length']  # Extract only the complet
 
 data_cens = ss.CensoredData(uncensored, right=censored)  # Create the scipy CensoredData instance
 
-
-names = ['lognorm', 'gengamma', 'gamma', 'weibull_min', 'expon', 'logistic', 'norm']  # list of names of scipy distribution to test
+names = ['lognorm', 'gengamma', 'expon', 'weibull_min', 'gamma', 'logistic', 'norm']  # list of names of scipy distribution to test
 
 data_frame = pd.DataFrame(columns=['dist_name',
                                    'AIC', 'delta_i', 'w_i', 'weight_ratios',

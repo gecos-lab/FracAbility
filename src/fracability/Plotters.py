@@ -46,6 +46,8 @@ import pandas as pd
 import seaborn as sns
 from pyvista import Plotter
 import ternary
+from vtkmodules.vtkFiltersCore import vtkConnectivityFilter
+
 from fracability.operations.Statistics import NetworkDistribution, NetworkFitter
 import numpy as np
 from scipy.stats import uniform, ecdf
@@ -385,7 +387,7 @@ def vtkplot_frac_net(entity,
                      return_plot=False,
                      show_plot=True):
     """
-    Plot a fracability FractureNetwork entity using matplotlib.
+    Plot a fracability FractureNetwork entity using Pyvista.
 
     :param entity: FractureNetwork entity to plot
     :param markersize: Size of the nodes
@@ -430,6 +432,65 @@ def vtkplot_frac_net(entity,
             plotter.reset_camera()
             plotter.show()
 
+
+def vtkplot_backbone(entity,
+                     linewidth=[2, 2],
+                     color=['white', 'white'],
+                     color_set=False,
+                     return_plot=False,
+                     show_plot=True):
+    """
+    Plot a fracability FractureNetwork backbone entity using pyvista.
+
+    :param entity: FractureNetwork entity to plot
+    :param markersize: Size of the nodes
+    :param linewidth: Size of the lines as a list of ints. The first value of the list will be the width of the fractures
+    while the second the width of the boundary.
+    :param color: General color of the lines as list of strings. The first value of the list will be the width of the fractures
+    while the second the width of the boundary.
+    :param color_set: Bool. If true the lines are based on the set values.
+    :param return_plot: Bool. If true the plot is returned. By default, False
+    :param show_plot: Bool. If true the plot is shown. By default, True
+    :return: If return_plot is true a matplotlib axis is returned
+
+    """
+    plotter = Plotter()
+    plotter.background_color = 'gray'
+    plotter.view_xy()
+    plotter.add_camera_orientation_widget()
+    plotter.enable_image_style()
+
+    fractures = entity.fractures
+    boundaries = entity.boundaries
+
+    connectivity = vtkConnectivityFilter()
+
+    connectivity.AddInputData(fractures.vtk_object)
+    connectivity.SetExtractionModeToLargestRegion()
+
+    connectivity.Update()
+
+    backbone = connectivity.GetOutput()
+
+    if fractures is not None:
+        fractures_actor = vtkplot_fractures(fractures, linewidth=linewidth[0],
+                                            color=color[0], color_set=color_set, return_plot=True)
+        plotter.add_actor(fractures_actor)
+
+    if backbone is not None:
+        plotter.add_mesh(backbone, color='yellow')
+
+    if boundaries is not None:
+        boundary_actor = vtkplot_boundaries(boundaries, linewidth=linewidth[1], color=color[1], return_plot=True)
+        plotter.add_actor(boundary_actor)
+
+    if return_plot:
+        actors = plotter.actors
+        return actors
+    else:
+        if show_plot:
+            plotter.reset_camera()
+            plotter.show()
 
 def matplot_stats_pdf(network_distribution: NetworkDistribution,
                       histogram: bool = True,

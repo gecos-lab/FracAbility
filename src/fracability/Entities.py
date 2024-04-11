@@ -11,8 +11,10 @@ from geopandas import GeoDataFrame, GeoSeries, read_file
 import pandas as pd
 from pandas import DataFrame
 from shapely.geometry import MultiLineString, Polygon, LineString, Point, MultiPoint
-from pyvista import PolyData, DataSet
+from pyvista import PolyData, DataSet, wrap
 from networkx import Graph
+from vtkmodules.vtkFiltersCore import vtkConnectivityFilter
+
 import fracability.Plotters as plts
 
 import fracability.Adapters as Rep
@@ -198,6 +200,7 @@ class Fractures(BaseEntity):
         """
 
         self._set_n = set_n
+        self._df = GeoDataFrame()
         if gdf is not None:
             super().__init__(gdf=gdf)
         elif csv is not None:
@@ -258,7 +261,6 @@ class Fractures(BaseEntity):
                 region = obj.extract_points(obj['RegionId'] == region_id)
                 self.entity_df.loc[self.entity_df['id'] == region, 'geometry'] = LineString(region.points)
         else:
-
             idx = list(set(obj['RegionId']))
             geometry = []
             for region_id in idx:
@@ -289,6 +291,8 @@ class Fractures(BaseEntity):
         overlaps_list = []
 
         for line, geom in enumerate(self.entity_df.geometry):
+            if geom is None:
+                print(f"Warning, empty geometry at line {line+1}, fix in GIS")
             overlaps = self.entity_df.overlaps(geom)
             if overlaps.any():
                 overlaps_list.append(self.entity_df.loc[line, 'original_line_id'])
@@ -1109,8 +1113,6 @@ class FractureNetwork(BaseEntity):
         else:
             print(overlaps_list_dict)
 
-
-
     def clean_network(self, buffer = 0.05, inplace=True):
         """Tidy the intersection of the active entities in the fracture network. A buffer is applied to all the
         geometries to ensure intersection in a given radius.
@@ -1139,6 +1141,28 @@ class FractureNetwork(BaseEntity):
         node_dict = Topology.nodes_conn(self)
         self.add_nodes_from_dict(node_dict)
 
+    def calculate_backbone(self,biggest_region=True):
+        """
+        Calculate the backbone(s) of the network and add the calculated nodes to the network.
+
+        :param biggest_region: Output only most connected region. Default is True
+        """
+
+        fractures = self.fractures
+
+        connectivity = vtkConnectivityFilter()
+
+        connectivity.AddInputData(fractures.vtk_object)
+        if biggest_region:
+            connectivity.SetExtractionModeToLargestRegion()
+
+        connectivity.Update()
+
+        backbone = connectivity.GetOutput()
+
+        return PolyData(backbone)
+
+
     @property
     def fraction_censored(self) -> float:
         """Get the fraction of censored fractures in the network """
@@ -1163,6 +1187,18 @@ class FractureNetwork(BaseEntity):
         """
 
         plts.vtkplot_frac_net(self, markersize, linewidth, color, color_set, return_plot)
+
+    def backbone_plot(self,
+                      linewidth=[2, 2],
+                      color='yellow',
+                      return_plot=False):
+        """
+        Method used to plot the fracture network using vtk
+        :return:
+        """
+
+        plts.vtkplot_backbone(self, return_plot=return_plot)
+
 
     def mat_plot(self,
                 markersize=5,

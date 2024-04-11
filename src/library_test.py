@@ -6,27 +6,31 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy.stats as ss
+
+# IVAN
+# fracture_set1 = Entities.Fractures(shp='/home/gabriele/STORAGE/projects/Ivan/Fracture_interpretation/Fracture_network_H_fixed.shp', set_n=1)
+# fracture_set2 = Entities.Fractures(shp='/home/gabriele/STORAGE/projects/Ivan/Fracture_interpretation/Fracture_network_fixed.shp', set_n=2)
+# boundary = Entities.Boundary(shp='/home/gabriele/STORAGE/projects/Ivan/Fracture_interpretation/Interpretation_boundary.shp', group_n=1)
+
+
 # fracture_set1 = Entities.Fractures(shp='/home/gabriele/STORAGE/projects/Ivan/Fracture_interpretation_BR_03B/Fracture_network_1.shp', set_n=1)
-#
 # fracture_set2 = Entities.Fractures(shp='/home/gabriele/STORAGE/projects/Ivan/Fracture_interpretation_BR_03B/Fracture_network_2_4.shp', set_n=2)
-#
 # fracture_set3 = Entities.Fractures(shp='/home/gabriele/STORAGE/projects/Ivan/Fracture_interpretation_BRdotto_03B/Fracture_network_3.shp', set_n=3)
-#
-#
 # boundary = Entities.Boundary(shp='/home/gabriele/STORAGE/projects/Ivan/Fracture_interpretation_BR_03B/Interpretation_boundary.shp', group_n=1)
 
 
-# fracture_set1 = Entities.Fractures(shp='/home/gabriele/STORAGE/projects/FracAbility/src/fracability/datasets/cava_pontrelli/FN_set_1.shp', set_n=1)
+# Pontrelli
+
+# fracture_set1 = Entities.Fractures(shp='/home/gabriele/STORAGE/projects/FracAbility/src/fracability/datasets/cava_pontrelli/Set_a.shp', set_n=1)
+# fracture_set2 = Entities.Fractures(shp='/home/gabriele/STORAGE/projects/FracAbility/src/fracability/datasets/cava_pontrelli/Set_b.shp', set_n=2)
+# fracture_set3 = Entities.Fractures(shp='/home/gabriele/STORAGE/projects/FracAbility/src/fracability/datasets/cava_pontrelli/Set_c.shp', set_n=3)
 # boundary = Entities.Boundary(shp='/home/gabriele/STORAGE/projects/FracAbility/src/fracability/datasets/cava_pontrelli/Interpretation-boundary.shp', group_n=1)
 
 
+# Salza
 fracture_set1 = Entities.Fractures(shp='/home/gabriele/STORAGE/projects/FracAbility/src/fracability/datasets/laghetto_salza/Set_1.shp', set_n=1)
 fracture_set2 = Entities.Fractures(shp='/home/gabriele/STORAGE/projects/FracAbility/src/fracability/datasets/laghetto_salza/Set_2.shp', set_n=2)
 boundary = Entities.Boundary(shp='/home/gabriele/STORAGE/projects/FracAbility/src/fracability/datasets/laghetto_salza/Interpretation_boundary.shp', group_n=1)
-
-# fracture_set1 = Entities.Fractures(csv='Fractures_gozo_result.csv')
-# boundary = Entities.Boundary(csv='Boundary_gozo_result.csv')
-# nodes = Entities.Nodes(csv='Nodes_gozo_result.csv')
 
 
 fracture_net = Entities.FractureNetwork()
@@ -37,15 +41,17 @@ fracture_net.add_fractures(fracture_set2)
 
 fracture_net.add_boundaries(boundary)
 
-# fracture_net.check_network()
-
-#
-#
-# fracture_net.deactivate_fractures([1])
 fracture_net.calculate_topology()
+backbone = fracture_net.calculate_backbone()
 
-# fracture_net.vtk_plot()
-fracture_net.fractures.save_csv('all_fracture_out.csv')
+# fracture_net.save_shp('Salza.shp')
+
+
+
+# fracture_net.vtk_plot(markersize=6)
+# fracture_net.backbone_plot()
+
+# fracture_net.fractures.save_csv('all_fracture_out.csv')
 # fracture_net.vtk_plot()
 # fracture_net.ternary_plot()
 # # print(fracture_net.fracture_network_to_components_df())
@@ -55,16 +61,23 @@ fracture_net.fractures.save_csv('all_fracture_out.csv')
 # # fracture_net.nodes.save_csv('gozo_result.csv')
 
 #
-fitter = Statistics.NetworkFitter(fracture_net, use_survival=True, complete_only=True)
-# #
-fitter.fit('lognorm')
+# fitter_remove = Statistics.NetworkFitter(fracture_net, use_survival=False, complete_only=True)
+# fitter_all = Statistics.NetworkFitter(fracture_net, use_survival=False, complete_only=False)
+# fitter_surv = Statistics.NetworkFitter(fracture_net)
+
+#
+# fitter_remove.fit('lognorm')
+# fitter_all.fit('lognorm')
+# fitter_surv.fit('lognorm')
+
+# Plotters.matplot_stats_pdf(fitter.get_fitted_distribution('lognorm'))
 # fitter.fit('expon')
 # fitter.fit('norm')
 # fitter.fit('gamma')
 # fitter.fit('gengamma')
 # fitter.fit('logistic')
 # fitter.fit('weibull_min')
-Plotters.matplot_stats_summary(fitter.get_fitted_distribution('lognorm'))
+# Plotters.matplot_stats_summary(fitter_surv.get_fitted_distribution('lognorm'))
 
 # Plotters.matplot_stats_uniform(fitter)
 # Plotters.matplot_stats_summary(fitter.get_fitted_distribution('norm'))
@@ -77,7 +90,6 @@ Plotters.matplot_stats_summary(fitter.get_fitted_distribution('lognorm'))
 # # fitter.fit('burr')
 # # Plotters.matplot_stats_summary(fitter.get_fitted_distribution('burr'))
 # # # print(fitter.get_fitted_parameters('burr12'))
-#
-print(fitter.fit_records)
+
 
 

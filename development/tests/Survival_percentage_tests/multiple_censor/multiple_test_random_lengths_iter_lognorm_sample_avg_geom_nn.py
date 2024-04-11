@@ -82,7 +82,7 @@ def lognorm_parameters(target_mean, target_std):
 
 distr = ss.lognorm
 mean = 4.94
-std = 6.52
+std = 6.53
 n_lines = 1000
 n_iterations = 10  # Number of iterations
 n_windows = 500  # number of windows used to censor the values
@@ -282,6 +282,21 @@ std_percent_censor = np.std(iter_mean_censor_interpolated_list, axis=0)  # std f
 # # print(test)
 # print(sim_dict[1]['percentage_list'])
 # print(sim_dict[1]['mean_cens_list'])
+
+fig, ax = plt.subplots()
+
+ax.plot(resample_line, mean_everything_curve, color='r', label='Fit using everything')
+ax.plot(resample_line, mean_nocensor_curve, color='b', label='Fit using only complete values')
+ax.plot(resample_line, mean_censoring_curve, color='k', label='Fit using survival')
+ax.set_xlabel('% censored')
+ax.set_ylabel('Estimated mean - Sample mean')
+ax.set_ylim([-(mean+std+3), mean+std+3])
+ax.legend()
+plt.suptitle('Survival analysis estimation performance')
+plt.title(f'{n_lines} data points drawn from lognormal ({mean}, {std}). {n_iterations} iterations')
+# plt.savefig(f'images/{mean}_{std}.png', dpi=200)
+plt.show()
+
 fig, ax = plt.subplots()
 #
 # ax.fill_between(resample_line, mean_everything_curve-std_percent_everything,
@@ -306,12 +321,15 @@ ax.fill_between(resample_line, mean_censoring_curve-std_percent_censor,
                 alpha=1, color='y', label='1 sigma')
 ax.plot(resample_line, mean_censoring_curve, color='k', label='Fit using survival')
 
-inspection_value = 8.9
+inspection_value = 10.1
 inspection_value_idx = np.where(resample_line == inspection_value)[0][0]  # % value to get the mean estimation value
 
-print(f'value at {resample_line[inspection_value_idx]}% fitting everything: {mean_everything_curve[inspection_value_idx]}')
-print(f'value at {resample_line[inspection_value_idx]}% fitting only complete measurements: {mean_nocensor_curve[inspection_value_idx]}')
-print(f'value at {resample_line[inspection_value_idx]}% fitting everything with survival: {mean_censoring_curve[inspection_value_idx]}')
+print(f'value at {resample_line[inspection_value_idx]}% '
+      f'fitting everything: {mean_everything_curve[inspection_value_idx]} ± {std_percent_everything[inspection_value_idx]}')
+print(f'value at {resample_line[inspection_value_idx]}% '
+      f'fitting only complete measurements: {mean_nocensor_curve[inspection_value_idx]} ± {std_percent_nocensor[inspection_value_idx]}')
+print(f'value at {resample_line[inspection_value_idx]}%'
+      f'fitting everything with survival: {mean_censoring_curve[inspection_value_idx]} ± {std_percent_censor[inspection_value_idx]}')
 
 # fig, ax = plt.subplots()
 #
@@ -352,7 +370,7 @@ ax.set_ylim([-(mean+std+3), mean+std+3])
 ax.legend()
 plt.suptitle('Survival analysis estimation performance')
 plt.title(f'{n_lines} data points drawn from lognormal ({mean}, {std}). {n_iterations} iterations')
-plt.savefig(f'images/{mean}_{std}.png', dpi=200)
+# plt.savefig(f'images/{mean}_{std}.png', dpi=200)
 plt.show()
 
 # sns.histplot(mean_censoring_curve.flatten())
