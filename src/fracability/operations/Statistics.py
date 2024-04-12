@@ -1,10 +1,13 @@
 import numpy as np
 
+from numpy import exp
 import pandas as pd
 from pandas import DataFrame
 import scipy.stats as ss
 from scipy.optimize import minimize
 import ast
+
+from fracability.utils.general_use import KM
 
 
 class NetworkData:
@@ -40,8 +43,10 @@ class NetworkData:
                 frac_obj = self._obj
 
             entity_df = frac_obj.entity_df
+            entity_df = entity_df.sort_values(by='length')
 
-            self._lengths = entity_df['length'].values  # the entity_df['censored'] >= 0 is to avoid problems with boundary lengths
+            self.delta = 1-entity_df['censored'].values
+            self._lengths = entity_df['length'].values
             self._non_censored_lengths = entity_df.loc[entity_df['censored'] == 0, 'length'].values
             self._censored_lengths = entity_df.loc[entity_df['censored'] == 1, 'length'].values
 
@@ -139,20 +144,20 @@ class NetworkData:
         return np.percentile(self.lengths, 95)
 
     @property
-    def ecdf(self) -> ss._survival.EmpiricalDistributionFunction:
+    def ecdf(self) -> np.ndarray:
         """
         Property that returns the empirical cdf of the data using Kaplan-Meier
         :return:
         """
-        return ss.ecdf(ss.CensoredData(uncensored=self.non_censored_lengths, right=self.censored_lengths)).cdf
+        return KM(self.lengths, self.lengths, self.delta)
 
     @property
-    def esf(self) -> ss._survival.EmpiricalDistributionFunction:
+    def esf(self) -> np.ndarray:
         """
         Property that returns the empirical sf of the data
         :return:
         """
-        return ss.ecdf(ss.CensoredData(uncensored=self.non_censored_lengths, right=self.censored_lengths)).sf
+        return 1-self.ecdf
 
     @property
     def total_n_fractures(self) -> int:
@@ -273,7 +278,7 @@ class NetworkDistribution:
         return self.distribution.ppf(0.95)
 
     @property
-    def log_likelihood(self) -> float:
+    def max_log_likelihood(self) -> float:
         """
         Property that returns the log likelihood of the distribution. The likelihood is calculated by adding
         the cumulative sum of the log pdf and log sf of the fitted distribution.
@@ -281,6 +286,7 @@ class NetworkDistribution:
         """
         if self.fit_data.use_survival:
             log_f = self.log_pdf(self.fit_data.non_censored_lengths)
+            print(len(self.fit_data.non_censored_lengths))
             log_r = self.log_sf(self.fit_data.censored_lengths)
         else:
             if self.fit_data.complete_only:
@@ -295,6 +301,21 @@ class NetworkDistribution:
 
         return LL_f + LL_rc
 
+
+    @property
+    def AIC(self) -> float:
+        """
+        Property that returns the classic Akaike Information Criterion (1974) of the distribution
+        :return:
+        """
+        max_log_likelihood = self.max_log_likelihood
+
+        k = self.n_distribution_parameters
+
+        AIC = (-2 * max_log_likelihood) + (2 * k)
+
+        return AIC
+
     @property
     def AICc(self) -> float:
         """
@@ -302,7 +323,7 @@ class NetworkDistribution:
         :return:
         """
 
-        LL2 = -2 * self.log_likelihood
+        LL2 = -2 * self.max_log_likelihood
 
         k = self.n_distribution_parameters
         n = self.fit_data.total_n_fractures
@@ -319,7 +340,7 @@ class NetworkDistribution:
         Property that returns the Bayesian Information Criterion of the distribution
         :return:
         """
-        LL2 = -2 * self.log_likelihood
+        LL2 = -2 * self.max_log_likelihood
 
         k = len(self.distribution_parameters)
         n = len(self.fit_data.non_censored_lengths) + len(self.fit_data.censored_lengths)
@@ -329,7 +350,7 @@ class NetworkDistribution:
 
     def log_pdf(self, x_values: np.array = None) -> np.array:
         """
-        Property that returns the log of the pdf of the distribution
+        Property that returns the logpdf calculated on the data
         :return:
         """
 
@@ -338,7 +359,11 @@ class NetworkDistribution:
         else:
             return np.array([0])
 
-    def log_sf(self, x_values: np.array = None):
+    def log_sf(self, x_values: np.array = None) -> np.array:
+        """
+        Property that returns the logsf calculated on the data
+        :return:
+        """
         if x_values.any():
             return self.distribution.logsf(x_values)
         else:
@@ -361,13 +386,22 @@ class NetworkFitter:
         + Do not consider censored lengths at all
 
     """
-    def __init__(self, obj=None, use_survival=True, complete_only=True):
+    def __init__(self, obj=None, use_survival=True, complete_only=True, use_AIC=True):
+        """
+
+        :param obj: fracture/fracture network object
+        :param use_survival: Bool flag to set to use survival analysis approach or not. Default is True
+        :param complete_only: Bool flag to set to use only complete values. Default is False
+        :param use_AIC: Bool flag to set to use AIC or AICc. If True use AIC if False AICc. Default is True. The
+        column name in the dataframe will remain the same (Akaike).
+        """
 
         self._net_data: NetworkData
         self._accepted_fit: list = []
         self._rejected_fit: list = []
-        self._fit_dataframe: DataFrame = DataFrame(columns=['name', 'AICc', 'BIC',
-                                                            'log_likelihood', 'distribution', 'params'])
+        self._AIC_flag: bool = use_AIC
+        self._fit_dataframe: DataFrame = DataFrame(columns=['name', 'Akaike', 'delta_i', 'w_i',
+                                                            'max_log_likelihood', 'distribution', 'params'])
 
         self.net_data = NetworkData(obj, use_survival, complete_only)
 
@@ -384,7 +418,7 @@ class NetworkFitter:
 
         """ Return the sorted fit dataframe"""
 
-        return self._fit_dataframe.sort_values(by='AICc', ignore_index=True)
+        return self._fit_dataframe.sort_values(by='Akaike', ignore_index=True)
 
     @net_data.setter
     def net_data(self, data: NetworkData):
@@ -407,13 +441,25 @@ class NetworkFitter:
 
         distribution = NetworkDistribution(distribution, params, self.net_data)
 
-        AICc = distribution.AICc
-        BIC = distribution.BIC
-        log_likelihood = distribution.log_likelihood
+        if self._AIC_flag:
+            akaike = distribution.AIC
+        else:
+            akaike = distribution.AICc
+        log_likelihood = distribution.max_log_likelihood
 
         self._fit_dataframe.loc[len(self._fit_dataframe)] = [distribution_name,
-                                                             AICc, BIC,
+                                                             akaike, 0.0, 0.0,
                                                              log_likelihood, distribution, str(params)]
+
+        for i, AIC_val in enumerate(self._fit_dataframe['Akaike']):
+            d_i = AIC_val - min(self._fit_dataframe['Akaike'])
+            self._fit_dataframe.loc[i, 'delta_i'] = d_i
+
+        total = exp(-self._fit_dataframe['delta_i'].values/2).sum()
+
+        for d, delta_i in enumerate(self._fit_dataframe['delta_i']):
+            w_i = np.round(exp(-delta_i/2)/total, 5)
+            self._fit_dataframe.loc[d, 'w_i'] = w_i
 
     def get_fitted_parameters(self, distribution_name: str) -> tuple:
         """

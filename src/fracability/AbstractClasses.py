@@ -130,6 +130,13 @@ class BaseEntity(ABC):
         """
         return self.entity_df.crs
 
+    @crs.setter
+    def crs(self, crs):
+        """
+        Property used to return the crs of the entity
+        :return: Name of the coordinate system as a string
+        """
+        self.entity_df.crs = crs
     @property
     def centroid(self) -> np.ndarray:
         """

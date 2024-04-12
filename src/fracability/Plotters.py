@@ -49,8 +49,10 @@ import ternary
 from vtkmodules.vtkFiltersCore import vtkConnectivityFilter
 
 from fracability.operations.Statistics import NetworkDistribution, NetworkFitter
+from fracability.utils.general_use import KM
+
 import numpy as np
-from scipy.stats import uniform, ecdf
+from scipy.stats import uniform
 
 def matplot_nodes(entity,
                   markersize=7,
@@ -521,7 +523,7 @@ def matplot_stats_pdf(network_distribution: NetworkDistribution,
 
     y_vals = distribution.pdf(x_vals)
 
-    sns.lineplot(x=x_vals, y=y_vals, color='r', label=f'{name} pdf')
+    plt.plot(x_vals, y_vals, color='r', label=f'{name} pdf')
     if histogram:
         sns.histplot(x_vals, stat='density')
 
@@ -564,10 +566,10 @@ def matplot_stats_cdf(network_distribution: NetworkDistribution,
 
     y_vals = distribution.cdf(x_vals)
 
-    sns.lineplot(x=x_vals, y=y_vals, color='r', label=f'{name} CDF')
+    plt.plot(x_vals, y_vals, color='r', label=f'{name} CDF')
     if plot_ecdf:
         ecdf = network_data.ecdf
-        sns.lineplot(x=ecdf.quantiles, y=ecdf.probabilities, color='b', label='Empirical CDF')
+        plt.step(x=x_vals, y=ecdf, color='b', label='Empirical CDF')
 
     plt.xlabel('length [m]')
     plt.title('CDF')
@@ -607,10 +609,10 @@ def matplot_stats_sf(network_distribution: NetworkDistribution,
 
     y_vals = distribution.sf(x_vals)
 
-    sns.lineplot(x=x_vals, y=y_vals, color='r', label=f'{name} SF')
+    plt.plot(x_vals, y_vals, color='r', label=f'{name} SF')
     if plot_esf:
         esf = network_data.esf
-        sns.lineplot(x=esf.quantiles, y=esf.probabilities, color='b', label='Empirical SF')
+        plt.step(x=x_vals, y=esf, color='b', label='Empirical SF')
 
     plt.xlabel('length [m]')
     plt.title('SF')
@@ -762,7 +764,7 @@ def matplot_stats_summary(network_distribution: NetworkDistribution,
 
 def matplot_stats_uniform(network_fit: NetworkFitter):
     """
-    Confront the fitted data with the standard uniform 0,1.
+    Confront the fitted data with the standard uniform 0,1. Following Kim 2019
 
     :param network_fit:
     :return:
@@ -773,18 +775,20 @@ def matplot_stats_uniform(network_fit: NetworkFitter):
 
     fig = plt.figure(num=f'Comparison plot', figsize=(13, 7))
 
-    x_values = np.linspace(0, 1, num=1000)
-    uniform_cdf = uniform.cdf(x_values)
+    uniform_list = np.linspace(0, 1, num=10)
+    uniform_cdf = uniform.cdf(uniform_list)
     plt.title('Comparison between CDFs')
 
-    plt.plot(x_values, uniform_cdf, 'k-', label='U(0, 1)')
+    plt.plot(uniform_list, uniform_cdf, 'k-', label='U(0, 1)')
 
     for fit_name in fitted_list:
         fitter = network_fit.get_fitted_distribution(fit_name)
-        cdf = fitter.cdf()
-        cdf_freq = ecdf(cdf).cdf
-        plt.plot(cdf_freq.quantiles, cdf_freq.probabilities, '--', label=fit_name)
+        Z = fitter.cdf()
+        delta = fitter.fit_data.delta
+        G_n = KM(Z, Z, delta)
+        plt.step(Z, G_n, label=f'G_n {fit_name}') # plot the Kaplan-Meier curves with steps
 
+    plt.title('Distance to Uniform comparison')
     plt.grid(True)
     plt.legend()
     plt.show()

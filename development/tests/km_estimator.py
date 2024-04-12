@@ -67,13 +67,13 @@ lengths = data['length'].values  # Length value
 
 lengths = lengths[lengths != np.nan]
 
-print(lengths)
+
 sns.histplot(lengths)
 plt.xlabel('Length [m]')
 plt.show()
 censored_value = data['censored'].values  # Censoring values: 0 is complete, 1 is censored
 delta = 1-censored_value  # In the formulas delta = 1 means complete while 0 means censored.
-print(delta)
+
 
 
 tot_n = len(lengths)
@@ -85,7 +85,7 @@ uncensored = data.loc[censored_value == 0, 'length']  # Extract only the complet
 data_cens = ss.CensoredData(uncensored, right=censored)  # Create the scipy CensoredData instance
 
 names = ['lognorm', 'gengamma', 'expon', 'weibull_min', 'gamma', 'logistic', 'norm']  # list of names of scipy distribution to test
-
+# names = ['lognorm']
 data_frame = pd.DataFrame(columns=['dist_name',
                                    'AIC', 'delta_i', 'w_i', 'weight_ratios',
                                    'KS', 'KG', 'AD',
@@ -97,15 +97,19 @@ for i, name in enumerate(names):  # for each scipy distribution do:
     data_frame.loc[i, 'dist_name'] = name
 
     dist = getattr(ss, name)
-    if name == 'norm' or 'logistic':  # for normal and logistic floc controls mu, so it must not be set to 0
+    if name == 'norm' or name == 'logistic':  # for normal and logistic floc controls mu, so it must not be set to 0
         params = dist.fit(data_cens)
     else:
         params = dist.fit(data_cens, floc=0)
+
+    print(params)
     fitted_dist = dist.freeze(*params)
 
+    print(len(uncensored))
     # Akaike 1974
 
     max_like = fitted_dist.logpdf(uncensored).sum()+fitted_dist.logsf(censored).sum()  # The maximum likelihood SHOULD be the sum of the total sum of logpdf(uncensored) and logsf(censored) of the fitted dist (that is estimated using MLE)
+    print(fitted_dist.logpdf(uncensored).sum())
     if name == 'norm' or name == 'logistic':
         k = len(fitted_dist.args)
     else:

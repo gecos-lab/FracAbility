@@ -188,7 +188,9 @@ class Fractures(BaseEntity):
     + Add method to plot rose diagram
     """
 
-    def __init__(self, gdf: GeoDataFrame = None, csv: str = None, shp: str = None, set_n: int = None):
+    def __init__(self, gdf: GeoDataFrame = None, csv: str = None,
+                 shp: str = None, set_n: int = None,
+                 check_geometry: bool = True):
         """
         Init for Fractures entity. Different inputs can be used. Geopandas dataframe, csv or shapefile. The csv needs to be
         structured in such a way to be compatible with the Nodes entity.
@@ -197,16 +199,19 @@ class Fractures(BaseEntity):
         :param csv: Path of a csv
         :param shp: Path of the shapefile
         :param set_n: Fracture set number
+        :param check_geometry: Perform geometry check. Default is True
         """
 
+        self.check_geometries_flag = check_geometry
         self._set_n = set_n
-        self._df = GeoDataFrame()
         if gdf is not None:
             super().__init__(gdf=gdf)
         elif csv is not None:
             super().__init__(csv=csv)
         elif shp is not None:
             super().__init__(shp=shp)
+        else:
+            super().__init__()
 
     @property
     def set_n(self):
@@ -239,10 +244,11 @@ class Fractures(BaseEntity):
         if 'f_set' not in self._df.columns:
             self._df['f_set'] = self.set_n
         if 'length' not in self._df.columns:
-            self._df['length'] = self._df['geometry'].length
+            self._df['length'] = np.round(self._df['geometry'].length, 4)
 
-        self.remove_double_points()
-        self.check_geometries()
+        if self.check_geometries_flag:
+            self.remove_double_points()
+            self.check_geometries()
 
     @property
     def vtk_object(self) -> PolyData:
@@ -264,8 +270,10 @@ class Fractures(BaseEntity):
             idx = list(set(obj['RegionId']))
             geometry = []
             for region_id in idx:
-                region = obj.extract_cells(obj['RegionId'] == region_id)
-                geometry.append(LineString(region.points))
+                region = wrap(obj.extract_cells(obj['RegionId'] == region_id))
+                index_list, ind = np.unique(region.cell_connectivity, return_index=True)
+                index_list = index_list[np.argsort(ind)]
+                geometry.append(LineString(region.points[index_list]))
             d = {'id': idx, 'geometry': geometry}
             gdf = GeoDataFrame(d)
             self.entity_df = gdf
@@ -1240,11 +1248,19 @@ class FractureNetwork(BaseEntity):
         """
         path, file = os.path.split(path)
 
+        name, _ = os.path.splitext(file)
+
+        if os.path.isdir(os.path.join(path, f'output_{name}')):
+            new_path = os.path.join(path, f'output_{name}')
+        else:
+            os.mkdir(os.path.join(path, f'output_{name}'))
+            new_path = os.path.join(path, f'output_{name}')
+
         if self.nodes is not None:
-            self.nodes.save_shp(os.path.join(path, f'nodes_{file}'))
+            self.nodes.save_shp(os.path.join(new_path, f'nodes_{name}.shp'))
 
         if self.fractures is not None:
-            self.fractures.save_shp(os.path.join(path, f'fractures_{file}'))
+            self.fractures.save_shp(os.path.join(new_path, f'fractures_{name}.shp'))
 
         if self.boundaries is not None:
-            self.boundaries.save_shp(os.path.join(path, f'boundaries_{file}'))
+            self.boundaries.save_shp(os.path.join(new_path, f'boundaries_{name}.shp'))

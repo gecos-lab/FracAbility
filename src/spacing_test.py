@@ -144,10 +144,10 @@ frac_net.add_fractures(valid_scanlines)
 frac_net.add_boundaries(boundary)
 
 # print(len(frac_net.fractures.entity_df['length']))
-frac_net.vtk_plot()
+# frac_net.vtk_plot()
 frac_net.calculate_topology()
 
-frac_net.fractures.save_csv('Spacing_pontrelli.csv')
+# frac_net.fractures.save_csv('Spacing_pontrelli.csv')
 
 # print(frac_net.fraction_censored)
 #
@@ -159,9 +159,9 @@ fitter.fit('weibull_min')
 fitter.fit('gamma')
 fitter.fit('logistic')
 fitter.fit('norm')
-# fitter.fit('powerlaw')
+fitter.fit('powerlaw')
 
 
 # matplot_stats_summary(fitter.get_fitted_distribution('lognorm'))
-matplot_stats_uniform(fitter)
+# matplot_stats_uniform(fitter)
 print(fitter.fit_records)
