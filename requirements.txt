@@ -12,3 +12,6 @@ scooby==0.7.2
 seaborn==0.13.0
 Shapely==2.0.2
 vtk==9.2.6
+sphinx
+sphinx_book_theme
+sphinx-autobuild

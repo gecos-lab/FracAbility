@@ -15,11 +15,11 @@ from pyvista import PolyData, DataSet, wrap
 from networkx import Graph
 from vtkmodules.vtkFiltersCore import vtkConnectivityFilter
 
-import fracability.Plotters as plts
+import src.fracability.Plotters as plts
 
-import fracability.Adapters as Rep
-from fracability.AbstractClasses import BaseEntity
-from fracability.operations import Geometry, Topology
+import src.fracability.Adapters as Rep
+from src.fracability.AbstractClasses import BaseEntity
+from src.fracability.operations import Geometry, Topology
 
 
 class Nodes(BaseEntity):
@@ -292,8 +292,7 @@ class Fractures(BaseEntity):
         saved with only the geometries that need to be corrected.
 
         :param remove_dup: Automatically remove duplicate points. By default, True
-        :param save_shp: Save in the same folder of the input shp with only the geometries that need to be
-        corrected. False by default
+        :param save_shp: Save in the same folder of the input shp with only the geometries that need to be corrected. False by default
         """
 
         overlaps_list = []
@@ -647,11 +646,8 @@ class FractureNetwork(BaseEntity):
     def add_nodes_from_dict(self, node_dict, classes=None):
         """Add nodes a dict of shapely geometry (key), classes and optionally node origin (value).
 
-        :param node_dict: Dict of shapely node geometries as keys and a tuple (class, origin). If origin is empty it will
-        be set to 0.
-        :param classes: List of node classes that are needed to be added. If none are provided all the classes are used
-        [1, 3, 4, 5, 6]
-
+        :param node_dict: Dict of shapely node geometries as keys and a tuple (class, origin). If origin is empty it will be set to 0.
+        :param classes: List of node classes that are needed to be added. If none are provided all the classes are used [1, 3, 4, 5, 6]
         """
         if classes is None:
             classes = [1, 3, 4, 5, 6]
@@ -1064,12 +1060,9 @@ class FractureNetwork(BaseEntity):
         By default, the method will return a list of geometries that need to be fixed. Additionally, a shp file can be
         saved with only the geometries that need to be corrected.
 
-        :param remove_dup: Automatically remove duplicate points. By default, True. When false, a point shapefile where
-        double points are present will be saved
+        :param remove_dup: Automatically remove duplicate points. By default, True. When false, a point shapefile where double points are present will be saved
         :param check_single: Perform check also for the single components
-        :param save_shp: Path to save the shp of the check. If check_single is true then also the results of the single
-        component check will be saved.
-        :return:
+        :param save_shp: Path to save the shp of the check. If check_single is true then also the results of the single component check will be saved.
         """
 
         df = self.fracture_network_to_components_df()
@@ -1139,9 +1132,7 @@ class FractureNetwork(BaseEntity):
         """
         Calculate the topology of the network and add the calculated nodes to the network.
 
-        :param clean_network: If true, before calculating the topology the network is cleaned with the clean_network.
-        Default is True
-
+        :param clean_network: If true, before calculating the topology the network is cleaned with the clean_network. Default is True
         """
         if clean_network is True:
             self.clean_network()

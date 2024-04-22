@@ -83,9 +83,9 @@ def lognorm_parameters(target_mean, target_std):
 distr = ss.lognorm
 mean = 4.94
 std = 6.53
-n_lines = 1000
+n_lines = 10
 n_iterations = 10  # Number of iterations
-n_windows = 500  # number of windows used to censor the values
+n_windows = 10  # number of windows used to censor the values
 resample_line = np.arange(0, 100.1, 0.01)  # Values used to resample the mean values
 
 
@@ -151,7 +151,7 @@ for i in range(n_iterations):
 
         n_censored = len(censored)  # number of censored values
         # print(n_censored)
-        # plot_survival(starts, ends, censoring_values, f"survp_{mean}_{std}.png")
+        plot_survival(starts, ends, censoring_list_mod, f"survp_{mean}_{std}.png")
 
         percentage_censored = 100*(n_censored/n_total)
         percentage_censoring_list_raw.append(percentage_censored)

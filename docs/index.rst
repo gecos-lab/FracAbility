@@ -78,7 +78,7 @@ Glossary
 
 
 Library status information
---------------------
+---------------------------
 
 .. |pypi| image:: https://img.shields.io/pypi/v/fracability.svg?logo=python&logoColor=white
    :target: https://pypi.org/project/pyvista/

@@ -4,7 +4,7 @@
 
 Fracture Networks
 ------------------
-.. autoclass:: fracability.Entities.FractureNetwork
+.. autoclass:: src.fracability.Entities.FractureNetwork
     :members:
     :inherited-members:
     :undoc-members:
