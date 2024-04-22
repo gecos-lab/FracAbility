@@ -1,4 +1,11 @@
+import os
+import sys
+
+cwd = os.path.dirname(os.getcwd())
+sys.path.append(cwd)
+
 from fracability import Entities
+from fracability import DATADIR
 from fracability.operations import Statistics
 from fracability import Plotters
 import geopandas as gpd
@@ -7,24 +14,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 import scipy.stats as ss
 
-# IVAN
-# fracture_set1 = Entities.Fractures(shp='/home/gabriele/STORAGE/projects/Ivan/Fracture_interpretation/Fracture_network_H_fixed.shp', set_n=1)
-# fracture_set2 = Entities.Fractures(shp='/home/gabriele/STORAGE/projects/Ivan/Fracture_interpretation/Fracture_network_fixed.shp', set_n=2)
-# boundary = Entities.Boundary(shp='/home/gabriele/STORAGE/projects/Ivan/Fracture_interpretation/Interpretation_boundary.shp', group_n=1)
-
-
-# fracture_set1 = Entities.Fractures(shp='/home/gabriele/STORAGE/projects/Ivan/Fracture_interpretation_BR_03B/Fracture_network_1.shp', set_n=1)
-# fracture_set2 = Entities.Fractures(shp='/home/gabriele/STORAGE/projects/Ivan/Fracture_interpretation_BR_03B/Fracture_network_2_4.shp', set_n=2)
-# fracture_set3 = Entities.Fractures(shp='/home/gabriele/STORAGE/projects/Ivan/Fracture_interpretation_BRdotto_03B/Fracture_network_3.shp', set_n=3)
-# boundary = Entities.Boundary(shp='/home/gabriele/STORAGE/projects/Ivan/Fracture_interpretation_BR_03B/Interpretation_boundary.shp', group_n=1)
-
 
 # Pontrelli
-
-fracture_set1 = Entities.Fractures(shp='/home/gabriele/STORAGE/projects/FracAbility/src/fracability/datasets/cava_pontrelli/Set_a.shp', set_n=1)
-fracture_set2 = Entities.Fractures(shp='/home/gabriele/STORAGE/projects/FracAbility/src/fracability/datasets/cava_pontrelli/Set_b.shp', set_n=2)
-fracture_set3 = Entities.Fractures(shp='/home/gabriele/STORAGE/projects/FracAbility/src/fracability/datasets/cava_pontrelli/Set_c.shp', set_n=3)
-boundary = Entities.Boundary(shp='/home/gabriele/STORAGE/projects/FracAbility/src/fracability/datasets/cava_pontrelli/Interpretation-boundary.shp', group_n=1)
+fracture_set1 = Entities.Fractures(shp=f'{DATADIR}/cava_pontrelli/Set_a.shp', set_n=1, check_geometry=False)
+# fracture_set2 = Entities.Fractures(shp=f'{DATADIR}/cava_pontrelli/Set_b.shp', set_n=2, check_geometry=False)
+# fracture_set3 = Entities.Fractures(shp=f'{DATADIR}/cava_pontrelli/Set_c.shp', set_n=3, check_geometry=False)
+boundary = Entities.Boundary(shp=f'{DATADIR}/cava_pontrelli/Interpretation-boundary.shp', group_n=1)
 
 
 # Salza
@@ -36,11 +31,12 @@ boundary = Entities.Boundary(shp='/home/gabriele/STORAGE/projects/FracAbility/sr
 fracture_net = Entities.FractureNetwork()
 
 fracture_net.add_fractures(fracture_set1)
-fracture_net.add_fractures(fracture_set2)
-fracture_net.add_fractures(fracture_set3)
+# fracture_net.add_fractures(fracture_set2)
+# fracture_net.add_fractures(fracture_set3)
 
 fracture_net.add_boundaries(boundary)
 
+print('ciao')
 fracture_net.calculate_topology()
 vtkbackbone = fracture_net.calculate_backbone()
 
@@ -49,9 +45,9 @@ backbone.vtk_object = vtkbackbone
 backbone.crs = fracture_set1.crs
 
 # backbone.vtk_plot()
-fracture_net.save_shp('Pontrelli')
-
-backbone.save_shp('output_Pontrelli/backbone.shp')
+# fracture_net.save_shp('Pontrelli')
+#
+# backbone.save_shp('output_Pontrelli/backbone.shp')
 
 
 # fracture_net.vtk_plot(markersize=6)

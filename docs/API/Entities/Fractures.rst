@@ -4,7 +4,7 @@
 
 Fractures
 ------------------
-.. autoclass:: src.fracability.Entities.Fractures
+.. autoclass:: fracability.Entities.Fractures
     :members:
     :inherited-members:
     :undoc-members:

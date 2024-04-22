@@ -15,11 +15,11 @@ from pyvista import PolyData, DataSet, wrap
 from networkx import Graph
 from vtkmodules.vtkFiltersCore import vtkConnectivityFilter
 
-import src.fracability.Plotters as plts
+import fracability.Plotters as plts
 
-import src.fracability.Adapters as Rep
-from src.fracability.AbstractClasses import BaseEntity
-from src.fracability.operations import Geometry, Topology
+import fracability.Adapters as Rep
+from fracability.AbstractClasses import BaseEntity
+from fracability.operations import Geometry, Topology
 
 
 class Nodes(BaseEntity):

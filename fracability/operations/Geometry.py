@@ -1,11 +1,10 @@
-from src.fracability.AbstractClasses import BaseEntity
-from src.fracability.utils.shp_operations import int_node
-
 from copy import deepcopy
 
 from pyvista import PolyData
 from vtkmodules.vtkFiltersCore import vtkCleanPolyData
 
+from fracability.AbstractClasses import BaseEntity
+from fracability.utils.shp_operations import int_node
 
 def connect_dots(vtk_obj: PolyData) -> PolyData:
 
@@ -27,7 +26,7 @@ def connect_dots(vtk_obj: PolyData) -> PolyData:
     return output_obj
 
 
-# @Halo(text='Calculating intersections', spinner='line', placement='right')
+#@Halo(text='Calculating intersections', spinner='line', placement='right')
 def tidy_intersections(obj, buffer=0.05, inplace: bool = True):
     """Method used to tidy shapefile intersections between fractures in a fracture or fracture network object."""
 
@@ -43,6 +42,7 @@ def tidy_intersections(obj, buffer=0.05, inplace: bool = True):
     df_buffer = gdf.buffer(buffer)
 
     for idx_line1, line in gdf.iterrows():
+        print(f'Calculating intersections: {idx_line1}/{len(gdf.index)}', end='\r')
 
         if line['type'] == 'boundary':
             continue

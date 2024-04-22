@@ -48,8 +48,8 @@ from pyvista import Plotter
 import ternary
 from vtkmodules.vtkFiltersCore import vtkConnectivityFilter
 
-from src.fracability.operations.Statistics import NetworkDistribution, NetworkFitter
-from src.fracability.utils.general_use import KM
+from fracability.operations.Statistics import NetworkDistribution, NetworkFitter
+from fracability.utils.general_use import KM
 
 import numpy as np
 from scipy.stats import uniform

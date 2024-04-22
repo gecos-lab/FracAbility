@@ -26,7 +26,7 @@ copyright = "2023-{},  Gabriele Benedetti".format(date.today().year)
 author = 'Gabriele Benedetti'
 
 # The full version, including alpha/beta/rc tags
-import src.fracability as fracability
+import fracability as fracability
 
 version = fracability.__version__
 release = version

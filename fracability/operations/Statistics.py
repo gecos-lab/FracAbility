@@ -7,7 +7,7 @@ import scipy.stats as ss
 from scipy.optimize import minimize
 import ast
 
-from src.fracability.utils.general_use import KM
+from fracability.utils.general_use import KM
 
 
 class NetworkData:

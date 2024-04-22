@@ -3,10 +3,6 @@ import numpy as np
 import shapely.geometry as geom
 from shapely.affinity import scale
 from shapely.ops import split
-import shapely as shp
-from shapely.validation import explain_validity
-import matplotlib.pyplot as plt
-
 
 def int_node(line1, line2, idx_list, gdf):
     """

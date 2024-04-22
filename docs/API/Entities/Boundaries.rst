@@ -4,7 +4,7 @@
 
 Boundaries
 ------------------
-.. autoclass:: src.fracability.Entities.Boundary
+.. autoclass:: fracability.Entities.Boundary
     :members:
     :inherited-members:
     :undoc-members:
