@@ -4,11 +4,9 @@ import pyvista
 
 import os
 import glob
-import numpy as np
 
 from fracability.Entities import Nodes, Fractures, Boundary, FractureNetwork
-from fracability.examples import example_fracture_network
-from fracability.utils.general_use import centers_to_lines
+from examples import example_fracture_network
 
 
 class TestNodes:

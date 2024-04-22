@@ -1,4 +1,4 @@
-from fracability.examples import example_fracture_network
+from examples import example_fracture_network
 import pytest
 from fracability import Entities
 from fracability.operations.Geometry import tidy_intersections, calculate_seg_length

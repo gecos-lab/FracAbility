@@ -1,3 +1,4 @@
+import os.path
 from abc import ABC, abstractmethod, abstractproperty
 
 from geopandas import GeoDataFrame
@@ -8,6 +9,7 @@ import scipy.stats as ss
 import numpy as np
 from copy import deepcopy
 from shapely import remove_repeated_points
+
 
 class BaseEntity(ABC):
     """
@@ -24,21 +26,38 @@ class BaseEntity(ABC):
         Init the entity. If a geopandas dataframe is specified then it is
         set as the source entity df.
 
-        :param gdf: Geopandas dataframe
-        :param csv: Path of a csv
+        Parameters
+        -----------
+        gdf: GeoDataFrame
+            Use as input a geopandas dataframe
+        csv: str
+            Use as input a csv indicated by the path
+        shp: str
+            Use as input a shapefile indicated by the path
+
+        Notes
+        --------
+        The csv needs to have a "geometry" column. If missing the import will fail.
         """
+
+
         self._df: GeoDataFrame = GeoDataFrame()
         if gdf is not None:
             self.entity_df = gdf
         elif csv is not None:
-            self.entity_df = read_file(csv, GEOM_POSSIBLE_NAMES="geometry", KEEP_GEOM_COLUMNS="NO")
+            gdf = read_file(csv, GEOM_POSSIBLE_NAMES="geometry", KEEP_GEOM_COLUMNS="NO")
+            if 'geometry' not in self.entity_df.columns:
+                exit('Missing geometry column, terminating')
+            else:
+                self.entity_df = gdf
         elif shp is not None:
             self.entity_df = read_file(shp)
 
-
-
     @property
-    def name(self):
+    def name(self) -> str:
+        """
+        Property used to return the name of the current class as a string.
+        """
         return self.__class__.__name__
 
     @property
@@ -104,28 +123,19 @@ class BaseEntity(ABC):
     def mat_plot(self):
         """
         Plot entity using matplotlib backend
-        :return:
         """
 
     @abstractmethod
     def vtk_plot(self):
         """
         Plot entity using vtk backend
-        :return:
         """
-
-    @property
-    def name(self) -> str:
-        """
-        Property used to return the name of the class (i.e. Fractures)
-        :return: Name of the class as string
-        """
-        return self.__class__.__name__
 
     @property
     def crs(self) -> str:
         """
         Property used to return the crs of the entity
+
         :return: Name of the coordinate system as a string
         """
         return self.entity_df.crs
@@ -134,13 +144,16 @@ class BaseEntity(ABC):
     def crs(self, crs):
         """
         Property used to return the crs of the entity
+
         :return: Name of the coordinate system as a string
         """
         self.entity_df.crs = crs
+
     @property
     def centroid(self) -> np.ndarray:
         """
         Property used to return the centroid of the entity. Dissolve is used to aggregate each shape in a single entity.
+
         :return: 1D numpy array of the centroid
         """
         trans_center = np.array(self.entity_df.dissolve().centroid[0].coords).flatten()
@@ -150,6 +163,7 @@ class BaseEntity(ABC):
     def get_copy(self):
         """
         Property used to return a deep copy of the entity
+
         :return:
         """
         return deepcopy(self)
@@ -209,28 +223,69 @@ class BaseEntity(ABC):
     def save_csv(self, path: str, sep: str = ',', index: bool = False):
         """
         Save the entity df as csv
-        :param index:
-        :type sep: object
-        :param path:
-        :return:
+
+        Parameters
+        -------------
+        index: Bool
+            Indicate whether to include or not the index column
+        sep: String
+            Indicate the separator string used to save the csv
+        path: String
+            Indicate the path in where to save the csv. **DO NOT** include the extension (.csv).
+
+        Notes
+        ---------
+
+        The csv will be saved in the output/csv directory in the indicated path in the working directory. If this path does not exist, then it will be created.
         """
 
-        self.entity_df.to_csv(f'{self.name}_{path}', sep=sep, index=index)
+        if not self.entity_df.empty:
+            cwd = os.getcwd()
+            output_path = os.path.join(cwd, path, 'output/csv')
+
+            if not os.path.isdir(output_path):
+                os.makedirs(output_path)
+
+            final_path = os.path.join(output_path, f'{self.name}.csv')
+            self.entity_df.to_csv(final_path, sep=sep, index=index)
+        else:
+            print('Cannot save an empty entity')
 
     def save_shp(self, path: str):
         """
-        Save the entity df as shp
-        :param path:
-        :return:
+        Save the entity df as shapefile
+
+        Parameters
+        -------------
+        path: String.
+            Indicate the path in where to save the csv. **DO NOT** include the extension (.csv).
+
+        Notes
+        ---------
+
+        The shapefile will be saved in output/shp directory in the indicated path in the working directory. If this path does not exist, then it will be created.
         """
         if not self.entity_df.empty:
-            self.entity_df.to_file(path, crs=self.crs)
+            cwd = os.getcwd()
+            output_path = os.path.join(cwd, path, 'output', 'shp')
+
+            if not os.path.isdir(output_path):
+                os.makedirs(output_path)
+
+            final_path = os.path.join(output_path, f'{self.name}.shp')
+            self.entity_df.to_file(final_path, crs=self.crs)
+        else:
+            print('Cannot save an empty entity')
 
     def remove_double_points(self):
+        """
+        Utility used to clean geometries with double points
+        """
 
         for line, geom in enumerate(self.entity_df.geometry):
-
             self.entity_df.loc[line, 'geometry'] = remove_repeated_points(geom, tolerance=0.000001)
+
+
 class BaseOperator(ABC):
     """
     Abstract class for Operators such as:

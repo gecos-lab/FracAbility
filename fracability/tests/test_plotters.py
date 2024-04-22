@@ -1,4 +1,4 @@
-from fracability.examples import example_fracture_network
+from examples import example_fracture_network
 import pytest
 from fracability.Entities import FractureNetwork
 from fracability.Plotters import *

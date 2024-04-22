@@ -25,18 +25,24 @@ from fracability.operations import Geometry, Topology
 class Nodes(BaseEntity):
     """
     Node base entity, represents all the nodes in the network.
+
+    Parameters
+    -----------
+    gdf: GeoDataFrame
+        Use as input a geopandas dataframe
+    csv: str
+        Use as input a csv indicated by the path
+    shp: str
+        Use as input a shapefile indicated by the path
+    node_type: int
+        Node type. I:1, Y:3, X:4, U:5
+
+    Notes
+    --------
+    The csv needs to have a "geometry" column. If missing the import will fail.
     """
 
     def __init__(self, gdf: GeoDataFrame = None, csv: str = None, shp: str = None, node_type: int = -9999):
-        """
-        Init for node entity. Different inputs can be used. Geopandas dataframe, csv or shapefile. The csv needs to be
-        structured in such a way to be compatible with the Nodes entity.
-
-        :param gdf: Geopandas dataframe
-        :param csv: Path of a csv
-        :param shp: Path of the shapefile
-        :param node_type: Node type (I,Y,X,U)
-        """
 
         self.node_type = node_type
         if gdf is not None:
@@ -53,7 +59,7 @@ class Nodes(BaseEntity):
     @entity_df.setter
     def entity_df(self, gdf: GeoDataFrame):
         """
-        Each entity process the input dataframe in different ways
+        Each entity process the input dataframe in different ways.
         Nodes modify the entity_df only to add the type column (if not
         already present)
         """
@@ -75,7 +81,6 @@ class Nodes(BaseEntity):
 
     @vtk_object.setter
     def vtk_object(self, obj: DataSet):
-
         for index, point in enumerate(obj.points):
             self.entity_df.loc[self.entity_df['id'] == index, 'geometry'] = Point(point)
 
@@ -85,7 +90,11 @@ class Nodes(BaseEntity):
 
     @property
     def node_count(self) -> tuple[float, float, float, float, float]:
+        """
+        Calculate the node proportions and precise connectivity value following Manzocchi 2002
 
+        :return: A tuple of values PI, PY, PX, PU, precise_n
+        """
         nodes = self.vtk_object['n_type']
         unique, count = np.unique(nodes, return_counts=True)
         count_dict = dict(zip(unique, count))
@@ -144,6 +153,7 @@ class Nodes(BaseEntity):
     @property
     def n_censored(self) -> int:
         """ Return the number of censored nodes"""
+
         nodes = self.vtk_object['n_type']
         unique, count = np.unique(nodes, return_counts=True)
         count_dict = dict(zip(unique, count))
@@ -155,7 +165,7 @@ class Nodes(BaseEntity):
 
     @property
     def n_complete(self) -> int:
-        """ Return the number of I nodes (complete fractures)"""
+        """ Return the number of I nodes"""
 
         nodes = self.vtk_object['n_type']
         unique, count = np.unique(nodes, return_counts=True)
@@ -183,24 +193,31 @@ class Nodes(BaseEntity):
 
 class Fractures(BaseEntity):
     """
-    Base entity for fractures
+    Base entity for fractures, represents all the fractures in the network.
 
-    + Add method to plot rose diagram
+    Parameters
+    -----------
+    gdf: GeoDataFrame
+        Use as input a geopandas dataframe
+    csv: str
+        Use as input a csv indicated by the path
+    shp: str
+        Use as input a shapefile indicated by the path
+    set_n: int
+        Fracture set number.
+    check_geometry: Bool
+        Perform geometry check. Default is True
+
+
+    Notes
+    --------
+    + The csv needs to have a "geometry" column. If missing the import will fail.
+    + If the input csv or shapefile has an f_set column then the set_n will be ignored
     """
 
     def __init__(self, gdf: GeoDataFrame = None, csv: str = None,
                  shp: str = None, set_n: int = None,
                  check_geometry: bool = True):
-        """
-        Init for Fractures entity. Different inputs can be used. Geopandas dataframe, csv or shapefile. The csv needs to be
-        structured in such a way to be compatible with the Nodes entity.
-
-        :param gdf: Geopandas dataframe
-        :param csv: Path of a csv
-        :param shp: Path of the shapefile
-        :param set_n: Fracture set number
-        :param check_geometry: Perform geometry check. Default is True
-        """
 
         self.check_geometries_flag = check_geometry
         self._set_n = set_n
@@ -214,7 +231,10 @@ class Fractures(BaseEntity):
             super().__init__()
 
     @property
-    def set_n(self):
+    def set_n(self) -> int:
+        """
+        Get the set number
+        """
         return self._set_n
 
     @property
@@ -223,6 +243,14 @@ class Fractures(BaseEntity):
 
     @entity_df.setter
     def entity_df(self, gdf: GeoDataFrame):
+        """
+        Each entity process the input dataframe in different ways.
+        Fractures modify the entity_df in a couple of ways:
+            + No Multilines can be used.
+            + If not f_set column is present, it will be created following the set_n value
+            + If no length column is present, it will be created (with length rounded to the 4th decimal point)
+            + If no censoring column is present, it will be created setting all values to 0
+        """
         multiline_list = []
         for index, geom in zip(gdf.index, gdf['geometry']):  # For each geometry in the df
 
@@ -233,6 +261,7 @@ class Fractures(BaseEntity):
             print(f'Multilines found, removing from database. If necessary correct them: {np.array(multiline_list)+1}')
 
         gdf.drop(multiline_list, inplace=True)
+
         self._df = gdf.copy()
         self._df.reset_index(inplace=True, drop=True)
         if 'original_line_id' not in self._df.columns:
@@ -306,34 +335,8 @@ class Fractures(BaseEntity):
         if len(overlaps_list) > 0:
             print(f'Detected overlaps for set {self._set_n}: {overlaps_list}. Check geometries in gis and fix.')
 
-    # def simplify_lines(self, tolerance: float, max_points: int = None, preserve_topology: bool = True):
-    #     """
-    #     Method used to simplify lines in a fracture entity. The coordinates of the new simplified geometry will be
-    #     no more than the tolerance distance from the original. If max_points is None then all lines will be simplified.
-    #     If max points is specified then only lines that have more points that max_points wil be simplified.
-    #
-    #     :param tolerance: Maximum distance of a point between the new and old geometry
-    #     :param max_points: Maximum tolerated points in a line over which the simplification is run
-    #     :param preserve_topology: Bool flag to ensure that the topology is preserved.
-    #     If set to False, self intersecting geometries may occur
-    #     """
-    #
-    #     df = self.entity_df.copy()
-    #     if max_points is None:
-    #         df['geometry'] = df['geometry'].simplify(tolerance=tolerance, preserve_topology=preserve_topology)
-    #
-    #     else:
-    #         new_geom = []
-    #         for i, row in df.iterrows():
-    #             line = row['geometry']
-    #             if len(line.coords) > tolerance:
-    #                 new_geom.append(line.simplify(tolerance=tolerance,
-    #                                               preserve_topology=preserve_topology))
-    #         df['geometry'] = new_geom
-    #
-    #     self.entity_df = df
-
     def mat_plot(self):
+
         plts.matplot_fractures(self)
 
     def vtk_plot(self, linewidth=1, color='white', color_set=False, return_plot=False, display_property: str = None):
@@ -344,7 +347,23 @@ class Fractures(BaseEntity):
 class Boundary(BaseEntity):
 
     """
-    Base entity for boundaries
+    Base entity for boundaries, represents all the boundaries in the network.
+
+    Parameters
+    -----------
+    gdf: GeoDataFrame
+        Use as input a geopandas dataframe
+    csv: str
+        Use as input a csv indicated by the path
+    shp: str
+        Use as input a shapefile indicated by the path
+    group_n: int
+        Boundary number.
+
+
+    Notes
+    --------
+    + The csv needs to have a "geometry" column. If missing the import will fail.
     """
     def __init__(self, gdf: GeoDataFrame = None, csv: str = None, shp: str = None, group_n: int = 1):
         """
