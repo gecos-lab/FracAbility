@@ -1,7 +1,15 @@
 """
 Python code to calculate the spacing distribution of a given linear fracture set.
 """
+import os
+import sys
+
+cwd = os.path.dirname(os.getcwd())
+sys.path.append(cwd)
+
+
 import pandas as pd
+from fracability import DATADIR
 from fracability import Entities
 from fracability.operations import Statistics
 from fracability.Plotters import matplot_stats_summary, matplot_stats_uniform
@@ -68,8 +76,8 @@ def center_points(center_coords, lengths, dir, resolution=10):
     return xyz
 
 
-data_path = 'fracability/datasets/cava_pontrelli/Set_a.shp'
-boundary_path = 'fracability/datasets/cava_pontrelli/Interpretation-boundary.shp'
+data_path = f'{DATADIR}/cava_pontrelli/Set_a.shp'
+boundary_path = f'{DATADIR}/cava_pontrelli/Interpretation-boundary.shp'
 
 df = gpd.read_file(data_path)
 boundary_df = gpd.read_file(boundary_path)
@@ -153,7 +161,6 @@ frac_net.calculate_topology()
 #
 fitter = Statistics.NetworkFitter(frac_net)
 fitter.fit('lognorm')
-fitter.fit('gengamma')
 fitter.fit('expon')
 fitter.fit('weibull_min')
 fitter.fit('gamma')
@@ -162,6 +169,7 @@ fitter.fit('norm')
 fitter.fit('powerlaw')
 
 
+matplot_stats_uniform(fitter)
 # matplot_stats_summary(fitter.get_fitted_distribution('lognorm'))
 # matplot_stats_uniform(fitter)
 print(fitter.fit_records)

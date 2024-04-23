@@ -84,7 +84,7 @@ uncensored = data.loc[censored_value == 0, 'length']  # Extract only the complet
 
 data_cens = ss.CensoredData(uncensored, right=censored)  # Create the scipy CensoredData instance
 
-names = ['lognorm', 'gengamma', 'expon', 'weibull_min', 'gamma', 'logistic', 'norm']  # list of names of scipy distribution to test
+names = ['lognorm', 'expon', 'weibull_min', 'gamma', 'logistic', 'norm']  # list of names of scipy distribution to test
 # names = ['lognorm']
 data_frame = pd.DataFrame(columns=['dist_name',
                                    'AIC', 'delta_i', 'w_i', 'weight_ratios',

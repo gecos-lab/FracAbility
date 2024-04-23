@@ -1,6 +1,0 @@
-.. image:: ../images/logo.png
-
--------------------------------------
-
-Creating a FractureNetwork object
------------------------------------
