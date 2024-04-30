@@ -1256,21 +1256,12 @@ class FractureNetwork(BaseEntity):
         :param path:
         :return:
         """
-        path, file = os.path.split(path)
-
-        name, _ = os.path.splitext(file)
-
-        if os.path.isdir(os.path.join(path, f'output_{name}')):
-            new_path = os.path.join(path, f'output_{name}')
-        else:
-            os.mkdir(os.path.join(path, f'output_{name}'))
-            new_path = os.path.join(path, f'output_{name}')
 
         if self.nodes is not None:
-            self.nodes.save_shp(os.path.join(new_path, f'nodes_{name}.shp'))
+            self.nodes.save_shp(path)
 
         if self.fractures is not None:
-            self.fractures.save_shp(os.path.join(new_path, f'fractures_{name}.shp'))
+            self.fractures.save_shp(path)
 
         if self.boundaries is not None:
-            self.boundaries.save_shp(os.path.join(new_path, f'boundaries_{name}.shp'))
+            self.boundaries.save_shp(path)

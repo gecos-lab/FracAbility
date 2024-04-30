@@ -246,8 +246,10 @@ class BaseEntity(ABC):
             if not os.path.isdir(output_path):
                 os.makedirs(output_path)
 
-            final_path = os.path.join(output_path, f'{self.name}.csv')
-            self.entity_df.to_csv(final_path, sep=sep, index=index)
+            set_n = list(set(self.entity_df['f_set']))
+            for f_set in set_n:
+                final_path = os.path.join(output_path, f'{self.name}_{f_set}.csv')
+                self.entity_df.to_csv(final_path, sep=sep, index=index)
         else:
             print('Cannot save an empty entity')
 
@@ -258,7 +260,7 @@ class BaseEntity(ABC):
         Parameters
         -------------
         path: String.
-            Indicate the path in where to save the csv. **DO NOT** include the extension (.csv).
+            Indicate the path in where to save the csv. **DO NOT** include the extension (.shp).
 
         Notes
         ---------

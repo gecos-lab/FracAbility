@@ -17,8 +17,8 @@ import scipy.stats as ss
 
 # Pontrelli
 fracture_set1 = Entities.Fractures(shp=f'{DATADIR}/cava_pontrelli/Set_a.shp', set_n=1, check_geometry=False)
-# fracture_set2 = Entities.Fractures(shp=f'{DATADIR}/cava_pontrelli/Set_b.shp', set_n=2, check_geometry=False)
-# fracture_set3 = Entities.Fractures(shp=f'{DATADIR}/cava_pontrelli/Set_c.shp', set_n=3, check_geometry=False)
+fracture_set2 = Entities.Fractures(shp=f'{DATADIR}/cava_pontrelli/Set_b.shp', set_n=2, check_geometry=False)
+fracture_set3 = Entities.Fractures(shp=f'{DATADIR}/cava_pontrelli/Set_c.shp', set_n=3, check_geometry=False)
 boundary = Entities.Boundary(shp=f'{DATADIR}/cava_pontrelli/Interpretation-boundary.shp', group_n=1)
 
 
@@ -31,20 +31,26 @@ boundary = Entities.Boundary(shp=f'{DATADIR}/cava_pontrelli/Interpretation-bound
 fracture_net = Entities.FractureNetwork()
 
 fracture_net.add_fractures(fracture_set1)
-# fracture_net.add_fractures(fracture_set2)
-# fracture_net.add_fractures(fracture_set3)
+fracture_net.add_fractures(fracture_set2)
+fracture_net.add_fractures(fracture_set3)
 
 fracture_net.add_boundaries(boundary)
 
-print('ciao')
+# print('ciao')
 fracture_net.calculate_topology()
 vtkbackbone = fracture_net.calculate_backbone()
 
-backbone = Entities.Fractures()
+backbone = Entities.Fractures(set_n=4)
 backbone.vtk_object = vtkbackbone
 backbone.crs = fracture_set1.crs
+fracture_net.add_fractures(backbone)
 
-# backbone.vtk_plot()
+fracture_net.deactivate_fractures([1, 2, 3])
+
+fracture_net.calculate_topology()
+fracture_net.ternary_plot()
+
+
 # fracture_net.save_shp('Pontrelli')
 #
 # backbone.save_shp('output_Pontrelli/backbone.shp')
@@ -65,7 +71,7 @@ backbone.crs = fracture_set1.crs
 #
 # fitter_remove = Statistics.NetworkFitter(fracture_net, use_survival=False, complete_only=True)
 # fitter_all = Statistics.NetworkFitter(fracture_net, use_survival=False, complete_only=False)
-# fitter = Statistics.NetworkFitter(fracture_net)
+fitter = Statistics.NetworkFitter(fracture_net)
 #
 # #
 # # fitter_remove.fit('lognorm')
@@ -73,18 +79,18 @@ backbone.crs = fracture_set1.crs
 # # fitter_surv.fit('lognorm')
 #
 # # Plotters.matplot_stats_pdf(fitter.get_fitted_distribution('lognorm'))
-# fitter.fit('lognorm')
-# fitter.fit('expon')
-# fitter.fit('norm')
-# fitter.fit('gamma')
-# fitter.fit('gengamma')
-# fitter.fit('logistic')
-# fitter.fit('weibull_min')
+fitter.fit('lognorm')
+fitter.fit('expon')
+fitter.fit('norm')
+fitter.fit('gamma')
+fitter.fit('gengamma')
+fitter.fit('logistic')
+fitter.fit('weibull_min')
 #
-# print(fitter.fit_records)
+print(fitter.fit_records)
 # # Plotters.matplot_stats_summary(fitter_surv.get_fitted_distribution('lognorm'))
 #
-# Plotters.matplot_stats_uniform(fitter)
+Plotters.matplot_stats_uniform(fitter)
 # Plotters.matplot_stats_summary(fitter.get_fitted_distribution('lognorm'))
 # fitter.fit('gamma')
 # Plotters.matplot_stats_summary(fitter.get_fitted_distribution('gamma'))

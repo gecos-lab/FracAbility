@@ -8,19 +8,14 @@ cwd = os.path.dirname(os.getcwd())
 sys.path.append(cwd)
 
 
-import pandas as pd
 from fracability import DATADIR
 from fracability import Entities
 from fracability.operations import Statistics
-from fracability.Plotters import matplot_stats_summary, matplot_stats_uniform
+from fracability.Plotters import matplot_stats_uniform, matplot_stats_table
 import geopandas as gpd
 import numpy as np
 from shapely.ops import split
 import pyvista as pv
-import matplotlib.pyplot as plt
-import seaborn as sns
-
-from vtkmodules.vtkFiltersModeling import vtkCookieCutter
 
 
 def centers_to_lines(center_coords, lengths, frac_dir, assign_id=True) -> pv.PolyData:
@@ -76,29 +71,24 @@ def center_points(center_coords, lengths, dir, resolution=10):
     return xyz
 
 
-data_path = f'{DATADIR}/cava_pontrelli/Set_a.shp'
-boundary_path = f'{DATADIR}/cava_pontrelli/Interpretation-boundary.shp'
+data_path = f'{DATADIR}/laghetto_salza/Set_1.shp'
+boundary_path = f'{DATADIR}/laghetto_salza/Interpretation_boundary.shp'
 
 df = gpd.read_file(data_path)
 boundary_df = gpd.read_file(boundary_path)
 
-length_plane = 150
-length_scanl = 170
-resolution = 50
+length_plane = 70  # E-W extension of the outcrop
+length_scanl = 70  # N-S extension of the outcrop
+resolution = 50  # Number of scanlines along the direction
 
 
-df_faults = df.loc[df['Fault'] == 1]
-# df_joints = df.loc[df['Fault'] == 0]
-
-mean_dir = np.mean(np.floor(df['dir']))
+mean_dir = np.mean(np.floor(df['azimuth']))
 # mean_dir = 45
 scanline_dir = (mean_dir+90) % 360
 
-# fractures = Entities.Fractures(gdf=df, set_n=1)
-fractures = Entities.Fractures(gdf=df_faults, set_n=1)
-# fractures = Entities.Fractures(gdf=df_joints, set_n=1)
+fractures = Entities.Fractures(gdf=df, set_n=1)
 
-directions = fractures.entity_df['dir'] % 180
+directions = fractures.entity_df['azimuth'] % 180
 
 frac_center = fractures.center_object(return_center=True)
 
@@ -114,26 +104,22 @@ scanlines = Entities.Fractures()
 scanlines.vtk_object = lines
 
 scanlines_shp = scanlines.entity_df['geometry'].values
-boundary_shp = boundary_df['geometry'].translate(-frac_center[0], -frac_center[1]).values[0]
+boundary_shps = boundary_df['geometry'].translate(-frac_center[0], -frac_center[1])
 
 
 fractures_diss = fractures.entity_df.dissolve()
 
 split_scanlines_list = []
 
-# for scanline in scanlines_shp:
-#     split_geom = split(scanline, boundary_shp)
-#     for segment in split_geom.geoms:
-#         if boundary_shp.buffer(0.001).contains(segment):
-#             split_scanlines_list.append(segment)
 
 for scanline in scanlines_shp:
     split_geom = split(scanline, fractures_diss['geometry'].values[0])
     for segment in split_geom.geoms:
-        split_segment = split(segment, boundary_shp)
-        for line in split_segment.geoms:
-            if boundary_shp.buffer(0.001).contains(line):
-                split_scanlines_list.append(line)
+        for boundary_shp in boundary_shps:
+            split_segment = split(segment, boundary_shp)
+            for line in split_segment.geoms:
+                if boundary_shp.buffer(0.001).contains(line):
+                    split_scanlines_list.append(line)
 
 
 split_scanlines_df = gpd.GeoDataFrame(geometry=split_scanlines_list)
@@ -145,31 +131,27 @@ valid_scanlines = Entities.Fractures(gdf=split_scanlines_df, set_n=1)
 # plotter.add_mesh(boundary.vtk_object, color='red')
 # plotter.add_mesh(valid_scanlines.vtk_object, color='yellow')
 # plotter.add_camera_orientation_widget()
+# plotter.background_color = 'Gray'
 # plotter.show()
 
 frac_net = Entities.FractureNetwork()
 frac_net.add_fractures(valid_scanlines)
 frac_net.add_boundaries(boundary)
 
-# print(len(frac_net.fractures.entity_df['length']))
-# frac_net.vtk_plot()
 frac_net.calculate_topology()
+frac_net.vtk_plot()
 
-# frac_net.fractures.save_csv('Spacing_pontrelli.csv')
+frac_net.fractures.save_csv('Spacing_Salza_S1')
 
-# print(frac_net.fraction_censored)
-#
 fitter = Statistics.NetworkFitter(frac_net)
 fitter.fit('lognorm')
 fitter.fit('expon')
 fitter.fit('weibull_min')
 fitter.fit('gamma')
-fitter.fit('logistic')
 fitter.fit('norm')
 fitter.fit('powerlaw')
 
-
-matplot_stats_uniform(fitter)
-# matplot_stats_summary(fitter.get_fitted_distribution('lognorm'))
+matplot_stats_table(fitter)
 # matplot_stats_uniform(fitter)
-print(fitter.fit_records)
+#
+# print(fitter.fit_records)

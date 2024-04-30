@@ -286,7 +286,6 @@ class NetworkDistribution:
         """
         if self.fit_data.use_survival:
             log_f = self.log_pdf(self.fit_data.non_censored_lengths)
-            print(len(self.fit_data.non_censored_lengths))
             log_r = self.log_sf(self.fit_data.censored_lengths)
         else:
             if self.fit_data.complete_only:
@@ -548,7 +547,7 @@ class NetworkFitter:
 
         return df.loc[1:]
 
-    def find_best_distribution(self, distribution_list: list = None) -> pd.Series:
+    def best_fit_name(self, distribution_list: list = None) -> pd.Series:
         """
         Method used to find the best distribution using BIC ranking
         :param distribution_list: list of distribution to test

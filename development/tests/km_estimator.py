@@ -59,7 +59,7 @@ def KM(z_values, Z, delta_list):
     return G
 
 
-data = pd.read_csv('Fractures_Spacing_pontrelli.csv', index_col=0)  # Read the data
+data = pd.read_csv('Spacing_Salza_S1/output/csv/Fractures_1.csv', index_col=0)  # Read the data
 
 data = data.sort_values(by='length')  # sort the data by length
 
@@ -74,8 +74,6 @@ plt.show()
 censored_value = data['censored'].values  # Censoring values: 0 is complete, 1 is censored
 delta = 1-censored_value  # In the formulas delta = 1 means complete while 0 means censored.
 
-
-
 tot_n = len(lengths)
 
 censored = data.loc[censored_value == 1, 'length']  # Extract only the censored values
@@ -84,10 +82,10 @@ uncensored = data.loc[censored_value == 0, 'length']  # Extract only the complet
 
 data_cens = ss.CensoredData(uncensored, right=censored)  # Create the scipy CensoredData instance
 
-names = ['lognorm', 'expon', 'weibull_min', 'gamma', 'logistic', 'norm']  # list of names of scipy distribution to test
+names = ['lognorm', 'gengamma', 'expon', 'weibull_min', 'gamma', 'norm', 'powerlaw']  # list of names of scipy distribution to test
 # names = ['lognorm']
 data_frame = pd.DataFrame(columns=['dist_name',
-                                   'AIC', 'delta_i', 'w_i', 'weight_ratios',
+                                   'AIC', 'delta_i', 'w_i',
                                    'KS', 'KG', 'AD',
                                    'AIC rank', 'KS rank', 'KG rank', 'AD rank'], dtype=float)  # Create empty final dataframe
 
@@ -95,25 +93,32 @@ data_frame = pd.DataFrame(columns=['dist_name',
 for i, name in enumerate(names):  # for each scipy distribution do:
 
     data_frame.loc[i, 'dist_name'] = name
+    loc_list = ['norm', 'logistic']  # list of dist names that have only two parameters (and so floc must not be set to 0)
 
     dist = getattr(ss, name)
-    if name == 'norm' or name == 'logistic':  # for normal and logistic floc controls mu, so it must not be set to 0
+    if name in loc_list:  # for normal and logistic floc controls mu, so it must not be set to 0
         params = dist.fit(data_cens)
     else:
         params = dist.fit(data_cens, floc=0)
 
-    print(params)
     fitted_dist = dist.freeze(*params)
+    ecdf = ss.ecdf(data_cens)
+    # plt.plot(ecdf.cdf.quantiles, ecdf.cdf.probabilities)
+    # plt.plot(lengths, fitted_dist.cdf(lengths))
+    # plt.xscale('log', base=10)
+    # plt.yscale('log', base=10)
+    #
+    # plt.xlabel('Length [m]')
+    # plt.show()
+    # plt.close()
 
-    print(len(uncensored))
     # Akaike 1974
 
     max_like = fitted_dist.logpdf(uncensored).sum()+fitted_dist.logsf(censored).sum()  # The maximum likelihood SHOULD be the sum of the total sum of logpdf(uncensored) and logsf(censored) of the fitted dist (that is estimated using MLE)
-    print(fitted_dist.logpdf(uncensored).sum())
-    if name == 'norm' or name == 'logistic':
+    if name in loc_list:
         k = len(fitted_dist.args)
     else:
-        k = len(fitted_dist.args) - 1 # because floc is fixed to 0, it is not considered in the maximum likelyhood and so the number of optimized arguments of the distribution are - 1
+        k = len(fitted_dist.args) - 1 # because floc is fixed to 0, it is not considered in the maximum likelihood and so the number of optimized arguments of the distribution are - 1
 
     AIC = (-2*max_like)+(2*k)
 
@@ -171,8 +176,10 @@ for i, name in enumerate(names):  # for each scipy distribution do:
 
     sum1 = 0  # First sum
     sum2 = 0  # Second sum
-
+    if Z[-1] == 1:
+        Z[-1] -= 10**-10  # this is to avoid 0 in ln(1 - Z[-1]) and similar
     for j in range(tot_n-1):
+
         sum1 += (G_n[j] ** 2) * (-ln(1 - Z[j + 1]) + ln(Z[j + 1]) + ln(1 - Z[j]) - ln(Z[j]))
         sum2 += G_n[j] * (-ln(1 - Z[j + 1]) + ln(1 - Z[j]))
 
@@ -199,13 +206,12 @@ for d, delta_i in enumerate(data_frame['delta_i']):
 
     data_frame.loc[d, 'w_i'] = w_i
 
-data_frame['weight_ratios'] = data_frame['w_i'][0]/data_frame['w_i']
 
 data_frame['AIC rank'] = ss.rankdata(data_frame['AIC'], nan_policy='omit')
 data_frame['KS rank'] = ss.rankdata(data_frame['KS'], nan_policy='omit')
 data_frame['KG rank'] = ss.rankdata(data_frame['KG'], nan_policy='omit')
 data_frame['AD rank'] = ss.rankdata(data_frame['AD'], nan_policy='omit')
-print(data_frame)
+# print(data_frame)
 data_frame.to_csv('analysis_output.csv')
 
 # Plot
@@ -220,10 +226,14 @@ plt.show()
 
 
 plt.axis('off')
-plt.table(cellText=data_frame.values[:, 8:],
+the_table = plt.table(cellText=data_frame.round(decimals=2).values[:,1:],
           rowLabels=data_frame['dist_name'],
-          colLabels=data_frame.columns[8:],
-          loc='center'
-)
+          colLabels=data_frame.columns[1:],
+          loc='center')
+
+the_table.auto_set_font_size(False)
+the_table.auto_set_column_width(col=list(range(len(data_frame.columns))))
+the_table.set_fontsize(14)
+# the_table.scale(2, 2)
 plt.show()
 

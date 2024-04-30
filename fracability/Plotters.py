@@ -623,9 +623,10 @@ def matplot_stats_sf(network_distribution: NetworkDistribution,
         plt.show()
 
 
-def matplot_stats_table(network_distribution: NetworkDistribution,
+def matplot_stats_table(fitter: NetworkFitter,
                         vertical: bool = True,
-                        show_plot: bool = True):
+                        show_plot: bool = True,
+                        best=True):
     """
     Plot the stats summary table for both the data and the NetworkDistribution. In particular the following
     estimators are calculated:
@@ -642,76 +643,83 @@ def matplot_stats_table(network_distribution: NetworkDistribution,
 
     Parameters
     -----------
-    network_distribution: Input NetworkDistribution object
+    fitter: Input NetworkFitter object
 
     vertical: Bool. If true the table is vertical (2cols x 7rows). By default, is True
 
     show_plot: Bool. If true show the plot. By default, is True
 
+    best: Bool. If true show only the best fit. If false show the plots for each fit. By default is True.
+
     """
 
-    name = network_distribution.distribution_name
+    if best:
+        names = [fitter.get_fitted_distribution_names()[0]]
+    else:
+        names = fitter.get_fitted_distribution_names
+    for name in names:
+        network_distribution = fitter.get_fitted_distribution(name)
+        if show_plot:
+            fig = plt.figure(num=f'{name} summary table')
+            fig.text(0.5, 0.95, f'{name} summary table', ha='center')
 
-    if show_plot:
-        fig = plt.figure(num=f'{name} summary table')
-        fig.text(0.5, 0.95, f'{name} summary table', ha='center')
+        network_data = network_distribution.fit_data
+        plt.axis("off")
+        dec = 4
 
-    network_data = network_distribution.fit_data
-    plt.axis("off")
-    dec = 4
+        text_mean = f'{np.round(network_distribution.mean, dec)}'
+        text_std = f'{np.round(network_distribution.std, dec)}'
+        text_var = f'{np.round(network_distribution.var, dec)}'
+        text_median = f'{np.round(network_distribution.median, dec)}'
+        text_mode = f'{np.round(network_distribution.mode[0], dec)}'
+        text_b5 = f'{np.round(network_distribution.b5, dec)}'
+        text_b95 = f'{np.round(network_distribution.b95, dec)}'
 
-    text_mean = f'{np.round(network_distribution.mean, dec)}'
-    text_std = f'{np.round(network_distribution.std, dec)}'
-    text_var = f'{np.round(network_distribution.var, dec)}'
-    text_median = f'{np.round(network_distribution.median, dec)}'
-    text_mode = f'{np.round(network_distribution.mode[0], dec)}'
-    text_b5 = f'{np.round(network_distribution.b5, dec)}'
-    text_b95 = f'{np.round(network_distribution.b95, dec)}'
+        text_mean_th = f'{np.round(network_data.mean, dec)}'
+        text_std_th = f'{np.round(network_data.std, dec)}'
+        text_var_th = f'{np.round(network_data.var, dec)}'
+        text_median_th = f'{np.round(network_data.median, dec)}'
+        text_mode_th = f'{np.round(network_data.mode[0], dec)}'
+        text_b5_th = f'{np.round(network_data.b5, dec)}'
+        text_b95_th = f'{np.round(network_data.b95, dec)}'
 
-    text_mean_th = f'{np.round(network_data.mean, dec)}'
-    text_std_th = f'{np.round(network_data.std, dec)}'
-    text_var_th = f'{np.round(network_data.var, dec)}'
-    text_median_th = f'{np.round(network_data.median, dec)}'
-    text_mode_th = f'{np.round(network_data.mode[0], dec)}'
-    text_b5_th = f'{np.round(network_data.b5, dec)}'
-    text_b95_th = f'{np.round(network_data.b95, dec)}'
+        text_totalf = f'{network_data.total_n_fractures}'
+        text_perc_censor = f'{np.round(network_data.censoring_percentage, dec)}'
 
-    text_totalf = f'{network_data.total_n_fractures}'
-    text_perc_censor = f'{np.round(network_data.censoring_percentage, dec)}'
+        general_stats_df = pd.DataFrame(data=[[text_totalf, text_perc_censor]],
+                                        columns=['Total number of fractures', '% censored'])
 
-    general_stats_df = pd.DataFrame(data=[[text_totalf, text_perc_censor]],
-                                    columns=['Total number of fractures', '% censored'])
+        stats_df = pd.DataFrame(data=[[text_mean_th, text_mean],
+                                      [text_median_th, text_median],
+                                      [text_mode_th, text_mode],
+                                      [text_b5_th, text_b5],
+                                      [text_b95_th, text_b95],
+                                      [text_std_th, text_std],
+                                      [text_var_th, text_var]],
+                                columns=['Data', 'Fit'], index=['Mean', 'Median', 'Mode',
+                                                                'B5', 'B95', 'Std', 'Var'])
+        if not vertical:
+            stats_df = stats_df.transpose()
 
-    stats_df = pd.DataFrame(data=[[text_mean_th, text_mean],
-                                  [text_median_th, text_median],
-                                  [text_mode_th, text_mode],
-                                  [text_b5_th, text_b5],
-                                  [text_b95_th, text_b95],
-                                  [text_std_th, text_std],
-                                  [text_var_th, text_var]],
-                            columns=['Data', 'Fit'], index=['Mean', 'Median', 'Mode',
-                                                            'B5', 'B95', 'Std', 'Var'])
-    if not vertical:
-        stats_df = stats_df.transpose()
+        plt.table(cellText=general_stats_df.values,
+                  colLabels=general_stats_df.columns,
+                  # colWidths=[0.3, 0.3],
+                  loc='upper center',cellLoc='center')
+        plt.table(cellText=stats_df.values,
+                  rowLabels=stats_df.index,
+                  colLabels=stats_df.columns,
+                  # colWidths=[0.3, 0.3],
+                  loc='center')
 
-    plt.table(cellText=general_stats_df.values,
-              colLabels=general_stats_df.columns,
-              # colWidths=[0.3, 0.3],
-              loc='upper center',cellLoc='center')
-    plt.table(cellText=stats_df.values,
-              rowLabels=stats_df.index,
-              colLabels=stats_df.columns,
-              # colWidths=[0.3, 0.3],
-              loc='center')
-
-    if show_plot:
-        plt.show()
+        if show_plot:
+            plt.show()
 
 
-def matplot_stats_summary(network_distribution: NetworkDistribution,
+def matplot_stats_summary(fitter: NetworkFitter,
                           function_list: list = ['pdf', 'cdf', 'sf'],
                           table: bool = True,
-                          show_plot: bool = True):
+                          show_plot: bool = True,
+                          best: bool = True):
     """
     Summarize PDF, CDF and SF functions and display summary table all
     in a single plot.
@@ -719,47 +727,54 @@ def matplot_stats_summary(network_distribution: NetworkDistribution,
 
     Parameters
     -------
-    network_distribution: Input NetworkDistribution object
+    fitter: Input NetworkFitter object
 
     function_list: List of function to calculate (cdf, pdf etc.). By default pdf, cdf and sf functions are calculated
 
     table: Bool. If true the summary table is shown. By default is true
 
     show_plot: Bool. If true show the plot. By default, is True
+    
+    best: Bool. If true show only the best fit. If false show the plots for each fit.  By default is True. 
 
     """
     sns.set_theme()
+    
+    if best:
+        names = [fitter.get_fitted_distribution_names()[0]]
+    else:
+        names = fitter.get_fitted_distribution_names
 
-    name = network_distribution.distribution_name
+    for name in names:
+        network_distribution = fitter.get_fitted_distribution(name)
+        fig = plt.figure(num=f'{name} summary plot', figsize=(13, 7))
+        # fig.text(0.5, 0.02, 'Length [m]', ha='center')
+        fig.suptitle(name)
+        # fig.text(0.04, 0.5, 'Density', va='center', rotation='vertical')
 
-    fig = plt.figure(num=f'{name} summary plot', figsize=(13, 7))
-    # fig.text(0.5, 0.02, 'Length [m]', ha='center')
-    fig.suptitle(name)
-    # fig.text(0.04, 0.5, 'Density', va='center', rotation='vertical')
+        for i, func_name in enumerate(function_list):
 
-    for i, func_name in enumerate(function_list):
+            if func_name == 'pdf':
+                plt.subplot(2, 2, i+1)
+                matplot_stats_pdf(network_distribution, show_plot=False)
+            if func_name == 'cdf':
+                plt.subplot(2, 2, i + 1)
+                matplot_stats_cdf(network_distribution, show_plot=False)
+            if func_name == 'sf':
+                plt.subplot(2, 2, i + 1)
+                matplot_stats_sf(network_distribution, show_plot=False)
 
-        if func_name == 'pdf':
-            plt.subplot(2, 2, i+1)
-            matplot_stats_pdf(network_distribution, show_plot=False)
-        if func_name == 'cdf':
-            plt.subplot(2, 2, i + 1)
-            matplot_stats_cdf(network_distribution, show_plot=False)
-        if func_name == 'sf':
-            plt.subplot(2, 2, i + 1)
-            matplot_stats_sf(network_distribution, show_plot=False)
+        if table:
+            plt.subplot(2, 2, i+2)
+            plt.axis("off")
+            plt.ylim([0, 8])
+            plt.xlim([0, 10])
+            matplot_stats_table(network_distribution, show_plot=False)
 
-    if table:
-        plt.subplot(2, 2, i+2)
-        plt.axis("off")
-        plt.ylim([0, 8])
-        plt.xlim([0, 10])
-        matplot_stats_table(network_distribution, show_plot=False)
+            plt.tight_layout()
 
-    plt.tight_layout()
-
-    if show_plot:
-        plt.show()
+        if show_plot:
+            plt.show()
 
 
 def matplot_stats_uniform(network_fit: NetworkFitter):
