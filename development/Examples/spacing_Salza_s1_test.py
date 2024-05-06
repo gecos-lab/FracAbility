@@ -143,15 +143,15 @@ frac_net.vtk_plot()
 
 frac_net.fractures.save_csv('Spacing_Salza_S1')
 
-fitter = Statistics.NetworkFitter(frac_net)
-fitter.fit('lognorm')
-fitter.fit('expon')
-fitter.fit('weibull_min')
-fitter.fit('gamma')
-fitter.fit('norm')
-fitter.fit('powerlaw')
-
-matplot_stats_table(fitter)
+# fitter = Statistics.NetworkFitter(frac_net)
+# fitter.fit('lognorm')
+# fitter.fit('expon')
+# fitter.fit('weibull_min')
+# fitter.fit('gengamma')
+# fitter.fit('norm')
+# fitter.fit('powerlaw')
+#
+# matplot_stats_table(fitter)
 # matplot_stats_uniform(fitter)
 #
 # print(fitter.fit_records)

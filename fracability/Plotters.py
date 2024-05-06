@@ -49,7 +49,7 @@ import ternary
 from vtkmodules.vtkFiltersCore import vtkConnectivityFilter
 
 from fracability.operations.Statistics import NetworkDistribution, NetworkFitter
-from fracability.utils.general_use import KM
+from fracability.utils.general_use import KM, setFigLinesBW
 
 import numpy as np
 from scipy.stats import uniform
@@ -494,6 +494,7 @@ def vtkplot_backbone(entity,
             plotter.reset_camera()
             plotter.show()
 
+
 def matplot_stats_pdf(network_distribution: NetworkDistribution,
                       histogram: bool = True,
                       show_plot: bool = True):
@@ -764,6 +765,8 @@ def matplot_stats_summary(fitter: NetworkFitter,
                 plt.subplot(2, 2, i + 1)
                 matplot_stats_sf(network_distribution, show_plot=False)
 
+        setFigLinesBW(fig)
+
         if table:
             plt.subplot(2, 2, i+2)
             plt.axis("off")
@@ -784,7 +787,7 @@ def matplot_stats_uniform(network_fit: NetworkFitter):
     :param network_fit:
     :return:
     """
-    sns.set_theme()
+    #sns.set_theme()
 
     fitted_list = network_fit.get_fitted_distribution_names()
 
@@ -792,17 +795,16 @@ def matplot_stats_uniform(network_fit: NetworkFitter):
 
     uniform_list = np.linspace(0, 1, num=10)
     uniform_cdf = uniform.cdf(uniform_list)
-    plt.title('Comparison between CDFs')
-
-    plt.plot(uniform_list, uniform_cdf, 'k-', label='U(0, 1)')
 
     for fit_name in fitted_list:
         fitter = network_fit.get_fitted_distribution(fit_name)
         Z = fitter.cdf()
         delta = fitter.fit_data.delta
         G_n = KM(Z, Z, delta)
-        plt.step(Z, G_n, label=f'G_n {fit_name}') # plot the Kaplan-Meier curves with steps
+        plt.plot(Z, G_n, label=f'G_n {fit_name}') # plot the Kaplan-Meier curves with steps
 
+    setFigLinesBW(fig)
+    plt.plot(uniform_list, uniform_cdf, 'r', label='U(0, 1)')
     plt.title('Distance to Uniform comparison')
     plt.grid(True)
     plt.legend()

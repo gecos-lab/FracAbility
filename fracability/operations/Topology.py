@@ -29,8 +29,10 @@ def nodes_conn(obj):
     frac_idx = np.where(vtk_obj.point_data['type'] == 'fracture')[0]
 
     node_dict = {}
-
+    tot_idx = len(frac_idx)
+    print('\n\n')
     for node in frac_idx:  # For each node of the fractures:
+        print(f'Analyzing nodes:{node}/{tot_idx}', end='\r')
 
         n_edges = network_obj.degree[node]  # Calculate number of connected nodes
 

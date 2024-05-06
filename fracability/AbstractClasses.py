@@ -283,8 +283,10 @@ class BaseEntity(ABC):
         """
         Utility used to clean geometries with double points
         """
-
+        tot_geom = len(self.entity_df.geometry)
+        print('\n\n')
         for line, geom in enumerate(self.entity_df.geometry):
+            print(f'Removing possible double points on geometries: {line}/{tot_geom}',end='\r')
             self.entity_df.loc[line, 'geometry'] = remove_repeated_points(geom, tolerance=0.000001)
 
 

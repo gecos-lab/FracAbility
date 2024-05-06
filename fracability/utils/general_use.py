@@ -91,3 +91,44 @@ def KM(z_values, Z, delta_list):
             G[i] = 1
 
     return G
+
+
+def setAxLinesBW(ax):
+    """
+    Take each Line2D in the axes, ax, and convert the line style to be
+    suitable for black and white viewing.
+    Code taken from https://stackoverflow.com/questions/7358118/black-white-colormap-with-dashes-dots-etc
+    """
+    MARKERSIZE = 1
+
+    COLORMAP = [{'marker': None, 'dash': (None,None)},
+                {'marker': None, 'dash': [5, 5]},
+                {'marker': None, 'dash': [5, 3, 1, 3]},
+                {'marker': None, 'dash': [1, 3]},
+                {'marker': None, 'dash': [5, 2, 5, 2, 5, 10]},
+                {'marker': None, 'dash': [5, 3, 1, 2, 1, 10]},
+                {'marker': None, 'dash': [1,2,1,10]}
+                ]
+
+    lines_to_adjust = ax.get_lines()
+    try:
+        lines_to_adjust += ax.get_legend().get_lines()
+    except AttributeError:
+        pass
+
+    for i, line in enumerate(lines_to_adjust):
+        line.set_color('black')
+        line.set_dashes(COLORMAP[i]['dash'])
+        line.set_marker(COLORMAP[i]['marker'])
+        line.set_markersize(MARKERSIZE)
+
+
+def setFigLinesBW(fig):
+
+    """
+    Take each axes in the figure, and for each line in the axes, make the
+    line viewable in black and white.
+    Code taken from https://stackoverflow.com/questions/7358118/black-white-colormap-with-dashes-dots-etc
+    """
+    for ax in fig.get_axes():
+        setAxLinesBW(ax)

@@ -206,7 +206,7 @@ class Fractures(BaseEntity):
     set_n: int
         Fracture set number.
     check_geometry: Bool
-        Perform geometry check. Default is True
+        Perform geometry check. Default is False
 
 
     Notes
@@ -217,7 +217,7 @@ class Fractures(BaseEntity):
 
     def __init__(self, gdf: GeoDataFrame = None, csv: str = None,
                  shp: str = None, set_n: int = None,
-                 check_geometry: bool = True):
+                 check_geometry: bool = False):
 
         self.check_geometries_flag = check_geometry
         self._set_n = set_n
@@ -325,15 +325,17 @@ class Fractures(BaseEntity):
         """
 
         overlaps_list = []
-
+        tot_geom = len(self.entity_df.geometry)
+        print('\n\n')
         for line, geom in enumerate(self.entity_df.geometry):
+            print(f'Checking geometries: {line}/{tot_geom}',end='\r')
             if geom is None:
-                print(f"Warning, empty geometry at line {line+1}, fix in GIS")
+                print(f"\n\nWarning, empty geometry at line {line+1}, fix in GIS\n\n")
             overlaps = self.entity_df.overlaps(geom)
             if overlaps.any():
                 overlaps_list.append(self.entity_df.loc[line, 'original_line_id'])
         if len(overlaps_list) > 0:
-            print(f'Detected overlaps for set {self._set_n}: {overlaps_list}. Check geometries in gis and fix.')
+            print(f'\n\nDetected overlaps for set {self._set_n}: {overlaps_list}. Check geometries in gis and fix.\n\n')
 
     def mat_plot(self):
 
@@ -359,13 +361,18 @@ class Boundary(BaseEntity):
         Use as input a shapefile indicated by the path
     group_n: int
         Boundary number.
+    check_geometry: Bool
+        Perform geometry check. Default is False
+
 
 
     Notes
     --------
     + The csv needs to have a "geometry" column. If missing the import will fail.
     """
-    def __init__(self, gdf: GeoDataFrame = None, csv: str = None, shp: str = None, group_n: int = 1):
+    def __init__(self, gdf: GeoDataFrame = None,
+                 csv: str = None, shp: str = None,
+                 group_n: int = 1, check_geometry: bool = False):
         """
         Init for Boundary entity. Different inputs can be used. Geopandas dataframe, csv or shapefile. The csv needs to be
         structured in such a way to be compatible with the Nodes entity.
@@ -377,7 +384,7 @@ class Boundary(BaseEntity):
         """
 
         self.group_n = group_n
-
+        self.check_geometries_flag = check_geometry
         if gdf is not None:
             super().__init__(gdf=gdf)
         elif csv is not None:
@@ -435,7 +442,9 @@ class Boundary(BaseEntity):
         if 'b_group' not in self._df.columns:
             self._df['b_group'] = self.group_n
 
-        self.remove_double_points()
+        if self.check_geometries_flag:
+            self.remove_double_points()
+            self.check_geometries()
     @property
     def vtk_object(self) -> PolyData:
 

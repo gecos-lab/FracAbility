@@ -79,7 +79,7 @@ boundary_df = gpd.read_file(boundary_path)
 
 length_plane = 70  # E-W extension of the outcrop
 length_scanl = 70  # N-S extension of the outcrop
-resolution = 50  # Number of scanlines along the direction
+resolution = 100  # Number of scanlines along the direction
 
 
 mean_dir = np.mean(np.floor(df['azimuth']))
@@ -124,7 +124,7 @@ for scanline in scanlines_shp:
 
 split_scanlines_df = gpd.GeoDataFrame(geometry=split_scanlines_list)
 
-valid_scanlines = Entities.Fractures(gdf=split_scanlines_df, set_n=1)
+valid_scanlines = Entities.Fractures(gdf=split_scanlines_df, set_n=2)
 
 
 # plotter = pv.Plotter()
@@ -136,15 +136,15 @@ valid_scanlines = Entities.Fractures(gdf=split_scanlines_df, set_n=1)
 # plotter.show()
 
 frac_net = Entities.FractureNetwork()
-frac_net.add_fractures(fractures)
+# frac_net.add_fractures(fractures)
 frac_net.add_fractures(valid_scanlines)
 frac_net.add_boundaries(boundary)
 
 frac_net.calculate_topology()
 frac_net.vtk_plot()
-#
-# frac_net.fractures.save_csv('Spacing_Salza_S2')
-#
+
+frac_net.fractures.save_csv('Spacing_Salza_S2')
+
 # fitter = Statistics.NetworkFitter(frac_net)
 # fitter.fit('lognorm')
 # fitter.fit('expon')

@@ -105,15 +105,13 @@ def setFigLinesBW(fig):
 # data = pd.read_csv('Salza/output/csv/Fractures_2.csv', index_col=0)
 
 # data = pd.read_csv('Spacing_Salza_S1/output/csv/Fractures_1.csv', index_col=0)  # Read the data
-data = pd.read_csv('Spacing_Salza_S2/output/csv/Fractures_2.csv', index_col=0)  # Read the data
+data = pd.read_csv('Spacing_Salza_S2/output/csv/Fractures_1.csv', index_col=0)  # Read the data
 
 data = data.sort_values(by='length')  # sort the data by length
 
 lengths = data['length'].values  # Length value
 
 lengths = lengths[lengths != np.nan]
-
-
 
 censored_value = data['censored'].values  # Censoring values: 0 is complete, 1 is censored
 delta = 1-censored_value  # In the formulas delta = 1 means complete while 0 means censored.
@@ -125,39 +123,39 @@ uncensored = data.loc[censored_value == 0, 'length']  # Extract only the complet
 
 data_cens = ss.CensoredData(uncensored, right=censored)  # Create the scipy CensoredData instance
 
-names = ['lognorm', 'gengamma', 'expon', 'weibull_min', 'norm', 'burr12']  # list of names of scipy distribution to test
-# names = ['lognorm']
 data_frame = pd.DataFrame(columns=['dist_name',
                                    'AIC', 'delta_i', 'w_i',
                                    'KS', 'KG', 'AD',
-                                   'AIC rank', 'KS rank', 'KG rank', 'AD rank', 'Mean rank'], dtype=float)  # Create empty final dataframe
+                                   'AIC rank', 'KS rank', 'KG rank', 'AD rank','Mean rank'], dtype=float)  # Create empty final dataframe
 
-fig = plt.figure(num=f'Comparison plot', figsize=(13, 7))
+
+name = 'gengamma'
+dist = getattr(ss, name)
+
+ignore_censoring = dist.freeze(*dist.fit(lengths, floc=0))
+remove_censored = dist.freeze(*dist.fit(uncensored, floc=0))
+survival = dist.freeze(*dist.fit(data_cens, floc=0))
+
+dist_dict = {f'{name}_ignore': ignore_censoring, f'{name}_remove': remove_censored, f'{name}_survival': survival}
 ecdf = ss.ecdf(data_cens)
-for i, name in enumerate(names):  # for each scipy distribution do:
+fig = plt.figure(num=f'Comparison plot', figsize=(13, 7))
 
-    data_frame.loc[i, 'dist_name'] = name
-    loc_list = ['norm', 'logistic']  # list of dist names that have only two parameters (and so floc must not be set to 0)
-
-    dist = getattr(ss, name)
-    if name in loc_list:  # for normal and logistic floc controls mu, so it must not be set to 0
-        params = dist.fit(data_cens)
-    else:
-        params = dist.fit(data_cens, floc=0)
-
-    fitted_dist = dist.freeze(*params)
-    # plt.plot(ecdf.cdf.quantiles, ecdf.cdf.probabilities)
-    # plt.plot(lengths, fitted_dist.cdf(lengths))
-    # plt.xscale('log', base=10)
-    # plt.yscale('log', base=10)
-    #
-    # plt.xlabel('Length [m]')
-    # plt.show()
-    # plt.close()
+loc_list = ['norm', 'logistic']
+for i, dict_value in enumerate(dist_dict):  # for each scipy distribution do:
 
     # Akaike 1974
 
-    max_like = fitted_dist.logpdf(uncensored).sum()+fitted_dist.logsf(censored).sum()  # The maximum likelihood SHOULD be the sum of the total sum of logpdf(uncensored) and logsf(censored) of the fitted dist (that is estimated using MLE)
+    name = dict_value
+    data_frame.loc[i, 'dist_name'] = name
+    fitted_dist = dist_dict[name]
+
+    if 'ignore' in name:
+        max_like = fitted_dist.logpdf(lengths).sum()  # The maximum likelihood SHOULD be the sum of the total sum of logpdf(uncensored) and logsf(censored) of the fitted dist (that is estimated using MLE)
+    elif 'remove' in name:
+        max_like = fitted_dist.logpdf(uncensored).sum()
+    else:
+        max_like = fitted_dist.logpdf(uncensored).sum() + fitted_dist.logsf(censored).sum()
+
     if name in loc_list:
         k = len(fitted_dist.args)
     else:
@@ -229,7 +227,9 @@ for i, name in enumerate(names):  # for each scipy distribution do:
     AC_sq = (tot_n * sum1) - (2 * tot_n * sum2) - (tot_n * ln(1 - Z[-1])) - (tot_n * ln(Z[-1])) - tot_n
 
     data_frame.loc[i, 'AD'] = AC_sq
+
 data_frame = data_frame.sort_values(by='AIC', ignore_index=True)
+
 
 # calculate AIC delta values (see Burnham and Anderson 2004)
 
@@ -253,7 +253,6 @@ data_frame['KS rank'] = ss.rankdata(data_frame['KS'], nan_policy='omit')
 data_frame['KG rank'] = ss.rankdata(data_frame['KG'], nan_policy='omit')
 data_frame['AD rank'] = ss.rankdata(data_frame['AD'], nan_policy='omit')
 data_frame['Mean rank'] = data_frame.iloc[:, 7:].mean(axis=1)
-data_frame = data_frame.sort_values(by='Mean rank', ignore_index=True)
 # print(data_frame)
 data_frame.to_csv('analysis_output.csv')
 
@@ -280,29 +279,3 @@ the_table.set_fontsize(14)
 # the_table.scale(2, 2)
 plt.show()
 
-line = (f'Total measures: {len(lengths)}'
-        f'\n{np.round(100*len(uncensored)/len(lengths),2)}% complete'
-        f'\n{np.round(100*len(censored)/len(lengths),2)}% censored')
-
-
-final_model = data_frame.loc[0, 'dist_name']
-
-final_dist = getattr(ss, final_model)
-
-final_fitter = final_dist.freeze(*final_dist.fit(data_cens))
-
-f, ax = plt.subplots()
-sns.histplot(lengths, stat='density')
-plt.plot(lengths, final_fitter.pdf(lengths), color='r', label='Best fitting model PDF')
-plt.title('Data frequency histogram')
-plt.ylabel('Density')
-plt.xlabel('Length [m]')
-plt.legend()
-plt.text(0.95, 0.1, line, ha='right', va='bottom', transform=ax.transAxes)
-
-plt.show()
-plt.close()
-
-plt.plot(lengths, final_fitter.cdf(lengths),'r')
-plt.plot(ecdf.cdf.quantiles,ecdf.cdf.probabilities, 'k')
-plt.show()

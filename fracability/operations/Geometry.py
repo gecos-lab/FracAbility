@@ -40,7 +40,7 @@ def tidy_intersections(obj, buffer=0.05, inplace: bool = True):
         return
 
     df_buffer = gdf.buffer(buffer)
-
+    print('\n\n')
     for idx_line1, line in gdf.iterrows():
         print(f'Calculating intersections: {idx_line1}/{len(gdf.index)}', end='\r')
 
