@@ -1,6 +1,7 @@
 from os.path import dirname, join as joinpath
 
-__version__ = "1.1.1"
+__version__ = "1.2.3"
 __author__ = 'Gabriele Benedetti'
 
-DATADIR = joinpath(dirname(__file__), 'datasets')  # used to set the global path of the datasets
+pontrelli_dir = joinpath(dirname(__file__), 'examples', 'datasets', 'cava_pontrelli')
+salza_dir = joinpath(dirname(__file__), 'examples', 'datasets', 'laghetto_salza')
