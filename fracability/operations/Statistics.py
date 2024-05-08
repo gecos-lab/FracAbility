@@ -1,6 +1,7 @@
 import numpy as np
 
 from numpy import exp
+from numpy import log as ln
 import pandas as pd
 from pandas import DataFrame
 import scipy.stats as ss
@@ -277,6 +278,33 @@ class NetworkDistribution:
         """
         return self.distribution.ppf(0.95)
 
+    # def cdf(self, x_values: np.array = None):
+    #     if x_values:
+    #         return self.distribution.cdf(x_values)
+    #     else:
+    #         return self.distribution.cdf(self.fit_data.lengths)
+
+    def log_pdf(self, x_values: np.array = None) -> np.array:
+        """
+        Property that returns the logpdf calculated on the data
+        :return:
+        """
+
+        if x_values.any():
+            return self.distribution.logpdf(x_values)
+        else:
+            return np.array([0])
+
+    def log_sf(self, x_values: np.array = None) -> np.array:
+        """
+        Property that returns the logsf calculated on the data
+        :return:
+        """
+        if x_values.any():
+            return self.distribution.logsf(x_values)
+        else:
+            return np.array([0])
+
     @property
     def max_log_likelihood(self) -> float:
         """
@@ -300,6 +328,7 @@ class NetworkDistribution:
 
         return LL_f + LL_rc
 
+    # Distance parameters
 
     @property
     def AIC(self) -> float:
@@ -347,32 +376,100 @@ class NetworkDistribution:
         BIC = np.log(n)*k + LL2
         return BIC
 
-    def log_pdf(self, x_values: np.array = None) -> np.array:
+    @property
+    def KS_distance(self) -> float:
         """
-        Property that returns the logpdf calculated on the data
-        :return:
+        Calcuate the Kolmogorov-Smirnov distance between the empirical and the fitted model
+        :return: Float. The KS distance
+
+        Notes
+        ------
+        Kim 2019, Tests based on EDF statistics for randomly censored normal
+        distributions when parameters are unknown
+        """
+        Z = self.distribution.cdf(self.fit_data.lengths)
+        G_n = self.fit_data.ecdf
+        tot_n = self.fit_data.total_n_fractures
+        delta = self.fit_data.delta
+
+        complete_list_index = np.where(delta == 1)[0]
+        diff_plus_list = []
+        diff_minus_list = []
+
+        for j in complete_list_index:
+            diff_plus = G_n[j] - Z[j]  # Calculate the positive difference at index j (DC+)
+
+            if j + 1 > tot_n - 1:  # Check if j+1 (0 indexed) is bigger than the total number tot_n (1 indexed)
+                Z_j1 = 1
+            else:
+                Z_j1 = Z[j + 1]
+
+            diff_minus = Z_j1 - G_n[j]  # Calculate the negative difference at index j (DC-)
+            diff_plus_list.append(diff_plus)
+            diff_minus_list.append(diff_minus)
+
+        DCn_pos = max(diff_plus_list)
+        DCn_neg = max(diff_minus_list)
+
+        DCn = max(DCn_pos, DCn_neg)
+
+        return DCn
+
+    @property
+    def KG_distance(self) -> float:
+        """
+        Calcuate the Koziol and Green distance between the empirical and the fitted model
+        :return: Float. The KG distance
+
+        Notes
+        ------
+        Kim 2019, Tests based on EDF statistics for randomly censored normal
+        distributions when parameters are unknown
         """
 
-        if x_values.any():
-            return self.distribution.logpdf(x_values)
-        else:
-            return np.array([0])
+        Z = self.distribution.cdf(self.fit_data.lengths)
+        G_n = self.fit_data.ecdf
+        tot_n = self.fit_data.total_n_fractures
+        kg_sum = 0
 
-    def log_sf(self, x_values: np.array = None) -> np.array:
-        """
-        Property that returns the logsf calculated on the data
-        :return:
-        """
-        if x_values.any():
-            return self.distribution.logsf(x_values)
-        else:
-            return np.array([0])
+        for j in range(tot_n):
 
-    def cdf(self, x_values: np.array = None):
-        if x_values:
-            return self.distribution.cdf(x_values)
-        else:
-            return self.distribution.cdf(self.fit_data.lengths)
+            if j + 1 > tot_n - 1:  # Check if j+1 (0 indexed) is bigger than the total number tot_n (1 indexed)
+                Z_j1 = 1
+            else:
+                Z_j1 = Z[j + 1]
+            kg_sum += G_n[j] * (Z_j1 - Z[j]) * (G_n[j] - (Z_j1 + Z[j]))
+
+        psi_sq = (tot_n * kg_sum) + tot_n / 3
+
+        return psi_sq
+
+    @property
+    def AD_distance(self) -> float:
+        """
+        Calcuate the Koziol and Green distance between the empirical and the fitted model
+        :return: Float. The KG distance
+
+        Notes
+        ------
+        Kim 2019, Tests based on EDF statistics for randomly censored normal
+        distributions when parameters are unknown
+        """
+        Z = self.distribution.cdf(self.fit_data.lengths)
+        G_n = self.fit_data.ecdf
+        tot_n = self.fit_data.total_n_fractures
+
+        sum1 = 0  # First sum
+        sum2 = 0  # Second sum
+        if Z[-1] == 1:
+            Z[-1] -= 10 ** -10  # this is to avoid 0 in ln(1 - Z[-1]) and similar
+        for j in range(tot_n - 1):
+            sum1 += (G_n[j] ** 2) * (-ln(1 - Z[j + 1]) + ln(Z[j + 1]) + ln(1 - Z[j]) - ln(Z[j]))
+            sum2 += G_n[j] * (-ln(1 - Z[j + 1]) + ln(1 - Z[j]))
+
+        AC_sq = (tot_n * sum1) - (2 * tot_n * sum2) - (tot_n * ln(1 - Z[-1])) - (tot_n * ln(Z[-1])) - tot_n
+
+        return AC_sq
 
 
 class NetworkFitter:
@@ -399,8 +496,13 @@ class NetworkFitter:
         self._accepted_fit: list = []
         self._rejected_fit: list = []
         self._AIC_flag: bool = use_AIC
-        self._fit_dataframe: DataFrame = DataFrame(columns=['name', 'Akaike', 'delta_i', 'w_i',
-                                                            'max_log_likelihood', 'distribution', 'params'])
+        self._fit_dataframe: DataFrame = DataFrame(columns=['name', 'Akaike',
+                                                            'delta_i', 'w_i',
+                                                            'max_log_likelihood', 'KS_distance',
+                                                            'KG_distance', 'AD_distance',
+                                                            'Akaike_rank', 'KS_rank',
+                                                            'KG_rank', 'AD_rank',
+                                                            'Mean_rank', 'distribution'])
 
         self.net_data = NetworkData(obj, use_survival, complete_only)
 
@@ -412,16 +514,15 @@ class NetworkFitter:
         """
         return self._net_data
 
-    @property
-    def fit_records(self) -> DataFrame:
-
-        """ Return the sorted fit dataframe"""
-
-        return self._fit_dataframe.sort_values(by='Akaike', ignore_index=True)
-
     @net_data.setter
     def net_data(self, data: NetworkData):
         self._net_data = data
+
+    def fit_records(self, sort_by='Akaike') -> DataFrame:
+
+        """ Return the sorted fit dataframe"""
+
+        return self._fit_dataframe.sort_values(by=sort_by, ignore_index=True)
 
     def fit(self, distribution_name: str):
 
@@ -430,57 +531,95 @@ class NetworkFitter:
         :param distribution_name: Name of the distribution to fit
         :return:
         """
+        last_pos = len(self._fit_dataframe)  # The position of a new entry in the dataframe will be the last (i.e. the length of the dataframe)
 
-        distribution = getattr(ss, distribution_name)
+        self._fit_dataframe.loc[last_pos, 'name'] = distribution_name
+
+        scipy_distribution = getattr(ss, distribution_name)
 
         if distribution_name == 'norm' or distribution_name == 'logistic':
-            params = distribution.fit(self.net_data.data)
+            params = scipy_distribution.fit(self.net_data.data)
         else:
-            params = distribution.fit(self.net_data.data, floc=0)
+            params = scipy_distribution.fit(self.net_data.data, floc=0)
 
-        distribution = NetworkDistribution(distribution, params, self.net_data)
+        distribution = NetworkDistribution(scipy_distribution, params, self.net_data)
 
         if self._AIC_flag:
             akaike = distribution.AIC
         else:
             akaike = distribution.AICc
+
+        self._fit_dataframe.loc[last_pos, 'Akaike'] = akaike
+
         log_likelihood = distribution.max_log_likelihood
 
-        self._fit_dataframe.loc[len(self._fit_dataframe)] = [distribution_name,
-                                                             akaike, 0.0, 0.0,
-                                                             log_likelihood, distribution, str(params)]
-
+        self._fit_dataframe.loc[last_pos, 'max_log_likelihood'] = log_likelihood
         for i, AIC_val in enumerate(self._fit_dataframe['Akaike']):
             d_i = AIC_val - min(self._fit_dataframe['Akaike'])
             self._fit_dataframe.loc[i, 'delta_i'] = d_i
-
-        total = exp(-self._fit_dataframe['delta_i'].values/2).sum()
+        delta_values = (-self._fit_dataframe['delta_i'].values/2).astype(float)
+        total = exp(delta_values).sum()
 
         for d, delta_i in enumerate(self._fit_dataframe['delta_i']):
             w_i = np.round(exp(-delta_i/2)/total, 5)
             self._fit_dataframe.loc[d, 'w_i'] = w_i
 
-    def get_fitted_parameters(self, distribution_name: str) -> tuple:
+        self._fit_dataframe.loc[last_pos, 'KS_distance'] = distribution.KS_distance
+        self._fit_dataframe.loc[last_pos, 'KG_distance'] = distribution.KG_distance
+        self._fit_dataframe.loc[last_pos, 'AD_distance'] = distribution.AD_distance
+
+        self._fit_dataframe['Akaike_rank'] = ss.rankdata(self._fit_dataframe['Akaike'], nan_policy='omit').astype(int)
+        self._fit_dataframe['KS_rank'] = ss.rankdata(self._fit_dataframe['KS_distance'], nan_policy='omit').astype(int)
+        self._fit_dataframe['KG_rank'] = ss.rankdata(self._fit_dataframe['KG_distance'], nan_policy='omit').astype(int)
+        self._fit_dataframe['AD_rank'] = ss.rankdata(self._fit_dataframe['AD_distance'], nan_policy='omit').astype(int)
+        self._fit_dataframe['Mean_rank'] = self._fit_dataframe.iloc[:, 8:12].mean(axis=1)
+
+        self._fit_dataframe.loc[last_pos, 'distribution'] = distribution
+
+        # self._fit_dataframe.loc[last_pos, 'params'] = params  # this gives out an error for setting the df, I do not know why
+
+    def get_fitted_parameters(self, distribution_name: str, sort_by='Akaike') -> tuple:
         """
         Get the fitted distributions parameters in the fit records df
         :param distribution_name: Name of the distribution
         """
-        parameters = self.fit_records.loc[self.fit_records['name'] == distribution_name, 'params'].values[0]
+        fit_records = self.fit_records(sort_by)
+        dist = fit_records.loc[fit_records['name'] == distribution_name, 'distribution'].values[0]
+        parameters = dist.disribution_parameters
         return ast.literal_eval(parameters)
 
-    def get_fitted_distribution(self, distribution_name: str) -> NetworkDistribution:
+    def get_fitted_parameters_list(self, distribution_names: list = None, sort_by='Akaike') -> list:
+
+        """
+        Get the parameters of the computed fit(s)
+        :return: Pandas DataFrame
+        """
+
+        fit_records = self.fit_records(sort_by)
+
+        if distribution_names is None:
+            distribution_names = fit_records['name'].tolist()
+
+        parameter_list = []
+
+        for name in distribution_names:
+            parameter_list.append(self.get_fitted_parameters(name))
+
+        return parameter_list
+
+    def get_fitted_distribution(self, distribution_name: str, sort_by='Akaike') -> NetworkDistribution:
 
         """
         get the fitted NetworkDistribution object
         :param distribution_name: name of the distribution
         :return:
         """
-
-        distribution = self.fit_records.loc[self.fit_records['name'] == distribution_name, 'distribution'].values[0]
+        fit_records = self.fit_records(sort_by)
+        distribution = fit_records.loc[fit_records['name'] == distribution_name, 'distribution'].values[0]
 
         return distribution
 
-    def get_fitted_distribution_names(self) -> list:
+    def get_fitted_distribution_names(self, sort_by='Akaike') -> list:
 
         """
         get the names of the fitted NetworkDistribution object
@@ -488,62 +627,45 @@ class NetworkFitter:
         :return:
         """
 
-        return self.fit_records['name'].values
+        return self.fit_records(sort_by)['name'].values
 
-    def get_fitted_parameters_list(self, distribution_names: list = None) -> list:
-
-        """
-        Get the parameters of the computed fit(s)
-        :return: Pandas DataFrame
-        """
-        if distribution_names is None:
-            distribution_names = self.fit_records['name'].tolist()
-
-        parameter_list = []
-
-        for name in distribution_names:
-            parameters = self.fit_records.loc[self.fit_records['name'] == name, 'params'].values[0]
-            parameter_list.append(ast.literal_eval(parameters))
-
-        return parameter_list
-
-    def get_fitted_distribution_list(self, distribution_names: list = None) -> list:
+    def get_fitted_distribution_list(self, distribution_names: list = None, sort_by='Akaike') -> list:
         """
         Get a list of NetworkDistribution objects  fot the given distribution name
         :param distribution_names:
         :return:
         """
-
+        fit_records = self.fit_records(sort_by)
         if distribution_names is None:
-            distribution_names = self.fit_records['name'].tolist()
+            distribution_names = fit_records['name'].tolist()
 
         distribution_list = []
 
         for name in distribution_names:
-            distribution = self.fit_records.loc[self.fit_records['name'] == name, 'distribution'].values[0]
+            distribution = fit_records.loc[fit_records['name'] == name, 'distribution'].values[0]
             distribution_list.append(distribution)
 
         return distribution_list
 
-    def best_fit(self) -> pd.Series:
+    def best_fit(self, sort_by='Akaike') -> pd.Series:
 
         """
         Return the best fit in the fit records dataframe
         :return:
         """
 
-        df = self.fit_records
+        df = self.fit_records(sort_by)
 
         return df.loc[0]
 
-    def rejected_fit(self) -> pd.DataFrame:
+    def rejected_fit(self, sort_by='Akaike') -> pd.DataFrame:
 
         """
         Return the fit records dataframe without the best fit
         :return:
         """
 
-        df = self.fit_records
+        df = self.fit_records(sort_by)
 
         return df.loc[1:]
 
@@ -567,164 +689,6 @@ class NetworkFitter:
             self.fit(distribution)
 
         return self.best_fit()
-
-        # fig1 = plt.figure(num='CDF plots', figsize=(13, 7))
-        # fig2 = plt.figure(num='Histograms', figsize=(13, 7))
-        # for i in sorted.index:
-        #
-        #     distr = sorted.loc[i, 'distr']
-        #     params = ast.literal_eval(sorted.loc[i, 'params'])
-        #     fitter_name = sorted.loc[i, 'name']
-        #     aicc = sorted.loc[i, 'AICc']
-        #
-        #     cdf = distr.cdf(ecdf.quantiles, *params)
-        #     pdf = distr.pdf(ecdf.quantiles, *params)
-        #
-        #     plt.figure(num='CDF plots')
-        #     plt.tight_layout()
-        #     plt.subplot(2, 3, i + 1)
-        #     # if i//3 < 1:
-        #     #     plt.tick_params(labelbottom=False)
-        #     # if i%3 > 0:
-        #     #     plt.tick_params(labelleft=False)
-        #     plt.title(f'{fitter_name}   AICc: {np.round(aicc, 3)}')
-        #     plt.plot(ecdf.quantiles, ecdf.probabilities, 'b-', label='Empirical CDF')
-        #     plt.plot(ecdf.quantiles, cdf, 'r-', label=f'{fitter_name} CDF')
-        #     plt.legend()
-        #
-        #     plt.figure('Histograms')
-        #     plt.subplot(2, 3, i + 1)
-        #     plt.title(f'{fitter_name}   AICc: {np.round(aicc, 3)}')
-        #     sns.histplot(lengths, stat='density', bins=50)
-        #     sns.lineplot(x=ecdf.quantiles, y=pdf, label=f'{fitter_name} PDF', color='r')
-        #     plt.legend()
-        #
-        # plt.show()
-
-
-    # def summary_plot(self, x_min: float = 0.0, x_max: float = None, res: int = 200):
-        #
-        #     """
-        #     Summarize PDF, CDF and SF functions and display mean, std, var, median, mode, 5th and 95th percentile all
-        #     in a single plot.
-        #     A range of values and the resolution can be defined with the x_min, x_max and res parameters.
-        #
-        #     Parameters
-        #     -------
-        #     x_min: Lower value of the range. By default is set to 0
-        #
-        #     x_max: Higher value of the range. If None the maximum length of the dataset is used. None by default
-        #
-        #     res: Point resolution between x_min and x_max. By default is set to 1000
-        #     """
-        #
-        #     if x_max is None:
-        #         x_max = max(self._obj.entity_df['length'])
-        #
-        #     x_vals = np.linspace(x_min, x_max, res)
-        #
-        #     fig = plt.figure(num='Summary plot', figsize=(13, 7))
-        #     fig.text(0.5, 0.02, 'Length [m]', ha='center')
-        #     fig.text(0.5, 0.95, self.dist.name2, ha='center')
-        #     fig.text(0.04, 0.5, 'Density', va='center', rotation='vertical')
-        #
-        #     for i, name in enumerate(self._function_list[:3]):
-        #         func = getattr(self.dist, name)
-        #
-        #         y_vals = func(xvals=x_vals, show_plot=False)
-        #         plt.subplot(2, 2, i+1)
-        #         plt.plot(x_vals, y_vals)
-        #         if name == 'CDF':
-        #             xvals, ecdf = statistics.ecdf(self.non_censored_lengths, self.censored_lengths)
-        #             plt.step(xvals, ecdf, 'r-')
-        #         plt.title(name)
-        #         plt.grid(True)
-        #
-        #     plt.subplot(2, 2, i+2)
-        #     plt.axis("off")
-        #     plt.ylim([0, 8])
-        #     plt.xlim([0, 10])
-        #     dec = 4
-        #
-        #     text_mean = f'Mean = {round_and_string(self.dist.mean, dec)}'
-        #     text_std = f'Std = {round_and_string(self.dist.standard_deviation, dec)}'
-        #     text_var = f'Var = {round_and_string(self.dist.variance, dec)}'
-        #     text_median = f'Median = {round_and_string(self.dist.median, dec)}'
-        #     text_mode = f'Mode = {round_and_string(self.dist.mode, dec)}'
-        #     text_b5 = f'5th Percentile = {round_and_string(self.dist.b5, dec)}'
-        #     text_b95 = f'95th Percentile = {round_and_string(self.dist.b95, dec)}'
-        #
-        #     plt.text(0, 7.5, 'Summary table')
-        #     plt.text(0, 6.5, text_mean)
-        #     plt.text(0, 5.5, text_median)
-        #     plt.text(0, 4.5, text_mode)
-        #     plt.text(0, 3.5, text_b5)
-        #     plt.text(0, 2.5, text_b95)
-        #     plt.text(0, 1.5, text_std)
-        #     plt.text(0, 0.5, text_var)
-        #
-        #     plt.text(6, 7.5, 'Test results:')
-        #
-        #     if self.test_parameters:
-        #
-        #         text_result = self.test_parameters['Result']
-        #         text_crit_val = f'KS critical value = {round_and_string(self.test_parameters["crit_val"])}'
-        #         text_ks_val = f'KS statistic = {round_and_string(self.test_parameters["KS_stat"])}'
-        #
-        #         plt.text(8.5, 7.5, text_result)
-        #         plt.text(6, 6.5, text_crit_val)
-        #         plt.text(6, 5.5, text_ks_val)
-        #
-        #     else:
-        #         plt.text(6, 6.5, 'No test has been executed')
-        #
-        #     plt.show()
-
-    # def plot_function(self,
-    #                   func_name: str,
-    #                   x_min: float = 0.0,
-    #                   x_max: float = None,
-    #                   res: int = 200):
-    #
-    #     """
-    #     Plot PDF, CDF or SF functions in a range of x values and with a given resolution.
-    #
-    #     Parameters
-    #     -------
-    #     func_name: Name of the function to plot. Use the fitter_list method to display the available methods.
-    #
-    #     x_min: Lower value of the range. By default it is set to 0
-    #
-    #     x_max: Higher value of the range. If None the maximum length of the dataset is used. None by default
-    #
-    #     res: Point resolution between x_min and x_max. By default is set to 1000
-    #
-    #     Notes
-    #     -------
-    #     Each plot is created in a separate figure with the name associated to the given funtion
-    #     """
-    #
-    #     if x_max is None:
-    #         x_max = self._lengths.max()*10
-    #
-    #     x_vals = np.linspace(x_min, x_max, res)
-    #
-    #     func = getattr(self.dist, func_name) # get the specific function (PDF, CDF, SF)
-    #     y_vals = func(xvals=x_vals, show_plot=False)
-    #
-    #
-    #     fig = plt.figure(num=func_name)
-    #     plt.plot(x_vals, y_vals, 'b-', label='Theoretical cdf')
-    #
-    #     if func_name == 'CDF':
-    #         xval, ecdf = statistics.ecdf(self.non_censored_lengths,self.censored_lengths)
-    #         plt.step(xval, ecdf, 'r-', label='Empirical cdf')
-    #     plt.title(func_name)
-    #     plt.xlabel('Length [m]')
-    #     plt.ylabel('Function response')
-    #     plt.grid(True)
-    #     plt.legend()
-    #     plt.show()
 
     # def plot_kde(self, n_bins: int = 25, x_min: float = 0.0, x_max: float = None, res: int = 1000):
     #

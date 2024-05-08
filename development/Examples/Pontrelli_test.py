@@ -36,7 +36,6 @@ fitter.fit('gengamma')
 fitter.fit('powerlaw')
 fitter.fit('weibull_min')
 
-
 # Plotters.matplot_stats_table(fitter)
 Plotters.matplot_stats_uniform(fitter)
 # Plotters.matplot_stats_ranks(fitter)

@@ -113,8 +113,6 @@ lengths = data['length'].values  # Length value
 
 lengths = lengths[lengths != np.nan]
 
-
-
 censored_value = data['censored'].values  # Censoring values: 0 is complete, 1 is censored
 delta = 1-censored_value  # In the formulas delta = 1 means complete while 0 means censored.
 
@@ -126,7 +124,6 @@ uncensored = data.loc[censored_value == 0, 'length']  # Extract only the complet
 data_cens = ss.CensoredData(uncensored, right=censored)  # Create the scipy CensoredData instance
 
 names = ['lognorm', 'gengamma', 'expon', 'weibull_min', 'norm', 'burr12']  # list of names of scipy distribution to test
-# names = ['lognorm']
 data_frame = pd.DataFrame(columns=['dist_name',
                                    'AIC', 'delta_i', 'w_i',
                                    'KS', 'KG', 'AD',

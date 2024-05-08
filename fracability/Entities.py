@@ -3,6 +3,7 @@ In general, it would be good to give the possibility to treat separately sets of
 boundary and then everything together to consider the network as a composition of single entities and not as a single
 entity.
 
+todo make somehow nodes and fractures connected so that for example when only a set is displayed only the nodes of the corresponding set are considered
 """
 import os.path
 
