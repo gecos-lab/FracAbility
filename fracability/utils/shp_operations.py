@@ -95,9 +95,20 @@ def int_node(line1, line2, idx_list, gdf):
 
                     break
     except IndexError:
-        print(f'Possible duplicate point found, fix geometry on gis')
+        print(f'Possible duplicate point found, fix geometry on gis:')
+        obj1_idx = gdf.loc[idx_list[0], 'original_line_id']
+        set1_idx = gdf.loc[idx_list[0], 'f_set']
+        obj2_idx = gdf.loc[idx_list[1], 'original_line_id']
+        set2_idx = gdf.loc[idx_list[1], 'f_set']
 
-        print(np.array(idx_list)+1)
+        if set2_idx == -9999:
+            group2_idx = gdf.loc[idx_list[1], 'b_group']
+            print(f'lines {obj1_idx} (set {set1_idx}), {obj2_idx} (boundary group {group2_idx})')
+        elif set1_idx == -9999:
+            group1_idx = gdf.loc[idx_list[0], 'b_group']
+            print(f'lines {obj1_idx} (boundary group {group1_idx}), {obj2_idx} (set {set2_idx})')
+        else:
+            print(f'lines {obj1_idx} (set {set1_idx}), {obj2_idx} (set {set2_idx})')
         exit()
     except ValueError:
         obj1_idx = gdf.loc[idx_list[0], 'original_line_id']
