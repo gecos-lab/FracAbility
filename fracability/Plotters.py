@@ -39,6 +39,8 @@ Fracture network (statistics):
         + pdf vs histograms
         + P-P and Q-Q plot?
 
+
+todo the plotters should all inherit from a BasePlotter class
 """
 import matplotlib
 import matplotlib.pyplot as plt
@@ -53,6 +55,7 @@ from fracability.utils.general_use import KM, setFigLinesBW
 
 import numpy as np
 from scipy.stats import uniform
+
 
 def matplot_nodes(entity,
                   markersize=7,
@@ -93,6 +96,7 @@ def matplot_nodes(entity,
     U = np.where(node_types == 5)
     Y2 = np.where(node_types == 6)
 
+    # todo change the colors to reflect the pallete of the paper
     ax.plot(points[I][:, 0], points[I][:, 1], 'or', markersize=markersize)
     ax.plot(points[Y][:, 0], points[Y][:, 1], '^g', markersize=markersize)
     ax.plot(points[Y2][:, 0], points[Y2][:, 1], '^c', markersize=markersize)
@@ -153,7 +157,7 @@ def matplot_fractures(entity,
 
 def matplot_boundaries(entity,
                        linewidth=1,
-                       color='black',
+                       color='red',
                        return_plot=False,
                        show_plot=True):
     """
@@ -184,21 +188,23 @@ def matplot_boundaries(entity,
 
 
 def matplot_frac_net(entity,
-                     markersize=5,
-                     linewidth=[2, 2],
-                     color=['black', 'blue'],
+                     markersize=7,
+                     fracture_linewidth=1,
+                     boundary_linewidth=1,
+                     fracture_color='black',
+                     boundary_color='red',
                      color_set=False,
-                     return_plot=False,
-                     show_plot=True):
+                     show_plot=True,
+                     return_plot=False):
     """
     Plot a fracability FractureNetwork entity using matplotlib.
 
     :param entity: FractureNetwork entity to plot
     :param markersize: Size of the nodes
-    :param linewidth: Size of the lines as a list of ints. The first value of the list will be the width of the fractures
-    while the second the width of the boundary.
-    :param color: General color of the lines as list of strings. The first value of the list will be the width of the fractures
-    while the second the width of the boundary.
+    :param fracture_linewidth: Size of the fracture lines.
+    :param boundary_linewidth: Size of the boundary lines.
+    :param fracture_color: Color of the fracture lines.
+    :param boundary_color: Color of the boundary lines.
     :param color_set: Bool. If true the lines are based on the set values.
     :param return_plot: Bool. If true the plot is returned. By default, False
     :param show_plot: Bool. If true the plot is shown. By default, True
@@ -212,9 +218,11 @@ def matplot_frac_net(entity,
     boundary = entity.boundaries
 
     if fractures is not None:
-        matplot_fractures(fractures, linewidth=linewidth[0], color=color[0], color_set=color_set, return_plot=True)
+        matplot_fractures(fractures, linewidth=fracture_linewidth,
+                          color=fracture_color, color_set=color_set, return_plot=True)
     if boundary is not None:
-        matplot_boundaries(boundary, linewidth=linewidth[1], color=color[1], return_plot=True)
+        matplot_boundaries(boundary, linewidth=boundary_linewidth,
+                           color=boundary_color, return_plot=True)
     if nodes is not None:
         matplot_nodes(nodes, markersize=markersize, return_plot=True)
 
@@ -239,9 +247,10 @@ def vtkplot_nodes(entity,
     :return: If return_plot is true a matplotlib axis is returned
 
     """
-    plotter = Plotter()
-    plotter.background_color = 'gray'
+    plotter = Plotter(notebook=False)
+    plotter.background_color = 'white'
     plotter.view_xy()
+    plotter.add_camera_orientation_widget()
     plotter.enable_image_style()
 
     class_dict = {
@@ -292,7 +301,7 @@ def vtkplot_nodes(entity,
 
 def vtkplot_fractures(entity,
                       linewidth=1,
-                      color='white',
+                      color='black',
                       color_set=False,
                       return_plot=False,
                       show_plot=True,
@@ -311,9 +320,10 @@ def vtkplot_fractures(entity,
 
     """
 
-    plotter = Plotter()
-    plotter.background_color = 'gray'
+    plotter = Plotter(notebook=False)
+    plotter.background_color = 'white'
     plotter.view_xy()
+    plotter.add_camera_orientation_widget()
     plotter.enable_image_style()
 
     vtk_object = entity.vtk_object
@@ -323,10 +333,10 @@ def vtkplot_fractures(entity,
 
     if display_property:
 
-        if display_property in vtk_object.array_names:
+        if display_property in vtk_object.array_names:  # this needs fixin'. Connecting fractures color are "contaminated"
             n_sets = len(set(vtk_object[display_property]))
             cmap = matplotlib.colormaps.get_cmap("rainbow").resampled(n_sets)
-            actor = plotter.add_mesh(entity.vtk_object, #this needs fixin'. Connecting fractures color are "contaminated"
+            actor = plotter.add_mesh(vtk_object,
                                      scalars=display_property,
                                      line_width=linewidth,
                                      cmap=cmap,
@@ -334,8 +344,7 @@ def vtkplot_fractures(entity,
         else:
             return False
     else:
-
-        actor = plotter.add_mesh(entity.vtk_object,
+        actor = plotter.add_mesh(vtk_object,
                                  color=color,
                                  line_width=linewidth,
                                  show_scalar_bar=False)
@@ -350,7 +359,7 @@ def vtkplot_fractures(entity,
 
 def vtkplot_boundaries(entity,
                        linewidth=1,
-                       color='white',
+                       color='red',
                        return_plot=False,
                        show_plot=True):
     """
@@ -363,9 +372,10 @@ def vtkplot_boundaries(entity,
     :param show_plot: Bool. If true the plot is shown. By default, True
     :return: If return_plot is true a matplotlib axis is returned
     """
-    plotter = Plotter()
-    plotter.background_color = 'gray'
+    plotter = Plotter(notebook=False)
+    plotter.background_color = 'white'
     plotter.view_xy()
+    plotter.add_camera_orientation_widget()
     plotter.enable_image_style()
 
     actor = plotter.add_mesh(entity.vtk_object,
@@ -382,29 +392,33 @@ def vtkplot_boundaries(entity,
 
 
 def vtkplot_frac_net(entity,
-                     markersize=5,
-                     linewidth=[2, 2],
-                     color=['white', 'white'],
+                     markersize=7,
+                     fracture_linewidth=1,
+                     boundary_linewidth=1,
+                     fracture_color='black',
+                     boundary_color='red',
                      color_set=False,
-                     return_plot=False,
-                     show_plot=True):
+                     show_plot=True,
+                     return_plot=False):
     """
     Plot a fracability FractureNetwork entity using Pyvista.
 
+
+
     :param entity: FractureNetwork entity to plot
     :param markersize: Size of the nodes
-    :param linewidth: Size of the lines as a list of ints. The first value of the list will be the width of the fractures
-    while the second the width of the boundary.
-    :param color: General color of the lines as list of strings. The first value of the list will be the width of the fractures
-    while the second the width of the boundary.
+    :param fracture_linewidth: Size of the fracture lines.
+    :param boundary_linewidth: Size of the boundary lines.
+    :param fracture_color: Color of the fracture lines.
+    :param boundary_color: Color of the boundary lines.
     :param color_set: Bool. If true the lines are based on the set values.
     :param return_plot: Bool. If true the plot is returned. By default, False
     :param show_plot: Bool. If true the plot is shown. By default, True
     :return: If return_plot is true a matplotlib axis is returned
 
     """
-    plotter = Plotter()
-    plotter.background_color = 'gray'
+    plotter = Plotter(notebook=False)
+    plotter.background_color = 'white'
     plotter.view_xy()
     plotter.add_camera_orientation_widget()
     plotter.enable_image_style()
@@ -418,12 +432,13 @@ def vtkplot_frac_net(entity,
         plotter.add_actor(node_actor)
 
     if fractures is not None:
-        fractures_actor = vtkplot_fractures(fractures, linewidth=linewidth[0],
-                                            color=color[0], color_set=color_set, return_plot=True)
+        fractures_actor = vtkplot_fractures(fractures, linewidth=fracture_linewidth,
+                                            color=fracture_color, color_set=color_set, return_plot=True)
         plotter.add_actor(fractures_actor)
 
     if boundaries is not None:
-        boundary_actor = vtkplot_boundaries(boundaries, linewidth=linewidth[1], color=color[1], return_plot=True)
+        boundary_actor = vtkplot_boundaries(boundaries, linewidth=boundary_linewidth,
+                                            color=boundary_color, return_plot=True)
         plotter.add_actor(boundary_actor)
 
     if return_plot:
@@ -435,10 +450,12 @@ def vtkplot_frac_net(entity,
             plotter.show()
 
 
+# todo check if backbone already exsists. If not create it (and then save it in the entity_df)
 def vtkplot_backbone(entity,
-                     linewidth=[2, 2],
-                     color=['white', 'white'],
-                     color_set=False,
+                     fracture_linewidth=1,
+                     boundary_linewidth=1,
+                     fracture_color='black',
+                     boundary_color='red',
                      return_plot=False,
                      show_plot=True):
     """
@@ -446,18 +463,18 @@ def vtkplot_backbone(entity,
 
     :param entity: FractureNetwork entity to plot
     :param markersize: Size of the nodes
-    :param linewidth: Size of the lines as a list of ints. The first value of the list will be the width of the fractures
-    while the second the width of the boundary.
-    :param color: General color of the lines as list of strings. The first value of the list will be the width of the fractures
-    while the second the width of the boundary.
+    :param fracture_linewidth: Size of the fracture lines.
+    :param boundary_linewidth: Size of the boundary lines.
+    :param fracture_color: Color of the fracture lines.
+    :param boundary_color: Color of the boundary lines.
     :param color_set: Bool. If true the lines are based on the set values.
     :param return_plot: Bool. If true the plot is returned. By default, False
     :param show_plot: Bool. If true the plot is shown. By default, True
     :return: If return_plot is true a matplotlib axis is returned
 
     """
-    plotter = Plotter()
-    plotter.background_color = 'gray'
+    plotter = Plotter(notebook=False)
+    plotter.background_color = 'white'
     plotter.view_xy()
     plotter.add_camera_orientation_widget()
     plotter.enable_image_style()
@@ -474,16 +491,12 @@ def vtkplot_backbone(entity,
 
     backbone = connectivity.GetOutput()
 
-    if fractures is not None:
-        fractures_actor = vtkplot_fractures(fractures, linewidth=linewidth[0],
-                                            color=color[0], color_set=color_set, return_plot=True)
-        plotter.add_actor(fractures_actor)
-
     if backbone is not None:
-        plotter.add_mesh(backbone, color='yellow')
+        plotter.add_mesh(backbone, line_width=fracture_linewidth, color=fracture_color)
 
     if boundaries is not None:
-        boundary_actor = vtkplot_boundaries(boundaries, linewidth=linewidth[1], color=color[1], return_plot=True)
+        boundary_actor = vtkplot_boundaries(boundaries, linewidth=boundary_linewidth,
+                                            color=boundary_color, return_plot=True)
         plotter.add_actor(boundary_actor)
 
     if return_plot:
@@ -493,6 +506,35 @@ def vtkplot_backbone(entity,
         if show_plot:
             plotter.reset_camera()
             plotter.show()
+
+
+# todo implement backbone plot with matplotlib
+def matplot_backbone(entity,
+                     markersize=7,
+                     fracture_linewidth=1,
+                     boundary_linewidth=1,
+                     fracture_color='black',
+                     boundary_color='red',
+                     color_set=False,
+                     show_plot=True,
+                     return_plot=False):
+    """
+    Plot a fracability FractureNetwork entity using matplotlib. (not yet implemented)
+
+    :param entity: FractureNetwork entity to plot
+    :param markersize: Size of the nodes
+    :param fracture_linewidth: Size of the fracture lines.
+    :param boundary_linewidth: Size of the boundary lines.
+    :param fracture_color: Color of the fracture lines.
+    :param boundary_color: Color of the boundary lines.
+    :param color_set: Bool. If true the lines are based on the set values.
+    :param return_plot: Bool. If true the plot is returned. By default, False
+    :param show_plot: Bool. If true the plot is shown. By default, True
+    :return: If return_plot is true a matplotlib axis is returned
+
+    """
+    print('not yet implemented')
+
 
 
 def matplot_stats_pdf(network_distribution: NetworkDistribution,

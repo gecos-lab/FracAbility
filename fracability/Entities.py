@@ -65,11 +65,12 @@ class Nodes(BaseEntity):
         """
 
         self._df = gdf
-        if 'original_line_id' not in self._df.columns:
+        columns = self._df.columns
+        if 'original_line_id' not in columns:
             self._df['original_line_id'] = np.array(gdf.index.values+1)
-        if 'type' not in self._df.columns:
+        if 'type' not in columns:
             self._df['type'] = 'node'
-        if 'n_type' not in self._df.columns:
+        if 'n_type' not in columns:
             self._df['n_type'] = self.node_type
 
     @property
@@ -181,11 +182,26 @@ class Nodes(BaseEntity):
         """
         return self.entity_df.loc[self.entity_df['n_type'] == node_type, 'n_origin']
 
-    def mat_plot(self, markersize=7, return_ax=False):
-        plts.matplot_nodes(self, markersize, return_ax)
+    def mat_plot(self, markersize=7, return_plot=False, show_plot=True):
+        """
+        Plot Nodes object with matplot
+        :param markersize:
+        :param return_plot:
+        :param show_plot:
+        :return:
+        """
+        plts.matplot_nodes(self, markersize, return_plot, show_plot)
 
-    def vtk_plot(self, markersize=7, return_plot=False):
-        plts.vtkplot_nodes(self, markersize, return_plot)
+    def vtk_plot(self, markersize=7, return_plot=False, show_plot=True):
+        """
+        Plot Nodes object with VTK
+        :param markersize:
+        :param return_plot:
+        :param show_plot:
+        :return:
+        """
+
+        plts.vtkplot_nodes(self, markersize, return_plot, show_plot)
 
     def ternary_plot(self):
         plts.matplot_ternary(self)
@@ -264,15 +280,16 @@ class Fractures(BaseEntity):
 
         self._df = gdf.copy()
         self._df.reset_index(inplace=True, drop=True)
-        if 'original_line_id' not in self._df.columns:
+        columns = self._df.columns
+        if 'original_line_id' not in columns:
             self._df['original_line_id'] = np.array(gdf.index.values+1)
-        if 'type' not in self._df.columns:
+        if 'type' not in columns:
             self._df['type'] = 'fracture'
-        if 'censored' not in self._df.columns:
+        if 'censored' not in columns:
             self._df['censored'] = 0
-        if 'f_set' not in self._df.columns:
+        if 'f_set' not in columns:  # todo change this to "set_n" and check at least for similar names
             self._df['f_set'] = self.set_n
-        if 'length' not in self._df.columns:
+        if 'length' not in columns:
             self._df['length'] = np.round(self._df['geometry'].length, 4)
 
         if self.check_geometries_flag:
@@ -321,7 +338,9 @@ class Fractures(BaseEntity):
         saved with only the geometries that need to be corrected.
 
         :param remove_dup: Automatically remove duplicate points. By default, True
-        :param save_shp: Save in the same folder of the input shp with only the geometries that need to be corrected. False by default
+        :param save_shp: Save in the same folder of the input shp with only the geometries that need to be corrected.
+                         This is a useful support file to be imported in gis to quickly find the problematic geometries.
+                         False by default. todo to be implemented
         """
 
         overlaps_list = []
@@ -337,13 +356,54 @@ class Fractures(BaseEntity):
         if len(overlaps_list) > 0:
             print(f'\n\nDetected overlaps for set {self._set_n}: {overlaps_list}. Check geometries in gis and fix.\n\n')
 
-    def mat_plot(self):
+    def mat_plot(self,
+                 linewidth=1,
+                 color='black',
+                 color_set=False,
+                 return_plot=False,
+                 show_plot=True):
+        """
+        Plot fracture object with matplotlib
 
-        plts.matplot_fractures(self)
+        :param linewidth:
+        :param color:
+        :param color_set:
+        :param return_plot:
+        :param show_plot:
+        :return:
+        """
 
-    def vtk_plot(self, linewidth=1, color='white', color_set=False, return_plot=False, display_property: str = None):
+        plts.matplot_fractures(self,
+                               linewidth,
+                               color,
+                               color_set,
+                               return_plot,
+                               show_plot)
 
-        plts.vtkplot_fractures(self, linewidth, color, color_set, return_plot, display_property=display_property)
+    def vtk_plot(self,
+                 linewidth=1,
+                 color='black',
+                 color_set=False,
+                 return_plot=False,
+                 show_plot=True,
+                 display_property: str = None):
+        """
+        Plot fracture object with VTK
+        :param linewidth:
+        :param color:
+        :param color_set:
+        :param return_plot:
+        :param show_plot:
+        :param display_property:
+        :return:
+        """
+        plts.vtkplot_fractures(self,
+                               linewidth,
+                               color,
+                               color_set,
+                               return_plot,
+                               show_plot,
+                               display_property)
 
 
 class Boundary(BaseEntity):
@@ -416,7 +476,10 @@ class Boundary(BaseEntity):
 
         # The following is horrible and I hate it but for some reason the commented lines above
         # do not work for shapely 1.8 and geopandas 0.11 while they work perfectly with 2.0 and 0.13
+        # When PZero moves to shapely 2.0 remove the lines between these comments
+        # and uncomment the two lines above
 
+        # Remove from here
         # This is to suppress the SettingWithCopyWarning (we are not working on a copy)
         pd.options.mode.chained_assignment = None
 
@@ -433,18 +496,19 @@ class Boundary(BaseEntity):
 
         for index, value in enumerate(geom_list):
             self._df.loc[index, 'geometry'] = value
-        # When PZero moves to shapely 2.0 remove the lines between the comments
-        # and uncomment the two lines above
-        if 'original_line_id' not in self._df.columns:
+        # Remove up to here
+
+        columns = self._df.columns
+        if 'original_line_id' not in columns:
             self._df['original_line_id'] = np.array(gdf.index.values+1)
-        if 'type' not in self._df.columns:
+        if 'type' not in columns:
             self._df['type'] = 'boundary'
-        if 'b_group' not in self._df.columns:
+        if 'b_group' not in columns:
             self._df['b_group'] = self.group_n
 
         if self.check_geometries_flag:
             self.remove_double_points()
-            self.check_geometries()
+
     @property
     def vtk_object(self) -> PolyData:
 
@@ -485,11 +549,46 @@ class Boundary(BaseEntity):
         network_obj = Rep.networkx_rep(self.vtk_object)
         return network_obj
 
-    def mat_plot(self):
-        plts.matplot_boundaries(self)
+    def mat_plot(self,
+                 linewidth=1,
+                 color='red',
+                 return_plot=False,
+                 show_plot=True):
+        """
+        Plot Boundary object with matplotlib
+        :param linewidth:
+        :param color:
+        :param return_plot:
+        :param show_plot:
+        :return:
+        """
 
-    def vtk_plot(self):
-        plts.vtkplot_boundaries(self)
+        plts.matplot_boundaries(self,
+                                linewidth,
+                                color,
+                                return_plot,
+                                show_plot)
+
+    def vtk_plot(self,
+                 linewidth=1,
+                 color='red',
+                 color_set=False,
+                 return_plot=False,
+                 show_plot=True):
+        """
+        Plot Boundary object with vtk
+        :param linewidth:
+        :param color:
+        :param color_set:
+        :param return_plot:
+        :param show_plot:
+        :return:
+        """
+        plts.vtkplot_boundaries(self,
+                                linewidth,
+                                color,
+                                return_plot,
+                                show_plot)
 
 
 class FractureNetwork(BaseEntity):
@@ -1203,41 +1302,96 @@ class FractureNetwork(BaseEntity):
     #  ==================== Plotting methods ====================
 
     def vtk_plot(self,
-                markersize=5,
-                linewidth=[2, 2],
-                color=['white', 'white'],
-                color_set=False,
-                return_plot=False):
+                 markersize=5,
+                 fracture_linewidth=1,
+                 boundary_linewidth=1,
+                 fracture_color='black',
+                 boundary_color='red',
+                 color_set=False,
+                 show_plot=True,
+                 return_plot=False):
         """
         Method used to plot the fracture network using vtk
+        :param markersize:
+        :param fracture_linewidth:
+        :param boundary_linewidth:
+        :param fracture_color:
+        :param boundary_color:
+        :param color_set:
+        :param show_plot:
+        :param return_plot:
         :return:
         """
 
-        plts.vtkplot_frac_net(self, markersize, linewidth, color, color_set, return_plot)
+        plts.vtkplot_frac_net(self,
+                              markersize,
+                              fracture_linewidth,
+                              boundary_linewidth,
+                              fracture_color,
+                              boundary_color,
+                              color_set,
+                              show_plot,
+                              return_plot)
 
     def backbone_plot(self,
-                      linewidth=[2, 2],
-                      color='yellow',
-                      return_plot=False):
+                      method = 'vtk',
+                      fracture_linewidth=1,
+                      boundary_linewidth=1,
+                      fracture_color='black',
+                      boundary_color='red',
+                      return_plot=False,
+                      show_plot=True):
         """
         Method used to plot the fracture network using vtk
         :return:
         """
-
-        plts.vtkplot_backbone(self, return_plot=return_plot)
-
+        if method == 'vtk':
+            plts.vtkplot_backbone(self,
+                                  fracture_linewidth,
+                                  boundary_linewidth,
+                                  fracture_color,
+                                  boundary_color,
+                                  return_plot,
+                                  show_plot)
+        elif method == 'matplot':
+            plts.matplot_backbone(self,
+                                  fracture_linewidth,
+                                  boundary_linewidth,
+                                  fracture_color,
+                                  boundary_color,
+                                  return_plot,
+                                  show_plot)
 
     def mat_plot(self,
-                markersize=5,
-                linewidth=[2, 2],
-                color=['black', 'blue'],
-                color_set=False,
-                return_ax=False):
+                 markersize=5,
+                 fracture_linewidth=1,
+                 boundary_linewidth=1,
+                 fracture_color='black',
+                 boundary_color='red',
+                 color_set=False,
+                 show_plot=True,
+                 return_plot=False):
         """
         Method used to plot the fracture network using matplotlib
+        :param markersize:
+        :param fracture_linewidth:
+        :param boundary_linewidth:
+        :param fracture_color:
+        :param boundary_color:
+        :param color_set:
+        :param show_plot:
+        :param return_plot:
         :return:
         """
-        plts.matplot_frac_net(self, markersize, linewidth, color, color_set, return_ax)
+        plts.matplot_frac_net(self,
+                              markersize,
+                              fracture_linewidth,
+                              boundary_linewidth,
+                              fracture_color,
+                              boundary_color,
+                              color_set,
+                              show_plot,
+                              return_plot)
 
     def ternary_plot(self):
         """

@@ -1,4 +1,5 @@
 import os.path
+import glob
 from abc import ABC, abstractmethod, abstractproperty
 
 from geopandas import GeoDataFrame
@@ -385,3 +386,34 @@ class AbstractStatistics(ABC):
     @property
     def function_list(self):
         return self._function_list
+
+
+class AbstractReadDataClass(ABC):
+
+    def __init__(self):
+        self.path: str = ''
+        pass
+
+    @property
+    def data_dict(self) -> dict:
+        """
+        Return a dict of name: path of the available data for the given dataset
+        :return:
+        """
+
+        paths = glob.glob(os.path.join(self.path, '*.shp'))
+
+        file_names = [os.path.basename(path) for path in paths]
+
+        data_dict = {file_name: path for file_name, path in zip(file_names, paths)}
+
+        return data_dict
+
+    @property
+    def available_data(self) -> list:
+        """
+        Return a list of names of the available data for the given dataset
+        :return:
+        """
+
+        return list(self.data_dict.keys())

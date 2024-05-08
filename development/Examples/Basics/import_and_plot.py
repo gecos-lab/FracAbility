@@ -4,19 +4,43 @@ network using vtk and matplotlib
 """
 import os.path
 
-from fracability import pontrelli_dir  # import the path of the sample data
+from fracability.examples import data  # import the path of the sample data
 from fracability import Entities  # import the Entities class
 
-# Import a fracture entity set
-fracture_set1 = Entities.Fractures(shp=os.path.join(pontrelli_dir, 'set_a.shp'), set_n=1)
+pontrelli_data = data.Pontrelli()
 
-# Plot such fracture entity using vtk
+# Display available file names for the Pontrelli dataset
 
-fracture_set1.vtk_plot()
+print(pontrelli_data.available_data)
 
-# Plot such fracture entity using matplotlib
 
-fracture_set1.mat_plot()
+# Build the complete fracture network object
+
+data_dict = pontrelli_data.data_dict  # Get dict of paths for the data
+
+set_a = Entities.Fractures(shp=data_dict['Set_a.shp'], set_n=1)
+set_b = Entities.Fractures(shp=data_dict['Set_b.shp'], set_n=2)
+set_c = Entities.Fractures(shp=data_dict['Set_c.shp'], set_n=3)
+
+boundary = Entities.Boundary(shp=data_dict['Interpretation_boundary.shp'], group_n=1)
+
+
+set_a.vtk_plot(linewidth=0.1)
+
+# fracture_net = Entities.FractureNetwork()
+#
+# fracture_net.add_fractures(set_a)
+# fracture_net.add_fractures(set_b)
+# fracture_net.add_fractures(set_c)
+# fracture_net.add_boundaries(boundary)
+#
+# # Plot the fracture network using VTK
+#
+# fracture_net.vtk_plot()
+#
+# # Plot the fracture network using matplot
+# fracture_net.mat_plot()
+
 
 
 
