@@ -287,9 +287,11 @@ class BaseEntity(ABC):
         if not self.entity_df.empty:
             cwd = os.getcwd()
             output_path = os.path.join(cwd, path, 'output', 'shp')
-
+            style_out = os.path.join(output_path, 'qgis_style')
             if not os.path.isdir(output_path):
                 os.makedirs(output_path)
+            if not os.path.isdir(style_out):
+                os.makedirs(style_out)
 
             if self.name == 'Fractures':
                 set_n = list(set(self.entity_df['f_set']))
@@ -311,7 +313,7 @@ class BaseEntity(ABC):
             qgis_style_paths = QgisStyle().available_paths
 
             for qgis_path in qgis_style_paths:
-                shutil.copy(qgis_path, output_path)
+                shutil.copy(qgis_path, style_out)
 
         else:
             print('Cannot save an empty entity')

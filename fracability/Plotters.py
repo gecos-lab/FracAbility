@@ -815,7 +815,7 @@ def matplot_stats_summary(fitter: NetworkFitter,
                           function_list: list = ['pdf', 'cdf', 'sf'],
                           table: bool = True,
                           show_plot: bool = True,
-                          best: bool = True,
+                          position: int = 1,
                           sort_by: str = 'Akaike'):
     """
     Summarize PDF, CDF and SF functions and display summary table all
@@ -832,15 +832,15 @@ def matplot_stats_summary(fitter: NetworkFitter,
 
     show_plot: Bool. If true show the plot. By default, is True
     
-    best: Bool. If true show only the best fit sorted by the sort_by field. If false show the plots for each fit.  By default is True.
+    position: int. Show the summary plot for the model at the indicated position (1 indexed) sorted by the sort_by field. If False show the plots for each fit.  By default is 1.
 
     sort_by: str. If best is True, show the best fit using the indicated column name. By default is Akaike
 
     """
     sns.set_theme()
     
-    if best:
-        names = [fitter.get_fitted_distribution_names(sort_by)[0]]
+    if position:
+        names = [fitter.get_fitted_distribution_names(sort_by)[position-1]]
     else:
         names = fitter.get_fitted_distribution_names(sort_by)
 
@@ -875,35 +875,51 @@ def matplot_stats_summary(fitter: NetworkFitter,
             plt.show()
 
 
-def matplot_stats_uniform(network_fit: NetworkFitter):
+def matplot_stats_uniform(fitter: NetworkFitter,
+                          show_plot: bool = True,
+                          position: int = 0,
+                          sort_by: str = 'Akaike'):
     """
     Confront the fitted data with the standard uniform 0,1. Following Kim 2019
 
-    :param network_fit:
-    :return:
+    Parameters
+    -------
+    fitter: Input NetworkFitter object
+
+    show_plot: Bool. If true show the plot. By default, is True
+
+    position: int. Show the summary plot for the model at the indicated position (1 indexed) sorted by the sort_by field. If False show the plots for each fit.  By default is False.
+
+    sort_by: str. If best is True, show the best fit using the indicated column name. By default is Akaike
+
     """
     #sns.set_theme()
 
-    fitted_list = network_fit.get_fitted_distribution_names()
+    if position:
+        names = [fitter.get_fitted_distribution_names(sort_by)[position-1]]
+    else:
+        names = fitter.get_fitted_distribution_names(sort_by)
 
     fig = plt.figure(num=f'Comparison plot', figsize=(13, 7))
 
     uniform_list = np.linspace(0, 1, num=10)
     uniform_cdf = uniform.cdf(uniform_list)
 
-    for fit_name in fitted_list:
-        fitter = network_fit.get_fitted_distribution(fit_name)
-        Z = fitter.cdf()
-        delta = fitter.fit_data.delta
+    for name in names:
+        network_distribution = fitter.get_fitted_distribution(name)
+        Z = network_distribution.cdf()
+        delta = network_distribution.fit_data.delta
         G_n = KM(Z, Z, delta)
-        plt.plot(Z, G_n, label=f'G_n {fit_name}') # plot the Kaplan-Meier curves with steps
+        plt.plot(Z, G_n, label=f'G_n {name}') # plot the Kaplan-Meier curves with steps
 
     setFigLinesBW(fig)
-    plt.plot(uniform_list, uniform_cdf, 'r', label='U(0, 1)')
-    plt.title('Distance to Uniform comparison')
-    plt.grid(True)
-    plt.legend()
-    plt.show()
+
+    if show_plot:
+        plt.plot(uniform_list, uniform_cdf, 'r', label='U(0, 1)')
+        plt.title('Distance to Uniform comparison')
+        plt.grid(False)
+        plt.legend()
+        plt.show()
 
 
 
@@ -934,10 +950,11 @@ def matplot_ternary(entity,
     elif entity.name == 'Nodes':
         nodes = entity
 
-    PI, PY, PX = nodes.node_count[: 3]
+    PI, PY, PX, _, CI = nodes.ternary_node_count
     points = [(PX, PI, PY)]
 
     tax.scatter(points, marker='o', color='red', label='Classification')
+    tax.annotate(f'{np.round(CI,2)}', position=[PX, PI, PY])
 
     for n in range(8):
         n += 1

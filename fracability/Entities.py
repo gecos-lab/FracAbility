@@ -91,15 +91,12 @@ class Nodes(BaseEntity):
         return network_obj
 
     @property
-    def node_count(self) -> tuple[float, float, float, float, float]:
+    def ternary_node_count(self) -> tuple[float, float, float, float, float]:
         """
         Calculate the node proportions and precise connectivity value following Manzocchi 2002
-
-        :return: A tuple of values PI, PY, PX, PU, precise_n
+        :return: A tuple of values PI, PY, PX, PU, CI
         """
-        nodes = self.vtk_object['n_type']
-        unique, count = np.unique(nodes, return_counts=True)
-        count_dict = dict(zip(unique, count))
+        count_dict = self.node_count
 
         if 1 in count_dict.keys():
             I_nodes = count_dict[1]
@@ -152,6 +149,18 @@ class Nodes(BaseEntity):
 
         return PI, PY, PX, PU, precise_n
 
+    @property
+    def node_count(self) -> dict:
+        """
+        Calculate the node count dictionary
+
+        :return: A dictionary of nodes and their count
+        """
+
+        nodes = self.vtk_object['n_type']
+        unique, count = np.unique(nodes, return_counts=True)
+        count_dict = dict(zip(unique, count))
+        return count_dict
     @property
     def n_censored(self) -> int:
         """ Return the number of censored nodes"""

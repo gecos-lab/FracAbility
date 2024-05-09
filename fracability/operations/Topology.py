@@ -32,7 +32,7 @@ def nodes_conn(obj):
     tot_idx = len(frac_idx)
     print('\n\n')
     for node in frac_idx:  # For each node of the fractures:
-        print(f'Analyzing nodes:{node}/{tot_idx}', end='\r')
+        print(f'Analyzing nodes:{node+1}/{tot_idx}', end='\r')
 
         n_edges = network_obj.degree[node]  # Calculate number of connected nodes
 
@@ -79,7 +79,7 @@ def nodes_conn(obj):
         node_dict[point] = (n_edges, node_origin)
 
     obj.entity_df = entity_df_obj
-
+    print('\n\nDone!')
     return node_dict
 
 

@@ -12,9 +12,21 @@ class AbstractReadDataClass(ABC):
     :param extension: String of extension to search in the dataset directory. Default is .shp
     """
     def __init__(self, extension='.shp'):
-        self.path: str = ''
+        self._path: str = ''
         self.extension = extension
         pass
+
+    @property
+    def path(self) -> str:
+        """
+        Set or get the path of the dataset
+        """
+
+        return self._path
+
+    @path.setter
+    def path(self, path: str):
+        self._path = path
 
     @property
     def data_dict(self) -> dict:
