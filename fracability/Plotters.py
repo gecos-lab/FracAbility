@@ -536,7 +536,6 @@ def matplot_backbone(entity,
     print('not yet implemented')
 
 
-
 def matplot_stats_pdf(network_distribution: NetworkDistribution,
                       histogram: bool = True,
                       show_plot: bool = True):
@@ -666,10 +665,9 @@ def matplot_stats_sf(network_distribution: NetworkDistribution,
         plt.show()
 
 
-def matplot_stats_table(fitter: NetworkFitter,
+def matplot_stats_table(network_distribution: NetworkDistribution,
                         vertical: bool = True,
-                        show_plot: bool = True,
-                        best=True):
+                        show_plot: bool = True):
     """
     Plot the stats summary table for both the data and the NetworkDistribution. In particular the following
     estimators are calculated:
@@ -686,83 +684,139 @@ def matplot_stats_table(fitter: NetworkFitter,
 
     Parameters
     -----------
-    fitter: Input NetworkFitter object
+    network_distribution: Input NetworkDistribution object
 
     vertical: Bool. If true the table is vertical (2cols x 7rows). By default, is True
 
     show_plot: Bool. If true show the plot. By default, is True
 
-    best: Bool. If true show only the best fit. If false show the plots for each fit. By default is True.
-
     """
+    name = network_distribution.distribution_name
+    if show_plot:
+        fig = plt.figure(num=f'{name} summary table')
+        fig.text(0.5, 0.95, f'{name} summary table', ha='center')
 
-    if best:
-        names = [fitter.get_fitted_distribution_names()[0]]
-    else:
-        names = fitter.get_fitted_distribution_names
-    for name in names:
-        network_distribution = fitter.get_fitted_distribution(name)
-        if show_plot:
-            fig = plt.figure(num=f'{name} summary table')
-            fig.text(0.5, 0.95, f'{name} summary table', ha='center')
+    network_data = network_distribution.fit_data
+    plt.axis("off")
+    dec = 4
 
-        network_data = network_distribution.fit_data
-        plt.axis("off")
-        dec = 4
+    text_mean = f'{np.round(network_distribution.mean, dec)}'
+    text_std = f'{np.round(network_distribution.std, dec)}'
+    text_var = f'{np.round(network_distribution.var, dec)}'
+    text_median = f'{np.round(network_distribution.median, dec)}'
+    text_mode = f'{np.round(network_distribution.mode[0], dec)}'
+    text_b5 = f'{np.round(network_distribution.b5, dec)}'
+    text_b95 = f'{np.round(network_distribution.b95, dec)}'
 
-        text_mean = f'{np.round(network_distribution.mean, dec)}'
-        text_std = f'{np.round(network_distribution.std, dec)}'
-        text_var = f'{np.round(network_distribution.var, dec)}'
-        text_median = f'{np.round(network_distribution.median, dec)}'
-        text_mode = f'{np.round(network_distribution.mode[0], dec)}'
-        text_b5 = f'{np.round(network_distribution.b5, dec)}'
-        text_b95 = f'{np.round(network_distribution.b95, dec)}'
+    text_mean_th = f'{np.round(network_data.mean, dec)}'
+    text_std_th = f'{np.round(network_data.std, dec)}'
+    text_var_th = f'{np.round(network_data.var, dec)}'
+    text_median_th = f'{np.round(network_data.median, dec)}'
+    text_mode_th = f'{np.round(network_data.mode[0], dec)}'
+    text_b5_th = f'{np.round(network_data.b5, dec)}'
+    text_b95_th = f'{np.round(network_data.b95, dec)}'
 
-        text_mean_th = f'{np.round(network_data.mean, dec)}'
-        text_std_th = f'{np.round(network_data.std, dec)}'
-        text_var_th = f'{np.round(network_data.var, dec)}'
-        text_median_th = f'{np.round(network_data.median, dec)}'
-        text_mode_th = f'{np.round(network_data.mode[0], dec)}'
-        text_b5_th = f'{np.round(network_data.b5, dec)}'
-        text_b95_th = f'{np.round(network_data.b95, dec)}'
+    text_totalf = f'{network_data.total_n_fractures}'
+    text_perc_censor = f'{np.round(network_data.censoring_percentage, dec)}'
 
-        text_totalf = f'{network_data.total_n_fractures}'
-        text_perc_censor = f'{np.round(network_data.censoring_percentage, dec)}'
+    text_AIC_rank = f'{network_distribution.Akaike_rank}'
+    text_KS_rank = f'{network_distribution.KS_rank}'
+    text_KG_rank = f'{network_distribution.KG_rank}'
+    text_AD_rank = f'{network_distribution.AD_rank}'
+    text_mean_rank = f'{network_distribution.Mean_rank}'
 
-        general_stats_df = pd.DataFrame(data=[[text_totalf, text_perc_censor]],
-                                        columns=['Total number of fractures', '% censored'])
+    general_stats_df = pd.DataFrame(data=[[text_totalf, text_perc_censor]],
+                                    columns=['Total number of fractures', '% censored'])
 
-        stats_df = pd.DataFrame(data=[[text_mean_th, text_mean],
-                                      [text_median_th, text_median],
-                                      [text_mode_th, text_mode],
-                                      [text_b5_th, text_b5],
-                                      [text_b95_th, text_b95],
-                                      [text_std_th, text_std],
-                                      [text_var_th, text_var]],
-                                columns=['Data', 'Fit'], index=['Mean', 'Median', 'Mode',
-                                                                'B5', 'B95', 'Std', 'Var'])
-        if not vertical:
-            stats_df = stats_df.transpose()
+    stats_df = pd.DataFrame(data=[[text_mean_th, text_mean],
+                                  [text_median_th, text_median],
+                                  [text_mode_th, text_mode],
+                                  [text_b5_th, text_b5],
+                                  [text_b95_th, text_b95],
+                                  [text_std_th, text_std],
+                                  [text_var_th, text_var]],
+                            columns=['Data', 'Fit'], index=['Mean', 'Median', 'Mode',
+                                                            'B5', 'B95', 'Std', 'Var'])
 
-        plt.table(cellText=general_stats_df.values,
-                  colLabels=general_stats_df.columns,
-                  # colWidths=[0.3, 0.3],
-                  loc='upper center',cellLoc='center')
-        plt.table(cellText=stats_df.values,
-                  rowLabels=stats_df.index,
-                  colLabels=stats_df.columns,
-                  # colWidths=[0.3, 0.3],
-                  loc='center')
+    rank_df = pd.DataFrame(data=[[text_AIC_rank,text_KS_rank, text_KG_rank, text_AD_rank, text_mean_rank]],
+                           columns=['Akaike rank', 'KS rank', 'KG rank', 'AD rank', 'Mean rank'])
 
-        if show_plot:
-            plt.show()
+    if not vertical:
+        stats_df = stats_df.transpose()
+
+    gen_table = plt.table(cellText=general_stats_df.values,
+                          colLabels=general_stats_df.columns,
+                          # colWidths=[0.3, 0.3],
+                          loc='upper center',cellLoc='center')
+
+    # gen_table.auto_set_font_size(False)
+    # gen_table.auto_set_column_width(col=list(range(len(general_stats_df.columns))))
+
+    sta_table = plt.table(cellText=stats_df.values,
+                          rowLabels=stats_df.index,
+                          colLabels=stats_df.columns,
+                          # colWidths=[0.3, 0.3],
+                          loc='center')
+
+    # sta_table.auto_set_font_size(False)
+    # sta_table.auto_set_column_width(col=list(range(len(stats_df.columns))))
+
+    ran_table = plt.table(cellText=rank_df.values,
+                          colLabels=rank_df.columns,
+                          # colWidths=[0.3, 0.3],
+                          loc='lower center', cellLoc='center')
+
+    # ran_table.auto_set_font_size(False)
+    # ran_table.auto_set_column_width(col=list(range(len(rank_df.columns))))
+
+    if show_plot:
+        plt.show()
+
+
+# def matplot_stats_model_selection(fitter: NetworkFitter,
+#                                   vertical: bool= False,
+#                                   show_plot: bool = True,
+#                                   sort_by: str = 'Akaike'):
+#     """
+#     Plot the stats summary table for the chosen models
+#
+#     Parameters
+#     -----------
+#     fitter: Network fitter object
+#     vertical: Bool. If true the table is vertical. By default, is False
+#     show_plot: Bool. If true show the plot. By default, is True
+#     sort_by: Sort the model based on a selection parameter. Available keys:
+#         1. Akaike
+#         2. KS_distance
+#         3. KG_distance
+#         4. AD_distance
+#     """
+#
+#     if show_plot:
+#         fig = plt.figure(num=f'Model selection summary table')
+#         fig.text(0.5, 0.95, f'Model selection summary table (sorted by {sort_by})', ha='center')
+#
+#     plt.axis('off')
+#     data_frame = fitter.fit_records(sort_by)
+#     the_table = plt.table(cellText=data_frame.round(decimals=2).values[:, 1:13],
+#                           rowLabels=data_frame['name'],
+#                           colLabels=data_frame.columns[1:13],
+#                           loc='center')
+#
+#     the_table.auto_set_font_size(False)
+#     the_table.auto_set_column_width(col=list(range(len(data_frame.columns))))
+#     the_table.set_fontsize(14)
+#
+#     if show_plot:
+#         plt.show()
 
 
 def matplot_stats_summary(fitter: NetworkFitter,
                           function_list: list = ['pdf', 'cdf', 'sf'],
                           table: bool = True,
                           show_plot: bool = True,
-                          best: bool = True):
+                          best: bool = True,
+                          sort_by: str = 'Akaike'):
     """
     Summarize PDF, CDF and SF functions and display summary table all
     in a single plot.
@@ -778,15 +832,17 @@ def matplot_stats_summary(fitter: NetworkFitter,
 
     show_plot: Bool. If true show the plot. By default, is True
     
-    best: Bool. If true show only the best fit. If false show the plots for each fit.  By default is True. 
+    best: Bool. If true show only the best fit sorted by the sort_by field. If false show the plots for each fit.  By default is True.
+
+    sort_by: str. If best is True, show the best fit using the indicated column name. By default is Akaike
 
     """
     sns.set_theme()
     
     if best:
-        names = [fitter.get_fitted_distribution_names()[0]]
+        names = [fitter.get_fitted_distribution_names(sort_by)[0]]
     else:
-        names = fitter.get_fitted_distribution_names
+        names = fitter.get_fitted_distribution_names(sort_by)
 
     for name in names:
         network_distribution = fitter.get_fitted_distribution(name)
@@ -806,9 +862,6 @@ def matplot_stats_summary(fitter: NetworkFitter,
             if func_name == 'sf':
                 plt.subplot(2, 2, i + 1)
                 matplot_stats_sf(network_distribution, show_plot=False)
-
-        setFigLinesBW(fig)
-
         if table:
             plt.subplot(2, 2, i+2)
             plt.axis("off")

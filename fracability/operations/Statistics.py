@@ -16,15 +16,14 @@ class NetworkData:
 
     """ Class used to represent fracture or fracture network data.
     It acts as a wrapper for the scipy CensoredData class
+
+    :param obj: fracture/fracture network object
+    :param use_survival: Use survival analysis to get the distribution. If false the whole dataset is used considering all fractures complete
+    :param complete_only: When not using survival, use only the complete length values
     """
 
     def __init__(self, obj=None, use_survival=True, complete_only=True):
-        """
 
-        :param obj: fracture/fracture network object
-        :param use_survival: Use survival analysis to get the distribution. If false the whole dataset is used considering all fractures complete
-        :param complete_only: When not using survival, use only the complete length values
-        """
 
         self._obj = obj  # fracture/fracture network object
 
@@ -58,6 +57,7 @@ class NetworkData:
                 if self.complete_only:
                     self.data = self.non_censored_lengths
                 else:
+                    self.delta[:] = 1
                     self.data = self.lengths
 
     @property
@@ -119,54 +119,90 @@ class NetworkData:
 
     @property
     def mean(self) -> np.ndarray:
+        """
+        Calculate the sample mean of ALL the input data (i.e. it ignores the complete_only flag).
+        :return: Numpy array of the sample mean
+        """
         return np.mean(self.lengths)
 
     @property
     def std(self) -> np.ndarray:
+        """
+        Calculate the sample standard deviation of ALL the input data (i.e. it ignores the complete_only flag).
+        :return: Numpy array of the sample standard deviation
+        """
         return np.std(self.lengths)
 
     @property
     def var(self) -> np.ndarray:
+        """
+        Calculate the sample variance of ALL the input data (i.e. it ignores the complete_only flag).
+        :return: Numpy array of the sample variance
+        """
         return np.var(self.lengths)
 
     @property
     def median(self) -> np.ndarray:
+        """
+        Calculate the sample median of ALL the input data (i.e. it ignores the complete_only flag).
+        :return: Numpy array of the sample median
+        """
         return np.median(self.lengths)
 
     @property
     def mode(self) -> tuple:
+        """
+        Calculate the sample mode of ALL the input data (i.e. it ignores the complete_only flag).
+        :return: Tuple of the most frequent value(s)
+        """
         return ss.mode(self.lengths)
 
     @property
     def b5(self) -> np.ndarray:
+        """
+        Calculate the sample 5th percentile of ALL the input data (i.e. it ignores the complete_only flag).
+        :return: Numpy array of the sample 5th percentile
+        """
         return np.percentile(self.lengths, 5)
 
     @property
     def b95(self) -> np.ndarray:
+        """
+        Calculate the sample 95th percentile of ALL the input data (i.e. it ignores the complete_only flag).
+        :return: Numpy array of the sample 95th percentile
+        """
         return np.percentile(self.lengths, 95)
 
     @property
     def ecdf(self) -> np.ndarray:
         """
-        Property that returns the empirical cdf of the data using Kaplan-Meier
-        :return:
+        Property that returns the empirical CDF of the input data (it ignores the complete_only flag but ) using Kaplan-Meier.
+        :return: Numpy array of the calculated CDF values using KM
         """
         return KM(self.lengths, self.lengths, self.delta)
 
     @property
     def esf(self) -> np.ndarray:
         """
-        Property that returns the empirical sf of the data
-        :return:
+        Property that returns the empirical SF of the ALL the input data (i.e. it ignores the complete_only flag) using Kaplan-Meier.
+        :return: Numpy array of the calculated SF values using KM
         """
         return 1-self.ecdf
 
     @property
     def total_n_fractures(self) -> int:
+        """
+        Total number of fractures of ALl the input data (i.e. it ignores the complete_only flag)
+        :return: Int. Number of fractures
+        """
         return len(self.lengths)
 
     @property
     def censoring_percentage(self) -> float:
+        """
+        Percentage of censoring of ALl the input data (i.e. it ignores the complete_only flag)
+        :return: Float. Censoring %
+        """
         return (len(self.censored_lengths)/self.total_n_fractures)*100
 
 
@@ -176,10 +212,15 @@ class NetworkDistribution:
     scipy rv distributions.
     """
 
-    def __init__(self, obj: ss.rv_continuous = None, parameters: tuple = None, fit_data: NetworkData = None):
+    def __init__(self, parent, obj: ss.rv_continuous = None, parameters: tuple = None, fit_data: NetworkData = None):
 
+        self.parent: NetworkFitter = parent
         self._distribution = obj.freeze(*parameters)
         self.fit_data = fit_data
+
+    # @property
+    # def parent(self) -> NetworkFitter:
+    #     return self._parent
 
     @property
     def distribution(self) -> ss.rv_continuous:
@@ -279,11 +320,11 @@ class NetworkDistribution:
         """
         return self.distribution.ppf(0.95)
 
-    # def cdf(self, x_values: np.array = None):
-    #     if x_values:
-    #         return self.distribution.cdf(x_values)
-    #     else:
-    #         return self.distribution.cdf(self.fit_data.lengths)
+    def cdf(self, x_values: np.array = None):
+        if x_values:
+            return self.distribution.cdf(x_values)
+        else:
+            return self.distribution.cdf(self.fit_data.lengths)
 
     def log_pdf(self, x_values: np.array = None) -> np.array:
         """
@@ -364,6 +405,12 @@ class NetworkDistribution:
             return AICc
 
     @property
+    def Akaike_rank(self):
+        fitter_records = self.parent.fit_records()
+        name = self.distribution_name
+        return fitter_records.loc[fitter_records['name'] == name, 'Akaike_rank'].values[0]
+
+    @property
     def BIC(self) -> float:
         """
         Property that returns the Bayesian Information Criterion of the distribution
@@ -417,6 +464,12 @@ class NetworkDistribution:
         return DCn
 
     @property
+    def KS_rank(self):
+        fitter_records = self.parent.fit_records()
+        name = self.distribution_name
+        return fitter_records.loc[fitter_records['name'] == name, 'KS_rank'].values[0]
+
+    @property
     def KG_distance(self) -> float:
         """
         Calcuate the Koziol and Green distance between the empirical and the fitted model
@@ -446,6 +499,12 @@ class NetworkDistribution:
         return psi_sq
 
     @property
+    def KG_rank(self):
+        fitter_records = self.parent.fit_records()
+        name = self.distribution_name
+        return fitter_records.loc[fitter_records['name'] == name, 'KG_rank'].values[0]
+
+    @property
     def AD_distance(self) -> float:
         """
         Calcuate the Koziol and Green distance between the empirical and the fitted model
@@ -472,26 +531,34 @@ class NetworkDistribution:
 
         return AC_sq
 
+    @property
+    def AD_rank(self):
+        fitter_records = self.parent.fit_records()
+        name = self.distribution_name
+        return fitter_records.loc[fitter_records['name'] == name, 'AD_rank'].values[0]
 
+    @property
+    def Mean_rank(self):
+        fitter_records = self.parent.fit_records()
+        name = self.distribution_name
+        return fitter_records.loc[fitter_records['name'] == name, 'Mean_rank'].values[0]
 class NetworkFitter:
 
     """
     Class used to fit a Fracture or Fracture network object
+
+    :param obj: fracture/fracture network object
+    :param use_survival: Boolean flag to use survival (True) or treat the data as if there were no censoring (False). Default is True.
+    :param complete_only: Boolean flag to use only complete measurements (True) or all the dataset (False). This flag is used only when use_survival is False. Default is False.
+    :param use_AIC: Boolean flag to use AIC (True) or AICc (False) for model selection. Default is True. The
+    column name in the dataframe will remain the same (Akaike).
 
     Add bool to:
         + Consider censored lengths as non-censored
         + Do not consider censored lengths at all
 
     """
-    def __init__(self, obj=None, use_survival=True, complete_only=True, use_AIC=True):
-        """
-
-        :param obj: fracture/fracture network object
-        :param use_survival: Bool flag to set to use survival analysis approach or not. Default is True
-        :param complete_only: Bool flag to set to use only complete values. Default is False
-        :param use_AIC: Bool flag to set to use AIC or AICc. If True use AIC if False AICc. Default is True. The
-        column name in the dataframe will remain the same (Akaike).
-        """
+    def __init__(self, obj=None, use_survival=True, complete_only=False, use_AIC=True):
 
         self._net_data: NetworkData
         self._accepted_fit: list = []
@@ -505,18 +572,18 @@ class NetworkFitter:
                                                             'KG_rank', 'AD_rank',
                                                             'Mean_rank', 'distribution'])
 
-        self.net_data = NetworkData(obj, use_survival, complete_only)
+        self.network_data = NetworkData(obj, use_survival, complete_only)
 
     @property
-    def net_data(self) -> NetworkData:
+    def network_data(self) -> NetworkData:
         """
         Property that returns or sets a NetworkData object
         :return:
         """
         return self._net_data
 
-    @net_data.setter
-    def net_data(self, data: NetworkData):
+    @network_data.setter
+    def network_data(self, data: NetworkData):
         self._net_data = data
 
     def fit_records(self, sort_by='Akaike') -> DataFrame:
@@ -539,11 +606,12 @@ class NetworkFitter:
         scipy_distribution = getattr(ss, distribution_name)
 
         if distribution_name == 'norm' or distribution_name == 'logistic':
-            params = scipy_distribution.fit(self.net_data.data)
+            params = scipy_distribution.fit(self.network_data.data)
         else:
-            params = scipy_distribution.fit(self.net_data.data, floc=0)
+            params = scipy_distribution.fit(self.network_data.data, floc=0)
 
-        distribution = NetworkDistribution(scipy_distribution, params, self.net_data)
+        distribution = NetworkDistribution(parent=self, obj=scipy_distribution,
+                                           parameters=params, fit_data=self.network_data)
 
         if self._AIC_flag:
             akaike = distribution.AIC
@@ -691,14 +759,31 @@ class NetworkFitter:
 
         return self.best_fit()
 
-    def fit_result_to_clipboard(self, sort_by='Akaike'):
+    def fit_result_to_csv(self, path, sort_by='Akaike'):
         """
-        Copy to clipboard the df to be easily pasted in a table
+        Save the csv to a specified path
+        :param path: Path of where to save the csv
         :param sort_by: Column name to sort the values
         :return:
         """
-        text = self.fit_records(sort_by)[:-1]
-        pyperclip.copy(str(text))
+        self.fit_records(sort_by).iloc[:, :-1].to_csv(path, sep=';', index=False)
+
+    def fit_result_to_excel(self, path, sort_by='Akaike'):
+        """
+        Save the excel to a specified path
+        :param path: Path of where to save the excel
+        :param sort_by: Column name to sort the values
+        :return:
+        """
+        self.fit_records(sort_by).iloc[:, :-1].to_excel(path, index=False)
+
+    def fit_result_to_clipboard(self, sort_by='Akaike'):
+        """
+        Copy to clipboard the df to be easily pasted in an excel file
+        :param sort_by: Column name to sort the values
+        :return:
+        """
+        self.fit_records(sort_by).iloc[:, :-1].to_clipboard(index=False)
 
     # def plot_kde(self, n_bins: int = 25, x_min: float = 0.0, x_max: float = None, res: int = 1000):
     #

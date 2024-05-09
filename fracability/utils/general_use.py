@@ -101,13 +101,13 @@ def setAxLinesBW(ax):
     """
     MARKERSIZE = 1
 
-    COLORMAP = [{'marker': None, 'dash': (None,None)},
-                {'marker': None, 'dash': [5, 5]},
-                {'marker': None, 'dash': [5, 3, 1, 3]},
-                {'marker': None, 'dash': [1, 3]},
-                {'marker': None, 'dash': [5, 2, 5, 2, 5, 10]},
-                {'marker': None, 'dash': [5, 3, 1, 2, 1, 10]},
-                {'marker': None, 'dash': [1,2,1,10]}
+    COLORMAP = [{'marker': '', 'dash': (None, None)},
+                {'marker': '', 'dash': [5, 5]},
+                {'marker': '', 'dash': [5, 3, 1, 3]},
+                {'marker': '', 'dash': [1, 3]},
+                {'marker': '', 'dash': [5, 2, 5, 2, 5, 10]},
+                {'marker': '', 'dash': [5, 3, 1, 2, 1, 10]},
+                {'marker': '', 'dash': [1, 2, 1, 10]}
                 ]
 
     lines_to_adjust = ax.get_lines()
