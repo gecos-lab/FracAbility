@@ -40,7 +40,7 @@ dependencies = [
 dynamic = ['version']
 
 [project.optional-dependencies]
-all = ['pyvista[jupyter]']
+all = ['fracability[jupyter]']
 
 jupyter = [
     'ipywidgets',
