@@ -1,6 +1,8 @@
 import os.path
-import glob
+import shutil
 from abc import ABC, abstractmethod, abstractproperty
+from fracability.examples.data import QgisStyle
+
 
 from geopandas import GeoDataFrame
 from geopandas import read_file
@@ -40,7 +42,6 @@ class BaseEntity(ABC):
         --------
         The csv needs to have a "geometry" column. If missing the import will fail.
         """
-
 
         self._df: GeoDataFrame = GeoDataFrame()
         if gdf is not None:
@@ -221,7 +222,7 @@ class BaseEntity(ABC):
             else:
                 return copy_obj
 
-    def save_csv(self, path: str, sep: str = ',', index: bool = False):
+    def save_csv(self, path: str, sep: str = ';', index: bool = False):
         """
         Save the entity df as csv
 
@@ -247,10 +248,25 @@ class BaseEntity(ABC):
             if not os.path.isdir(output_path):
                 os.makedirs(output_path)
 
-            set_n = list(set(self.entity_df['f_set']))
-            for f_set in set_n:
-                final_path = os.path.join(output_path, f'{self.name}_{f_set}.csv')
-                self.entity_df.to_csv(final_path, sep=sep, index=index)
+            if self.name == 'Fractures':
+                set_n = list(set(self.entity_df['f_set']))
+                for f_set in set_n:
+                    final_path = os.path.join(output_path, f'{self.name}_{f_set}.csv')
+                    entity_df = self.entity_df.loc[self.entity_df['f_set'] == f_set, :]
+                    entity_df.to_csv(final_path, sep=sep, index=index)
+            elif self.name == 'Boundary':
+                group_n = list(set(self.entity_df['b_group']))
+                for b_group in group_n:
+                    final_path = os.path.join(output_path, f'{self.name}_{b_group}.csv')
+                    entity_df = self.entity_df.loc[self.entity_df['b_group'] == b_group, :]
+                    entity_df.to_csv(final_path, sep=sep, index=index)
+            else:
+                final_path = os.path.join(output_path, f'{self.name}.csv')
+                entity_df = self.entity_df
+                entity_df.to_csv(final_path, sep=sep, index=index)
+
+
+
         else:
             print('Cannot save an empty entity')
 
@@ -275,8 +291,28 @@ class BaseEntity(ABC):
             if not os.path.isdir(output_path):
                 os.makedirs(output_path)
 
-            final_path = os.path.join(output_path, f'{self.name}.shp')
-            self.entity_df.to_file(final_path, crs=self.crs)
+            if self.name == 'Fractures':
+                set_n = list(set(self.entity_df['f_set']))
+                for f_set in set_n:
+                    final_path = os.path.join(output_path, f'{self.name}_{f_set}.shp')
+                    entity_df = self.entity_df.loc[self.entity_df['f_set'] == f_set, :]
+                    entity_df.to_file(final_path, crs=self.crs)
+            elif self.name == 'Boundary':
+                group_n = list(set(self.entity_df['b_group']))
+                for b_group in group_n:
+                    final_path = os.path.join(output_path, f'{self.name}_{b_group}.shp')
+                    entity_df = self.entity_df.loc[self.entity_df['b_group'] == b_group, :]
+                    entity_df.to_file(final_path, crs=self.crs)
+            elif self.name == 'Nodes':
+                final_path = os.path.join(output_path, f'{self.name}.shp')
+                entity_df = self.entity_df
+                entity_df.to_file(final_path, crs=self.crs)
+
+            qgis_style_paths = QgisStyle().available_paths
+
+            for qgis_path in qgis_style_paths:
+                shutil.copy(qgis_path, output_path)
+
         else:
             print('Cannot save an empty entity')
 
@@ -387,33 +423,3 @@ class AbstractStatistics(ABC):
     def function_list(self):
         return self._function_list
 
-
-class AbstractReadDataClass(ABC):
-
-    def __init__(self):
-        self.path: str = ''
-        pass
-
-    @property
-    def data_dict(self) -> dict:
-        """
-        Return a dict of name: path of the available data for the given dataset
-        :return:
-        """
-
-        paths = glob.glob(os.path.join(self.path, '*.shp'))
-
-        file_names = [os.path.basename(path) for path in paths]
-
-        data_dict = {file_name: path for file_name, path in zip(file_names, paths)}
-
-        return data_dict
-
-    @property
-    def available_data(self) -> list:
-        """
-        Return a list of names of the available data for the given dataset
-        :return:
-        """
-
-        return list(self.data_dict.keys())

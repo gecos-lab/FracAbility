@@ -1405,14 +1405,21 @@ class FractureNetwork(BaseEntity):
 
     def save_csv(self, path: str, sep: str = ',', index: bool = False):
         """
-        Save the entity df as csv
+        Save the fracture network entity df as csv
         :param index:
         :type sep: object
         :param path:
         :return:
         """
 
-        self.fracture_network_to_components_df().to_csv(f'Fracture_net_{path}', sep=sep, index=index)
+        if self.nodes is not None:
+            self.nodes.save_csv(path)
+
+        if self.fractures is not None:
+            self.fractures.save_csv(path)
+
+        if self.boundaries is not None:
+            self.boundaries.save_csv(path)
 
     def save_shp(self, path: str):
         """

@@ -2,8 +2,53 @@
 Module used to import the example data from the Pontrelli quarry.
 """
 
-from fracability.AbstractClasses import AbstractReadDataClass
-from os.path import dirname, join
+from abc import ABC, abstractmethod, abstractproperty
+from os.path import dirname, join, basename
+import glob
+
+
+class AbstractReadDataClass(ABC):
+    """
+    :param extension: String of extension to search in the dataset directory. Default is .shp
+    """
+    def __init__(self, extension='.shp'):
+        self.path: str = ''
+        self.extension = extension
+        pass
+
+    @property
+    def data_dict(self) -> dict:
+        """
+        Return a dict of name: path of the available data for the given dataset
+        :param extension: String of extension to search in the dataset directory. Default is .shp
+        :return:
+        """
+
+        paths = glob.glob(join(self.path, f'*{self.extension}'))
+
+        file_names = [basename(path) for path in paths]
+
+        data_dict = {file_name: path for file_name, path in zip(file_names, paths)}
+
+        return data_dict
+
+    @property
+    def available_data(self) -> list:
+        """
+        Return a list of names of the available data for the given dataset
+        :return:
+        """
+
+        return list(self.data_dict.keys())
+
+    @property
+    def available_paths(self) -> list:
+        """
+        Return a list of names of the available data for the given dataset
+        :return:
+        """
+
+        return list(self.data_dict.values())
 
 
 class Pontrelli(AbstractReadDataClass):
@@ -16,6 +61,12 @@ class Salza(AbstractReadDataClass):
     def __init__(self):
         super().__init__()
         self.path = join(dirname(__file__), 'datasets', 'laghetto_salza')
+
+
+class QgisStyle(AbstractReadDataClass):
+    def __init__(self):
+        super().__init__(extension='.qml')
+        self.path = join(dirname(__file__), 'datasets', 'qgis_styles')
 
 #
 #
