@@ -7,6 +7,7 @@ from pandas import DataFrame
 import scipy.stats as ss
 from scipy.optimize import minimize
 import ast
+import pyperclip
 
 from fracability.utils.general_use import KM
 
@@ -585,8 +586,8 @@ class NetworkFitter:
         """
         fit_records = self.fit_records(sort_by)
         dist = fit_records.loc[fit_records['name'] == distribution_name, 'distribution'].values[0]
-        parameters = dist.disribution_parameters
-        return ast.literal_eval(parameters)
+        parameters = dist.distribution_parameters
+        return parameters
 
     def get_fitted_parameters_list(self, distribution_names: list = None, sort_by='Akaike') -> list:
 
@@ -689,6 +690,15 @@ class NetworkFitter:
             self.fit(distribution)
 
         return self.best_fit()
+
+    def fit_result_to_clipboard(self, sort_by='Akaike'):
+        """
+        Copy to clipboard the df to be easily pasted in a table
+        :param sort_by: Column name to sort the values
+        :return:
+        """
+        text = self.fit_records(sort_by)[:-1]
+        pyperclip.copy(str(text))
 
     # def plot_kde(self, n_bins: int = 25, x_min: float = 0.0, x_max: float = None, res: int = 1000):
     #
