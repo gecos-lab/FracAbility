@@ -3,10 +3,13 @@ requires = ['setuptools']
 build-backend = 'setuptools.build_meta'
 
 [project]
-name = 'fracability'
+name = 'FracAbility'
 description = 'Analyse fracture networks for digitalized rock outcrops. '
 authors = [
     {name = 'Gabriele Benedetti', email = 'gabri.benedetti@gmail.com'},
+    {name = 'Stefano Casiraghi', email = 's.casiraghi21@campus.unimib.it'},
+    {name = 'Daniela Bertacchi', email = 'daniela.bertacchi@unimib.it'},
+    {name = 'Andrea Bistacchi', email = 'andrea.bistacchi@unimib.it'},
 ]
 readme = 'README.md'
 requires-python = '>=3.8'

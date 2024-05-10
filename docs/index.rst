@@ -5,8 +5,7 @@
 Overview
 ---------
 
-**FracAbility** is a Python toolbox that can be used to analyse fracture networks in digitalized rock
-outcrops.
+**FracAbility** is a Python toolbox that can be used to analyse fracture networks and estimate length distributions considering and correcting the effect of right-censoring using survival analysis.
 
 These are the main features available :
 
@@ -16,19 +15,18 @@ These are the main features available :
 - **Topological analysis and identification of I,Y,X and U nodes**
 
 
-- **Fracture network backbone calculation**
+- **Backbone identification**
 
 
 - **Statistical analysis tools:**
     + Empirical CDF and SF calculation
-    + Distribution fitting
-    + Statistical model testing
-
+    + Distribution fitting with survival analysis
+    + Model selection methods
 
 - **Plotting tools:**
-    + Matplotlib or VTK backend
+    + Network objects plotting using matplotlib or vtk
     + Ternary node plot
-    + Statistical plotting
+    + Probability Integral Transform plots
 
 
 The name FracAbility recalls the `reliability <https://github.com/MatthewReid854/reliability/tree/master>`_
