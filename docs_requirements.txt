@@ -1,8 +1,0 @@
-nbsphinx
-fracability
-Sphinx
-IPython
-ipykernel
-sphinx_book_theme
-sphinx-autobuild
-pandoc

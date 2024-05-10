@@ -1,3 +1,7 @@
-sphinx==6.2.1
-sphinx-book-theme==1.0.1
+nbsphinx
 fracability
+Sphinx
+IPython
+ipykernel
+sphinx_book_theme
+sphinx-autobuild
