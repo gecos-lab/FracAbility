@@ -4,7 +4,7 @@
 
 NetworkData
 ------------------
-.. autoclass:: fracability.operations.Statistics.NetworkData
+.. autoclass:: fracability.Statistics.NetworkData
     :members:
     :inherited-members:
     :undoc-members:

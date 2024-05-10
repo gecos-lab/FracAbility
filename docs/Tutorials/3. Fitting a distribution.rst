@@ -1,0 +1,15 @@
+.. image:: ../images/logo.png
+
+-------------------------------------
+
+Fitting distributions example table of contents
+------------------------------------------------
+
+Lorem ipsum
+
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+   notebooks/3. Fitting a distribution

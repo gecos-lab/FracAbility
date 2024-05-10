@@ -2,8 +2,8 @@
 
 -------------------------------------
 
-Fracture Networks
-------------------
+FractureNetwork class
+----------------------
 .. autoclass:: fracability.Entities.FractureNetwork
     :members:
     :inherited-members:

@@ -4,7 +4,7 @@
 
 NetworkFitter
 ------------------
-.. autoclass:: fracability.operations.Statistics.NetworkFitter
+.. autoclass:: fracability.Statistics.NetworkFitter
     :members:
     :inherited-members:
     :undoc-members:

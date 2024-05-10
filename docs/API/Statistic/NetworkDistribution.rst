@@ -3,8 +3,8 @@
 -------------------------------------
 
 NetworkDistribution
-------------------
-.. autoclass:: fracability.operations.Statistics.NetworkDistribution
+---------------------
+.. autoclass:: fracability.Statistics.NetworkDistribution
     :members:
     :inherited-members:
     :undoc-members:
