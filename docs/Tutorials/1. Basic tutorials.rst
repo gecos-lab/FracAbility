@@ -2,12 +2,16 @@
 
 -------------------------------------
 
+
+
 Basic tutorials
 ===================
 
 This set of 4 tutorials is made to showcase the basic functions of FracAbility and the more common use case.
 Each notebook will show different parts of the intended workflow separately so it is suggested to follow the
 order of the notebooks.
+
+.. _basic_tutorials_toc:
 
 .. toctree::
     :maxdepth: 1

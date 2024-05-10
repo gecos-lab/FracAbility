@@ -2,7 +2,7 @@
 
 -------------------------------------
 
-3. Nodes class
+Nodes class
 ------------------
 .. autoclass:: fracability.Entities.Nodes
     :members:

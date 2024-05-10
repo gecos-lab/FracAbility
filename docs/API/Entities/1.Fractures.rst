@@ -2,7 +2,7 @@
 
 -------------------------------------
 
-1. Fractures class
+Fractures class
 --------------------
 .. autoclass:: fracability.Entities.Fractures
     :members:

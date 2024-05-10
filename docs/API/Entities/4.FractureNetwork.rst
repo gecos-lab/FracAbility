@@ -2,7 +2,7 @@
 
 -------------------------------------
 
-4. FractureNetwork class
+FractureNetwork class
 -------------------------
 .. autoclass:: fracability.Entities.FractureNetwork
     :members:

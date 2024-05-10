@@ -5,9 +5,14 @@
 Topology
 ======================================
 
+Nodes and traces define the topology of the network. Topology is a useful branch of mathematics used to study properties that do not change with continuous transformations of space or scale. Nodes can be classified by counting the number of connections to traces. Isolated **I** nodes are connected to one trace only. **Y/T** and **X** nodes are respectively connected to 3 and 4 traces. Finally, “unknown” **U** nodes are located at the intersection between a fracture and the sampling area boundary (i.e boundary nodes).
+Nodes also have important geological significance. I nodes indicate fracture isolation, and thus a network with a prevalence of these nodes, will be less connected and fluid flow will be more restrained. Y and X nodes correlate respectively to abutting and crosscutting relationships. Both types contribute heavily on fluid transmission in the rock volume, in particular Y nodes, because they lower the total number of I nodes in the fracture network. U nodes indicate that the fracture is censored because it is not completely exposed in the sampling area and thus some measured properties are incomplete (such as length). Any fracture network can be classified using the connectivity index value (equation **A6** in Manzocchi (2002) and plotted in a ternary plot that with the I, Y, and X relative proportions at each vertex.
 
-Graph theory and node classification
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. figure:: ../images/ternary_plot.png
+   :align: center
+
+   Ternary plot of a fracture network. The red dot corresponds to the I, Y and X nodes proportions of the outcrop. The
+   contour lines are the average number of connections per fracture derived from equation **A6** in Manzocchi (2002).
 
 With nodes it is possible to analise a fracture network in a more abstract way by defining connections and relations
 between fracture segments. In a fracture network, fractures are connected in different ways (and sometimes
@@ -22,37 +27,6 @@ such that for each edge there are **two** vertices. This means that the **degree
    Abstraction example of a small fracture network. Spatial relationships are partially conserved to help in the comparison.
    Higher abstraction is possible in which the spatial dimension is completely disregarded.
 
-Node classes
-+++++++++++++
-
-Four classes of nodes have been defined:
-
-+ I nodes: Given by a termination of a fracture in the outcrop
-+ Y or T nodes: Given by a termination of a fracture on **another fracture**
-+ X nodes: Given by crossing fractures
-+ U nodes: Given by a termination of a fracture on a **boundary**
-
-.. figure:: ../images/node_types.png
-   :align: center
-
-   Schematic representation of the different node classes. For each cell highlighted the corresponding node.
 
 
-Geologically each node type can give information on the nature of the fracture and the genetic processes of the network.
-I and U nodes define the "completeness" of the given fracture.
-An isolated fracture (i.e. bounded by two I vertices) is whole and so its length is complete
-while the presence of U nodes will identify a cut fracture with a partial length.
-
-Y and X nodes are useful on the other hand to define the relative chronology. For example in joints, Y nodes identify
-abutting relationships (i.e. older cutting younger). X nodes on the other hand indicate cross-cutting relationships.
-
-I Y and X nodes are also useful to describe the connectivity of the network; connected networks will have a higher
-proportions of Y and X nodes while the opposite will be defined by a dominance of I nodes. Using this principles,
-networks can be graphically represented in a ternary plot such as the one below.
-
-.. figure:: ../images/ternary_plot.png
-   :align: center
-
-   Ternary plot of a fracture network. The red dot corresponds to the I, Y and X nodes proportions of the outcrop. The
-   contour lines are the average number of connections per fracture derived from equation **A6** in Manzocchi (2002).
 

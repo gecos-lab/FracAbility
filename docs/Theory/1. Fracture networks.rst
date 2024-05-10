@@ -5,54 +5,29 @@
 Fracture networks
 ==================================
 
-Fracture networks have an essential control on the hydraulic properties of rock masses. Research or exploitation
-of water, hydrothermal fluids, natural gas, and the characterization of reservoirs for carbon sequestration and
-hydrogen storage, all heavily rely on creating fracture models to understand the distribution of fractures and
-their properties in 3D space. This is achieved by creating Discrete Fracture Network (DFNs) based on **stochastic**
-algorithms. There are different DFN approaches provided by software:
+A discontinuity in a rock mass can be defined as surfaces across which a material has lost its cohesion, thus including faults, foliations, stylolites, compaction or deformation bands and fractures. Fractures can be additionally subdivided into shear and tensional fractures, the latter further divided in joints when empty or veins when filled by minerals (Twiss and Moores, 2007; Davis et al., 2012). Discontinuities that have the same formation age, kinematics and orientation can be grouped into families or sets and multiple sets form a fracture network (Davis et al., 2012). Fundamental for its impact on the mechanical and hydraulic properties of fractured rock mass, is the connectivity of a fracture network (Gueguen et al., 1991), that will be characterized by intersection lines where pairs of fractures show crosscutting or abutting relationships (Hancock, 1985).
 
-+ `Petrel <https://www.software.slb.com/products/petrel>`_
-+ `Move <https://www.petex.com/products/move-suite/>`_
-+ `FracMan <https://www.golder.com/fracman/>`_
-+ `DFNWorks <https://dfnworks.lanl.gov>`_.
+Although three dimensional by nature, most of the times discontinuities appear as 2D lineaments or traces, i.e. the intersection of discontinuity surfaces with a secondary surface that reveals the internal structure of the rock mass, such as the outcrop or topographic surface (but also a surface cut in a sample or a borehole).
 
-All of these use many different parameters to drive the building of the model. The most important are summarized
-in the following table:
+Expanding on these basis, fracture networks can be considered as the composition of three main components:
 
-.. figure:: ../images/mystic_table.png
-   :align: center
++ **Fractures**: In this case, any type of discontinuity in a rock volume (so faults, foliations, stylolites etc..).
 
-   Summary table of the most important parameters used as input for DFNs. The distinction fracture network and fracture
-   set identifies from where the property can be extracted.
++ **Boundaries**: The observational limits that the interpreter has on an outcrop i.e. areas of exposed rock where fractures can be measured. These limits can be defined as :term:`interpretational boundaries` and also internal areas in which interpretation cannot be carried out can be present (:term:`interpretational holes`)
 
-Structure of a fracture network
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++ **Nodes**: The intersection points between two fractures (pertaining to the same or different set) or between a fracture and the boundary/hole
 
-Fracture networks can be subdivided in three main different components:
-
-1. Nodes
-2. Fractures
-3. Boundaries
 
 .. figure:: ../images/frac_net.png
    :align: center
 
    Subdivision of a simple fracture network
 
-**Nodes**
-
-The nodes can be defined as the intersection points between two fractures (pertaining to the same or different set).
-
-**Fractures**
-
-Fractures are, unsurprisingly, the most important component of the three. We define as a fracture a generic discontinuity
-in a rock volume grouping. Fractures can be further divided into **sets** (i.e. fractures that have the same genetic origin and processes).
 
 
-**Boundaries**
 
-Finally the boundaries are defined as the observational limits that the interpreter imposes in the outcrop.
-We define these limits as :term:`interpretational boundaries`. These delimit the areas of exposed rock where fractures can be measured and can be
-more than one.
-Boundaries can also present internal areas in which interpretation cannot be carried out defined
-as :term:`interpretational voids`.
+
+
+
+
+

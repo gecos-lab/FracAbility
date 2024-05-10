@@ -2,7 +2,7 @@
 
 -------------------------------------
 
-2. Boundary class
+Boundary class
 ------------------
 .. autoclass:: fracability.Entities.Boundary
     :members:
