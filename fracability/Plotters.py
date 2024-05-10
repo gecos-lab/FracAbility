@@ -50,7 +50,7 @@ from pyvista import Plotter
 import ternary
 from vtkmodules.vtkFiltersCore import vtkConnectivityFilter
 
-from fracability.operations.Statistics import NetworkDistribution, NetworkFitter
+from fracability.Statistics import NetworkDistribution, NetworkFitter
 from fracability.utils.general_use import KM, setFigLinesBW
 
 import numpy as np
@@ -105,6 +105,79 @@ def matplot_nodes(entity,
 
     if return_plot:
         return ax
+    else:
+        if show_plot:
+            plt.show()
+
+
+def matplot_ternary(entity,
+                    return_plot: bool = False,
+                    show_plot: bool = True):
+
+    """
+    Plot the ternary diagram for nodes
+
+    Parameters
+    ----------
+
+    entity: The fracability Nodes entity
+
+    return_plot: Bool. If true return the plot. By default, false
+
+    show_plot: Bool. If true show the plot. By default, true.
+
+
+    """
+
+    figure, tax = ternary.figure(scale=100)
+    figure.set_size_inches(10, 10)
+
+    if entity.name == 'FractureNetwork':
+        nodes = entity.nodes
+    elif entity.name == 'Nodes':
+        nodes = entity
+
+    PI, PY, PX, _, CI = nodes.ternary_node_count
+    points = [(PX, PI, PY)]
+
+    tax.scatter(points, marker='o', color='red', label='Classification')
+    tax.annotate(f'{np.round(CI,2)}', position=[PX, PI, PY])
+
+    for n in range(8):
+        n += 1
+        A1 = np.array([[1, 1, 1], [0, 0, 1], [-n, 4, 0]])
+        B = np.array([1, 0, 4 - n])
+
+        X1 = np.linalg.inv(A1).dot(B) * 100
+        if n < 4:
+            side = [1, 0, 0]
+        else:
+            side = [0, 1, 0]
+        A2 = np.array([[1, 1, 1], side, [-n, 4, 0]])
+
+        X2 = np.linalg.inv(A2).dot(B) * 100
+
+        tax.line(X1, X2, color='black', linewidth=1, alpha=n / 8)
+
+    ax = tax.get_axes()
+    ax.text(76.8, 21.3, 8)
+    ax.text(74.8, 23.8, 7)
+    ax.text(73.5, 27.9, 6)
+    ax.text(71, 32.3, 5)
+    ax.text(69.1, 38, 4)
+    ax.text(65.8, 45, 3)
+    ax.text(62.7, 54, 2)
+    ax.text(57, 66.5, 1)
+
+    tax.right_corner_label("X", fontsize=15)
+    tax.top_corner_label("I", fontsize=15)
+    tax.left_corner_label("Y", fontsize=15)
+
+    tax.get_axes().set_aspect(1)  # This is used to avoid deformation when rescaling the plotter window
+    # tax.clear_matplotlib_ticks()
+    tax.get_axes().axis('off')
+    if return_plot:
+        return tax
     else:
         if show_plot:
             plt.show()
@@ -773,49 +846,11 @@ def matplot_stats_table(network_distribution: NetworkDistribution,
         plt.show()
 
 
-# def matplot_stats_model_selection(fitter: NetworkFitter,
-#                                   vertical: bool= False,
-#                                   show_plot: bool = True,
-#                                   sort_by: str = 'Akaike'):
-#     """
-#     Plot the stats summary table for the chosen models
-#
-#     Parameters
-#     -----------
-#     fitter: Network fitter object
-#     vertical: Bool. If true the table is vertical. By default, is False
-#     show_plot: Bool. If true show the plot. By default, is True
-#     sort_by: Sort the model based on a selection parameter. Available keys:
-#         1. Akaike
-#         2. KS_distance
-#         3. KG_distance
-#         4. AD_distance
-#     """
-#
-#     if show_plot:
-#         fig = plt.figure(num=f'Model selection summary table')
-#         fig.text(0.5, 0.95, f'Model selection summary table (sorted by {sort_by})', ha='center')
-#
-#     plt.axis('off')
-#     data_frame = fitter.fit_records(sort_by)
-#     the_table = plt.table(cellText=data_frame.round(decimals=2).values[:, 1:13],
-#                           rowLabels=data_frame['name'],
-#                           colLabels=data_frame.columns[1:13],
-#                           loc='center')
-#
-#     the_table.auto_set_font_size(False)
-#     the_table.auto_set_column_width(col=list(range(len(data_frame.columns))))
-#     the_table.set_fontsize(14)
-#
-#     if show_plot:
-#         plt.show()
-
-
 def matplot_stats_summary(fitter: NetworkFitter,
                           function_list: list = ['pdf', 'cdf', 'sf'],
                           table: bool = True,
                           show_plot: bool = True,
-                          position: int = 1,
+                          position: list = [],
                           sort_by: str = 'Akaike'):
     """
     Summarize PDF, CDF and SF functions and display summary table all
@@ -832,15 +867,18 @@ def matplot_stats_summary(fitter: NetworkFitter,
 
     show_plot: Bool. If true show the plot. By default, is True
     
-    position: int. Show the summary plot for the model at the indicated position (1 indexed) sorted by the sort_by field. If False show the plots for each fit.  By default is 1.
+    position: List.  Plot the models at the given position (1 indexed) in the ordered sorted by the sort_by field. If None show the plots for each fit. By default is [1].
 
     sort_by: str. If best is True, show the best fit using the indicated column name. By default is Akaike
 
     """
     sns.set_theme()
-    
+
+    # This distribution selection process could be probably optimized
+    names = []
     if position:
-        names = [fitter.get_fitted_distribution_names(sort_by)[position-1]]
+        for pos in position:
+            names.append(fitter.get_fitted_distribution_names(sort_by)[pos-1])
     else:
         names = fitter.get_fitted_distribution_names(sort_by)
 
@@ -877,8 +915,9 @@ def matplot_stats_summary(fitter: NetworkFitter,
 
 def matplot_stats_uniform(fitter: NetworkFitter,
                           show_plot: bool = True,
-                          position: int = 0,
-                          sort_by: str = 'Akaike'):
+                          position: list = None,
+                          sort_by: str = 'Akaike',
+                          bw: bool = False):
     """
     Confront the fitted data with the standard uniform 0,1. Following Kim 2019
 
@@ -888,15 +927,20 @@ def matplot_stats_uniform(fitter: NetworkFitter,
 
     show_plot: Bool. If true show the plot. By default, is True
 
-    position: int. Show the summary plot for the model at the indicated position (1 indexed) sorted by the sort_by field. If False show the plots for each fit.  By default is False.
+    position: List.  Plot the models at the given position (1 indexed) in the ordered fit_records dataframe sorted by the sort_by field. If None show the plots for each fit. Default is None
 
     sort_by: str. If best is True, show the best fit using the indicated column name. By default is Akaike
 
-    """
-    #sns.set_theme()
+    bw: Bool. If true turn the plot color-blind friendly (black lines with different patterns). Max 7 lines (i.e. models). Default is False
 
+    """
+
+    # This distribution selection process could be probably optimized
+
+    names = []
     if position:
-        names = [fitter.get_fitted_distribution_names(sort_by)[position-1]]
+        for pos in position:
+            names.append(fitter.get_fitted_distribution_names(sort_by)[pos-1])
     else:
         names = fitter.get_fitted_distribution_names(sort_by)
 
@@ -912,7 +956,8 @@ def matplot_stats_uniform(fitter: NetworkFitter,
         G_n = KM(Z, Z, delta)
         plt.plot(Z, G_n, label=f'G_n {name}') # plot the Kaplan-Meier curves with steps
 
-    setFigLinesBW(fig)
+    if bw:
+        setFigLinesBW(fig)
 
     if show_plot:
         plt.plot(uniform_list, uniform_cdf, 'r', label='U(0, 1)')
@@ -921,76 +966,3 @@ def matplot_stats_uniform(fitter: NetworkFitter,
         plt.legend()
         plt.show()
 
-
-
-def matplot_ternary(entity,
-                    return_plot: bool = False,
-                    show_plot: bool = True):
-
-    """
-    Plot the ternary diagram for nodes
-
-    Parameters
-    ----------
-
-    entity: The fracability Nodes entity
-
-    return_plot: Bool. If true return the plot. By default, false
-
-    show_plot: Bool. If true show the plot. By default, true.
-
-
-    """
-
-    figure, tax = ternary.figure(scale=100)
-    figure.set_size_inches(10, 10)
-
-    if entity.name == 'FractureNetwork':
-        nodes = entity.nodes
-    elif entity.name == 'Nodes':
-        nodes = entity
-
-    PI, PY, PX, _, CI = nodes.ternary_node_count
-    points = [(PX, PI, PY)]
-
-    tax.scatter(points, marker='o', color='red', label='Classification')
-    tax.annotate(f'{np.round(CI,2)}', position=[PX, PI, PY])
-
-    for n in range(8):
-        n += 1
-        A1 = np.array([[1, 1, 1], [0, 0, 1], [-n, 4, 0]])
-        B = np.array([1, 0, 4 - n])
-
-        X1 = np.linalg.inv(A1).dot(B) * 100
-        if n < 4:
-            side = [1, 0, 0]
-        else:
-            side = [0, 1, 0]
-        A2 = np.array([[1, 1, 1], side, [-n, 4, 0]])
-
-        X2 = np.linalg.inv(A2).dot(B) * 100
-
-        tax.line(X1, X2, color='black', linewidth=1, alpha=n / 8)
-
-    ax = tax.get_axes()
-    ax.text(76.8, 21.3, 8)
-    ax.text(74.8, 23.8, 7)
-    ax.text(73.5, 27.9, 6)
-    ax.text(71, 32.3, 5)
-    ax.text(69.1, 38, 4)
-    ax.text(65.8, 45, 3)
-    ax.text(62.7, 54, 2)
-    ax.text(57, 66.5, 1)
-
-    tax.right_corner_label("X", fontsize=15)
-    tax.top_corner_label("I", fontsize=15)
-    tax.left_corner_label("Y", fontsize=15)
-
-    tax.get_axes().set_aspect(1)  # This is used to avoid deformation when rescaling the plotter window
-    # tax.clear_matplotlib_ticks()
-    tax.get_axes().axis('off')
-    if return_plot:
-        return tax
-    else:
-        if show_plot:
-            plt.show()

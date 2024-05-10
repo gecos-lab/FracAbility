@@ -6,10 +6,9 @@ import pandas as pd
 from pandas import DataFrame
 import scipy.stats as ss
 from scipy.optimize import minimize
-import ast
-import pyperclip
 
 from fracability.utils.general_use import KM
+import fracability.Plotters as plotter
 
 
 class NetworkData:
@@ -217,10 +216,6 @@ class NetworkDistribution:
         self.parent: NetworkFitter = parent
         self._distribution = obj.freeze(*parameters)
         self.fit_data = fit_data
-
-    # @property
-    # def parent(self) -> NetworkFitter:
-    #     return self._parent
 
     @property
     def distribution(self) -> ss.rv_continuous:
@@ -542,6 +537,8 @@ class NetworkDistribution:
         fitter_records = self.parent.fit_records()
         name = self.distribution_name
         return fitter_records.loc[fitter_records['name'] == name, 'Mean_rank'].values[0]
+
+
 class NetworkFitter:
 
     """
@@ -585,12 +582,6 @@ class NetworkFitter:
     @network_data.setter
     def network_data(self, data: NetworkData):
         self._net_data = data
-
-    def fit_records(self, sort_by='Akaike') -> DataFrame:
-
-        """ Return the sorted fit dataframe"""
-
-        return self._fit_dataframe.sort_values(by=sort_by, ignore_index=True)
 
     def fit(self, distribution_name: str):
 
@@ -647,10 +638,59 @@ class NetworkFitter:
 
         # self._fit_dataframe.loc[last_pos, 'params'] = params  # this gives out an error for setting the df, I do not know why
 
+    def fit_records(self, sort_by='Akaike') -> DataFrame:
+
+        """ Return the sorted fit dataframe"""
+
+        return self._fit_dataframe.sort_values(by=sort_by, ignore_index=True)
+
+    def get_fitted_distribution(self, distribution_name: str, sort_by='Akaike') -> NetworkDistribution:
+
+        """
+        get the fitted NetworkDistribution object
+        :param distribution_name: name of the distribution
+        :param sort_by: Column name to sort the output order
+        :return:
+        """
+        fit_records = self.fit_records(sort_by)
+        distribution = fit_records.loc[fit_records['name'] == distribution_name, 'distribution'].values[0]
+
+        return distribution
+
+    def get_fitted_distribution_names(self, sort_by='Akaike') -> list:
+
+        """
+        get the names of the fitted NetworkDistribution object
+        :param sort_by: Column name to sort the output order
+        :return:
+        """
+
+        return self.fit_records(sort_by)['name'].values
+
+    def get_fitted_distribution_list(self, distribution_names: list = None, sort_by='Akaike') -> list:
+        """
+        Get a list of NetworkDistribution objects for the given distribution name
+        :param distribution_names:
+        :param sort_by: Column name to sort the output order
+        :return:
+        """
+        fit_records = self.fit_records(sort_by)
+        if distribution_names is None:
+            distribution_names = fit_records['name'].tolist()
+
+        distribution_list = []
+
+        for name in distribution_names:
+            distribution = fit_records.loc[fit_records['name'] == name, 'distribution'].values[0]
+            distribution_list.append(distribution)
+
+        return distribution_list
+
     def get_fitted_parameters(self, distribution_name: str, sort_by='Akaike') -> tuple:
         """
         Get the fitted distributions parameters in the fit records df
         :param distribution_name: Name of the distribution
+        :param sort_by: Column name to sort the output order
         """
         fit_records = self.fit_records(sort_by)
         dist = fit_records.loc[fit_records['name'] == distribution_name, 'distribution'].values[0]
@@ -676,50 +716,10 @@ class NetworkFitter:
 
         return parameter_list
 
-    def get_fitted_distribution(self, distribution_name: str, sort_by='Akaike') -> NetworkDistribution:
-
-        """
-        get the fitted NetworkDistribution object
-        :param distribution_name: name of the distribution
-        :return:
-        """
-        fit_records = self.fit_records(sort_by)
-        distribution = fit_records.loc[fit_records['name'] == distribution_name, 'distribution'].values[0]
-
-        return distribution
-
-    def get_fitted_distribution_names(self, sort_by='Akaike') -> list:
-
-        """
-        get the names of the fitted NetworkDistribution object
-        :param distribution_name: name of the distribution
-        :return:
-        """
-
-        return self.fit_records(sort_by)['name'].values
-
-    def get_fitted_distribution_list(self, distribution_names: list = None, sort_by='Akaike') -> list:
-        """
-        Get a list of NetworkDistribution objects  fot the given distribution name
-        :param distribution_names:
-        :return:
-        """
-        fit_records = self.fit_records(sort_by)
-        if distribution_names is None:
-            distribution_names = fit_records['name'].tolist()
-
-        distribution_list = []
-
-        for name in distribution_names:
-            distribution = fit_records.loc[fit_records['name'] == name, 'distribution'].values[0]
-            distribution_list.append(distribution)
-
-        return distribution_list
-
     def best_fit(self, sort_by='Akaike') -> pd.Series:
 
         """
-        Return the best fit in the fit records dataframe
+        Return the best fit in the fit records dataframe sorted by sort_by
         :return:
         """
 
@@ -727,38 +727,35 @@ class NetworkFitter:
 
         return df.loc[0]
 
-    def rejected_fit(self, sort_by='Akaike') -> pd.DataFrame:
+    # ====================== Plot ==========================
 
+    def plot_PIT(self,  show_plot: bool = True,
+                 position: list = None, sort_by: str = 'Akaike',
+                 bw: bool = False):
         """
-        Return the fit records dataframe without the best fit
+        Method to plot the uniform comparison plot for the fitted models.
+        :param show_plot: Bool. If True, show the plot if False do not show. Default is True.
+        :param position: List. Plot the models at the given position in the ordered fit_records dataframe. If None (default) plot all models.
+        :param sort_by: String. Column name to sort the fit_records dataframe. Default is Akaike
+        :param bw: Bool. If true turn the plot color-blind friendly (black lines with different patterns). Max 7 lines (i.e. models). Default is False
+
         :return:
         """
 
-        df = self.fit_records(sort_by)
+        plotter.matplot_stats_uniform(self, show_plot, position, sort_by, bw)
 
-        return df.loc[1:]
-
-    def best_fit_name(self, distribution_list: list = None) -> pd.Series:
+    def plot_summary(self, show_plot:bool = True, position: list = None, sort_by: str = 'Akaike'):
         """
-        Method used to find the best distribution using BIC ranking
-        :param distribution_list: list of distribution to test
+        Method to plot the summary plot for the given fitted model(s).
+        :param show_plot: Bool. If True, show the plot if False do not show. Default is True.
+        :param position: List. Plot the models at the given position in the ordered fit_records dataframe. If None (default) plot all models.
+        :param sort_by: String. Column name to sort the fit_records dataframe. Default is Akaike
         :return:
         """
 
-        if distribution_list is None:
+        plotter.matplot_stats_summary(self, show_plot=show_plot, position=position, sort_by=sort_by)
 
-            distribution_list = ['lognorm',
-                                 'norm',
-                                 'expon',
-                                 'burr12',
-                                 'gamma',
-                                 'logistic']
-
-        for distribution in distribution_list:
-            self.fit(distribution)
-
-        return self.best_fit()
-
+    # ====================== Export ==========================
     def fit_result_to_csv(self, path, sort_by='Akaike'):
         """
         Save the csv to a specified path

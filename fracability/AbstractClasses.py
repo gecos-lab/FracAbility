@@ -335,7 +335,6 @@ class BaseOperator(ABC):
 
     1. Geometry operations
     2. Topology operations
-    3. Statistics operations
 
     This class provides a unified input for the different operators since all are based on the BaseObj and associated
     entity_df

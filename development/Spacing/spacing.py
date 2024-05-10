@@ -1,18 +1,13 @@
 """
 Python code to calculate the spacing distribution of a given linear fracture set.
 """
-import pandas as pd
 from fracability import Entities
-from fracability.operations import Statistics
+import Statistics
 from fracability.Plotters import matplot_stats_summary
 import geopandas as gpd
 import numpy as np
 from shapely.ops import split
 import pyvista as pv
-import matplotlib.pyplot as plt
-import seaborn as sns
-
-from vtkmodules.vtkFiltersModeling import vtkCookieCutter
 
 
 def centers_to_lines(center_coords, lengths, frac_dir, assign_id=True) -> pv.PolyData:

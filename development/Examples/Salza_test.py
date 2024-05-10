@@ -6,10 +6,6 @@ sys.path.append(cwd)
 
 from fracability import Entities
 from fracability import DATADIR
-from fracability.operations import Statistics
-from fracability import Plotters
-
-
 
 # Salza
 fracture_set1 = Entities.Fractures(shp=f'{DATADIR}/laghetto_salza/Set_1.shp', set_n=1)

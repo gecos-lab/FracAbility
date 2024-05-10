@@ -6,14 +6,8 @@ sys.path.append(cwd)
 
 from fracability import Entities
 from fracability import DATADIR
-from fracability.operations import Statistics
+import Statistics
 from fracability import Plotters
-import geopandas as gpd
-import seaborn as sns
-import matplotlib.pyplot as plt
-import numpy as np
-import scipy.stats as ss
-
 
 # Pontrelli
 fracture_set1 = Entities.Fractures(shp=f'{DATADIR}/cava_pontrelli/Set_a.shp', set_n=1, check_geometry=False)

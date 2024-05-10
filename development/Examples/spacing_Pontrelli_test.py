@@ -10,7 +10,7 @@ sys.path.append(cwd)
 
 from fracability import DATADIR
 from fracability import Entities
-from fracability.operations import Statistics
+import Statistics
 from fracability.Plotters import matplot_stats_uniform
 import geopandas as gpd
 import numpy as np

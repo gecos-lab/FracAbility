@@ -6,7 +6,7 @@ sys.path.append(cwd)
 
 from fracability import Entities
 from fracability import DATADIR
-from fracability.operations import Statistics
+import Statistics
 from fracability import Plotters
 
 

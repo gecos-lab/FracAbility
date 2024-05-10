@@ -14,7 +14,7 @@ from vtkmodules.vtkFiltersModeling import vtkCookieCutter
 
 from fracability import Entities
 from fracability.operations.Geometry import tidy_intersections
-from fracability.operations.Statistics import NetworkFitter
+from Statistics import NetworkFitter
 from fracability.operations.Topology import nodes_conn
 
 from numpy.random import Generator, PCG64

@@ -10,8 +10,6 @@ sys.path.append(cwd)
 
 from fracability import DATADIR
 from fracability import Entities
-from fracability.operations import Statistics
-from fracability.Plotters import matplot_stats_uniform, matplot_stats_table
 import geopandas as gpd
 import numpy as np
 from shapely.ops import split
