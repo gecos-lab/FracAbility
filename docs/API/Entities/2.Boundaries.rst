@@ -2,9 +2,9 @@
 
 -------------------------------------
 
-FractureNetwork class
-----------------------
-.. autoclass:: fracability.Entities.FractureNetwork
+2. Boundary class
+------------------
+.. autoclass:: fracability.Entities.Boundary
     :members:
     :inherited-members:
     :undoc-members:

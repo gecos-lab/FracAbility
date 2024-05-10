@@ -2,8 +2,8 @@
 
 -------------------------------------
 
-Fractures
-------------------
+1. Fractures class
+--------------------
 .. autoclass:: fracability.Entities.Fractures
     :members:
     :inherited-members:

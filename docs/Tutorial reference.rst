@@ -9,4 +9,4 @@ Tutorials reference
     :maxdepth: 1
     :glob:
 
-    Tutorials/*
+    Tutorials/notebooks/*

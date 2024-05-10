@@ -16,7 +16,8 @@ Fracability is based on the access and manipulation of data enclosed in objects 
 Each entity is build in such a way to properly modify and streamline the input data.
     1. Fracture entity objects represent fracture data
     2. Boundary entity objects represent boundary data
-    3. FractureNetwork entity is the combination of Fractures and Boundaries
+    3. Nodes entity objects represent nodes data
+    4. FractureNetwork entity is the combination of Fractures, Boundaries and Nodes
 
 Using this object oriented approach flexibility is ensured. Each entity have shared and custom methods that can be
 accessed.
