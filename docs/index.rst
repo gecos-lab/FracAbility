@@ -13,10 +13,10 @@ These are the main features available :
 - **Shapefile importing support**
 
 
-- **Rapid topology analysis and identification of I,Y,X and U nodes**
+- **Topological analysis and identification of I,Y,X and U nodes**
 
 
-- **Fracture network backbone(s) identification**
+- **Fracture network backbone calculation**
 
 
 - **Statistical analysis tools:**
@@ -26,9 +26,8 @@ These are the main features available :
 
 
 - **Plotting tools:**
-    + Network objects plotting using matplotlib or vtk
+    + Matplotlib or VTK backend
     + Ternary node plot
-    + Rose diagram
     + Statistical plotting
 
 
@@ -38,27 +37,39 @@ library that inspired and helped in the creation of this project.
 Documentation contents
 -----------------------
 
-Quickstart & Theory
-~~~~~~~~~~~~~~~~~~~
+1. Quickstart & Introduction
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. toctree::
-  :maxdepth: 2
+  :maxdepth: 1
 
   Quickstart
-  Introduction to fracture network analysis
-  Recommended resources
+.. toctree::
+  :maxdepth: 1
 
-Tutorials
+  Introduction to fracture network analysis
+
+
+2. Theory and recommended resources
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. toctree::
+  :maxdepth: 2
+
+  Theory reference
+
+
+3. Tutorials
 ~~~~~~~~~~~~~~~~~~~
 
 
 .. toctree::
   :maxdepth: 2
-  :glob:
 
   Tutorial reference
 
-API
+
+4. API
 ~~~~~~~~~~~~~~~~~~~
 
 
@@ -67,18 +78,9 @@ API
 
   API reference
 
-Glossary
-~~~~~~~~~~~~~~~~~~~
-
-.. toctree::
-  :maxdepth: 2
-
-  Glossary
-
-
 
 Library status information
----------------------------
+----------------------------------------------
 
 .. |pypi| image:: https://img.shields.io/pypi/v/fracability.svg?logo=python&logoColor=white
    :target: https://pypi.org/project/pyvista/

@@ -31,12 +31,3 @@ In the following chapters we briefly introduce the concept of fracture networks,
 that can be carried out on them. We will focus also on introducing fracture network topological analysis and on fracture length distributions analysis
 applying `survival analysis <https://en.wikipedia.org/wiki/Survival_analysis>`_ techniques for
 right-censoring bias correction.
-
-Theory index
-----------------------
-
-.. toctree::
-  :maxdepth: 2
-  :glob:
-
-  Theory reference
