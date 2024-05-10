@@ -109,7 +109,7 @@ Library status information
 +----------------------+--------------------------------------+
 | Deployment           | |pypi|                               |
 +----------------------+--------------------------------------+
-| GitHub               | |maintained|  |stars|  |issues|      |
+| GitHub               | |maintained|                         |
 +----------------------+--------------------------------------+
 | Citation             | |zenodo|                             |
 +----------------------+--------------------------------------+
@@ -117,4 +117,12 @@ Library status information
 +----------------------+--------------------------------------+
 
 
+Authors
+--------
 
+This library and its contents was written and curated with love and care by:
+
++ Gabriele Benedetti (`gabri.benedetti@gmail.com <mailto:gabri.benedetti@gmail.com>`_)
++ Stefano Casiraghi (`s.casiraghi21@campus.unimib.it <mailto:s.casiraghi21@campus.unimib.it>`_)
++ Daniela Bertacchi (`daniela.bertacchi@unimib.it <mailto:daniela.bertacchi@unimib.it>`_)
++ Andrea Bistacchi (`andrea.bistacchi@unimib.it <mailto:andrea.bistacchi@unimib.it>`_)

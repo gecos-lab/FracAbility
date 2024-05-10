@@ -99,15 +99,21 @@ html_theme_options = {
     },
     "icon_links": [
         {
-            "name": "PyPI",
+            "name": "Package latest release",
             "url": "https://pypi.org/project/FracAbility/",
             "icon": "https://img.shields.io/github/release/gbene/FracAbility?&sort=semver&color=orange",
             "type": "url",
         },
         {
-            "name": "GitHub",
+            "name": "Star on GitHub!",
             "url": "https://github.com/gbene/FracAbility",
-            "icon": "fa-brands fa-github",
+            "icon": "https://img.shields.io/github/stars/gbene/fracability.svg?style=social&label=Stars",
+            "type": "url",
+        },
+        {
+            "name": "Report issues!",
+            "url": "https://github.com/gbene/FracAbility/issues",
+            "icon": "fa-solid fa-triangle-exclamation",
         }
     ],
     # For testing
