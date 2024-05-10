@@ -77,3 +77,49 @@ html_theme = 'sphinx_book_theme'
 # # relative to this directory. They are copied after the builtin static files,
 # # so a file named "default.css" will overwrite the builtin "default.css".
 # html_static_path = ['_static']
+
+html_theme_options = {
+    "path_to_docs": "docs",
+    "repository_url": "https://github.com/gbene/FracAbility",
+    "repository_branch": "master",
+    "use_edit_page_button": True,
+    "use_source_button": True,
+    "use_issues_button": True,
+    # "use_repository_button": True,
+    "use_download_button": True,
+    "use_sidenotes": True,
+    "show_toc_level": 2,
+    # "announcement": (
+    #     "⚠️The latest release refactored our HTML, "
+    #     "so double-check your custom CSS rules!⚠️"
+    # ),
+    "logo": {
+        "image_dark": "_static/logo-wide-dark.svg",
+        # "text": html_title,  # Uncomment to try text with logo
+    },
+    "icon_links": [
+        {
+            "name": "PyPI",
+            "url": "https://pypi.org/project/FracAbility/",
+            "icon": "https://img.shields.io/github/release/gbene/FracAbility?&sort=semver&color=orange",
+            "type": "url",
+        },
+        {
+            "name": "GitHub",
+            "url": "https://github.com/gbene/FracAbility",
+            "icon": "fa-brands fa-github",
+        }
+    ],
+    # For testing
+    # "use_fullscreen_button": False,
+    # "home_page_in_toc": True,
+    # "extra_footer": "<a href='https://google.com'>Test</a>",  # DEPRECATED KEY
+    # "show_navbar_depth": 2,
+    # Testing layout areas
+    # "navbar_start": ["test.html"],
+    # "navbar_center": ["test.html"],
+    # "navbar_end": ["test.html"],
+    # "navbar_persistent": ["test.html"],
+    # "footer_start": ["test.html"],
+    # "footer_end": ["test.html"]
+}
