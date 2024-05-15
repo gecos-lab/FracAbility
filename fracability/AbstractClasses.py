@@ -293,7 +293,7 @@ class BaseEntity(ABC):
             if not os.path.isdir(style_out):
                 os.makedirs(style_out)
 
-            if self.name == 'Fractures':
+            if self.name == 'Fractures' or self.name == 'Backbone':
                 set_n = list(set(self.entity_df['f_set']))
                 for f_set in set_n:
                     final_path = os.path.join(output_path, f'{self.name}_{f_set}.shp')

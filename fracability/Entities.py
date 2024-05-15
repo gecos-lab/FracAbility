@@ -601,6 +601,16 @@ class Boundary(BaseEntity):
                                 show_plot)
 
 
+class Backbone(Fractures):
+    """
+    Base entity for the backbone. It inherits the same properties of Fractures and is made to differentiate the two types and in case add backbone specific methods/properties if needed
+    """
+    def __init__(self, gdf: GeoDataFrame = None, csv: str = None,
+                 shp: str = None, set_n: int = None,
+                 check_geometry: bool = False):
+        super().__init__(gdf, csv, shp, set_n, check_geometry)
+
+
 class FractureNetwork(BaseEntity):
     """
     Fracture network base entity. Fracture networks are defined by one or
@@ -941,8 +951,8 @@ class FractureNetwork(BaseEntity):
             fractures_group = Fractures(gdf=fractures_df, set_n=set_n)
 
             if set_n not in self._df['f_set'].values:
-                new_df = DataFrame([['fractures', fractures_group, set_n, 1]], columns=['type', 'object',
-                                                                                        'f_set', 'active'])
+                new_df = DataFrame([['fractures', fractures_group, set_n, 1]],
+                                   columns=['type', 'object', 'f_set', 'active'])
                 self._df = pd.concat([self._df, new_df], ignore_index=True)
             else:
                 self._df.loc[self._df['f_set'] == set_n, 'object'] = fractures_group
@@ -1078,8 +1088,8 @@ class FractureNetwork(BaseEntity):
 
             if group_n not in self._df['b_group'].values:
 
-                new_df = DataFrame([['boundary', boundary_group, group_n, 1]], columns=['type', 'object',
-                                                                                        'b_group', 'active'])
+                new_df = DataFrame([['boundary', boundary_group, group_n, 1]],
+                                   columns=['type', 'object', 'b_group', 'active'])
                 self._df = pd.concat([self._df, new_df], ignore_index=True)
             else:
                 self._df.loc[self._df['b_group'] == group_n, 'object'] = boundary_group
@@ -1136,6 +1146,45 @@ class FractureNetwork(BaseEntity):
         value = boundaries.loc[boundaries['b_group'] == group_n, 'active'].values[0]
 
         return value
+
+    #  ==================== Backbone methods ====================
+
+    def calculate_backbone(self, biggest_region=True):
+        """
+        Calculate the backbone(s) of the network and add the calculated nodes to the network.
+
+        :param biggest_region: Output only most connected region. Default is True
+        """
+
+        fractures = self.fractures
+
+        connectivity = vtkConnectivityFilter()
+
+        connectivity.AddInputData(fractures.vtk_object)
+        # if biggest_region: # For now only biggest region
+        connectivity.SetExtractionModeToLargestRegion()
+
+        connectivity.Update()
+
+        vtkbackbone = PolyData(connectivity.GetOutput())
+
+        backbone_set_n = self.sets[-1] + 1 # use the last available set and add +1. This could be expanded for multiple backbones
+
+        backbone = Backbone(set_n=backbone_set_n)
+        backbone.vtk_object = vtkbackbone
+        backbone.crs = self.crs
+
+        new_df = DataFrame([['backbone', backbone, backbone_set_n, 0]],
+                           columns=['type', 'object', 'f_set', 'active'])
+        self._df = pd.concat([self._df, new_df], ignore_index=True)
+
+    @property
+    def backbone(self):
+        """
+        Property that returns a Fractures entity object of the backbone.
+        :return: Fracture entity object
+        """
+        return self._df.loc[self._df['type'] == 'backbone', 'object'].values
 
     #  ==================== Generic methods ====================
 
@@ -1277,28 +1326,6 @@ class FractureNetwork(BaseEntity):
         node_dict = Topology.nodes_conn(self)
         self.add_nodes_from_dict(node_dict)
 
-    def calculate_backbone(self,biggest_region=True):
-        """
-        Calculate the backbone(s) of the network and add the calculated nodes to the network.
-
-        :param biggest_region: Output only most connected region. Default is True
-        """
-
-        fractures = self.fractures
-
-        connectivity = vtkConnectivityFilter()
-
-        connectivity.AddInputData(fractures.vtk_object)
-        if biggest_region:
-            connectivity.SetExtractionModeToLargestRegion()
-
-        connectivity.Update()
-
-        backbone = connectivity.GetOutput()
-
-        return PolyData(backbone)
-
-
     @property
     def fraction_censored(self) -> float:
         """Get the fraction of censored fractures in the network """
@@ -1344,7 +1371,7 @@ class FractureNetwork(BaseEntity):
                               return_plot)
 
     def backbone_plot(self,
-                      method = 'vtk',
+                      method='vtk',
                       fracture_linewidth=1,
                       boundary_linewidth=1,
                       fracture_color='black',
@@ -1430,6 +1457,10 @@ class FractureNetwork(BaseEntity):
         if self.boundaries is not None:
             self.boundaries.save_csv(path)
 
+        if self.backbone is not None:
+            for bb in self.backbone:
+                bb.save_csv(path)
+
     def save_shp(self, path: str):
         """
         Save the entity df as shp
@@ -1445,3 +1476,7 @@ class FractureNetwork(BaseEntity):
 
         if self.boundaries is not None:
             self.boundaries.save_shp(path)
+
+        if self.backbone is not None:
+            for bb in self.backbone:
+                bb.save_shp(path)
