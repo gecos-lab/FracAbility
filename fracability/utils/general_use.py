@@ -212,7 +212,7 @@ def shp2vtk(df: GeoDataFrame, nodes=False) -> pv.PolyData:
     arrays = list(df.columns)
     arrays.remove('geometry')
     for array in arrays:
-        vtk_obj[array] = df[array].values
+        vtk_obj.cell_data[array] = df[array].values
 
 
     # Use CleanPolyData to collapse double points in one

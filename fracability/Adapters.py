@@ -22,94 +22,98 @@ import networkx as nx
 from vtkmodules.vtkFiltersGeometry import vtkGeometryFilter
 
 from fracability.operations.Geometry import connect_dots
+from fracability.utils.general_use import shp2vtk
 
 
 #  =============== VTK representations ===============
 
 def node_vtk_rep(input_df: geopandas.GeoDataFrame) -> PolyData:
-
-    points = np.array([point.coords for point in input_df.geometry]).reshape(-1, 3)
-    types = input_df['type'].values
-    node_types = input_df['n_type'].values
-
-    points_vtk = PolyData(points)
-    points_vtk['type'] = types
-    points_vtk['n_type'] = node_types
+    points_vtk = shp2vtk(input_df)
+    # points = np.array([point.coords for point in input_df.geometry]).reshape(-1, 3)
+    # types = input_df['type'].values
+    # node_types = input_df['n_type'].values
+    #
+    # points_vtk = PolyData(points)
+    # points_vtk['type'] = types
+    # points_vtk['n_type'] = node_types
 
     return points_vtk
 
 
 def frac_vtk_rep(input_df: geopandas.GeoDataFrame) -> PolyData:
-    appender = vtkAppendPolyData()
 
-    for index, geom, set_n in zip(input_df.index, input_df['geometry'],
-                                  input_df['f_set']):  # For each geometry in the df
-
-        x, y = geom.coords.xy  # get xy as an array
-        z = np.zeros_like(x)  # create a zeros z array with the same dim of the x (or y)
-
-        points = np.stack((x, y, z), axis=1)  # Stack the coordinates to a [n,3] shaped array
-        # offset = np.round(points[0][0])
-        if len(points) != 0:  # Avoid empty geometries
-            pv_obj = lines_from_points(points)  # Create the corresponding vtk line with the given points
-            pv_obj.cell_data['type'] = ['fracture'] * pv_obj.GetNumberOfCells()
-            pv_obj.point_data['type'] = ['fracture'] * pv_obj.GetNumberOfPoints()
-
-            pv_obj.cell_data['f_set'] = [set_n] * pv_obj.GetNumberOfCells()
-            pv_obj.point_data['f_set'] = [set_n] * pv_obj.GetNumberOfPoints()
-
-            pv_obj.cell_data['RegionId'] = [index] * pv_obj.GetNumberOfCells()
-            pv_obj.point_data['RegionId'] = [index] * pv_obj.GetNumberOfPoints()
-
-            if 'length' in input_df.columns:
-                pv_obj.cell_data['length'] = input_df.loc[index, 'length']
-
-        appender.AddInputData(pv_obj)  # Add the new object
-
-    geometry_filter = vtkGeometryFilter()
-    geometry_filter.SetInputConnection(appender.GetOutputPort())
-    geometry_filter.Update()
-
-    output_obj = PolyData(geometry_filter.GetOutput())
-    conn_obj = connect_dots(output_obj)
+    conn_obj = shp2vtk(input_df)
+    # appender = vtkAppendPolyData()
+    #
+    # for index, geom, set_n in zip(input_df.index, input_df['geometry'],
+    #                               input_df['f_set']):  # For each geometry in the df
+    #
+    #     x, y = geom.coords.xy  # get xy as an array
+    #     z = np.zeros_like(x)  # create a zeros z array with the same dim of the x (or y)
+    #
+    #     points = np.stack((x, y, z), axis=1)  # Stack the coordinates to a [n,3] shaped array
+    #     # offset = np.round(points[0][0])
+    #     if len(points) != 0:  # Avoid empty geometries
+    #         pv_obj = lines_from_points(points)  # Create the corresponding vtk line with the given points
+    #         pv_obj.cell_data['type'] = ['fracture'] * pv_obj.GetNumberOfCells()
+    #         pv_obj.point_data['type'] = ['fracture'] * pv_obj.GetNumberOfPoints()
+    #
+    #         pv_obj.cell_data['f_set'] = [set_n] * pv_obj.GetNumberOfCells()
+    #         pv_obj.point_data['f_set'] = [set_n] * pv_obj.GetNumberOfPoints()
+    #
+    #         pv_obj.cell_data['RegionId'] = [index] * pv_obj.GetNumberOfCells()
+    #         pv_obj.point_data['RegionId'] = [index] * pv_obj.GetNumberOfPoints()
+    #
+    #         if 'length' in input_df.columns:
+    #             pv_obj.cell_data['length'] = input_df.loc[index, 'length']
+    #
+    #     appender.AddInputData(pv_obj)  # Add the new object
+    #
+    # geometry_filter = vtkGeometryFilter()
+    # geometry_filter.SetInputConnection(appender.GetOutputPort())
+    # geometry_filter.Update()
+    #
+    # output_obj = PolyData(geometry_filter.GetOutput())
+    # conn_obj = connect_dots(output_obj)
 
     return conn_obj
 
 
 def bound_vtk_rep(input_df: geopandas.GeoDataFrame) -> PolyData:
 
-    appender = vtkAppendPolyData()
-
-    for index, geom, b_group in zip(input_df.index,
-                                    input_df['geometry'],
-                                    input_df['b_group']):  # For each geometry in the df
-
-        x, y = geom.coords.xy  # get xy as an array
-        z = np.zeros_like(x)  # create a zeros z array with the same dim of the x (or y)
-
-        points = np.stack((x, y, z), axis=1)  # Stack the coordinates to a [n,3] shaped array
-        # offset = np.round(points[0][0])
-        pv_obj = lines_from_points(points)  # Create the corresponding vtk line with the given points
-        pv_obj.cell_data['type'] = ['boundary'] * pv_obj.GetNumberOfCells()
-        pv_obj.point_data['type'] = ['boundary'] * pv_obj.GetNumberOfPoints()
-
-        pv_obj.cell_data['b_group'] = [b_group] * pv_obj.GetNumberOfCells()
-        pv_obj.point_data['b_group'] = [b_group] * pv_obj.GetNumberOfPoints()
-
-        pv_obj.cell_data['RegionId'] = [index] * pv_obj.GetNumberOfCells()
-        pv_obj.point_data['RegionId'] = [index] * pv_obj.GetNumberOfPoints()
-
-
-        # line.plot()
-
-        appender.AddInputData(pv_obj)  # Add the new object
-
-    geometry_filter = vtkGeometryFilter()
-    geometry_filter.SetInputConnection(appender.GetOutputPort())
-    geometry_filter.Update()
-
-    output_obj = PolyData(geometry_filter.GetOutput())
-    conn_obj = connect_dots(output_obj)
+    conn_obj = shp2vtk(input_df)
+    # appender = vtkAppendPolyData()
+    #
+    # for index, geom, b_group in zip(input_df.index,
+    #                                 input_df['geometry'],
+    #                                 input_df['b_group']):  # For each geometry in the df
+    #
+    #     x, y = geom.coords.xy  # get xy as an array
+    #     z = np.zeros_like(x)  # create a zeros z array with the same dim of the x (or y)
+    #
+    #     points = np.stack((x, y, z), axis=1)  # Stack the coordinates to a [n,3] shaped array
+    #     # offset = np.round(points[0][0])
+    #     pv_obj = lines_from_points(points)  # Create the corresponding vtk line with the given points
+    #     pv_obj.cell_data['type'] = ['boundary'] * pv_obj.GetNumberOfCells()
+    #     pv_obj.point_data['type'] = ['boundary'] * pv_obj.GetNumberOfPoints()
+    #
+    #     pv_obj.cell_data['b_group'] = [b_group] * pv_obj.GetNumberOfCells()
+    #     pv_obj.point_data['b_group'] = [b_group] * pv_obj.GetNumberOfPoints()
+    #
+    #     pv_obj.cell_data['RegionId'] = [index] * pv_obj.GetNumberOfCells()
+    #     pv_obj.point_data['RegionId'] = [index] * pv_obj.GetNumberOfPoints()
+    #
+    #
+    #     # line.plot()
+    #
+    #     appender.AddInputData(pv_obj)  # Add the new object
+    #
+    # geometry_filter = vtkGeometryFilter()
+    # geometry_filter.SetInputConnection(appender.GetOutputPort())
+    # geometry_filter.Update()
+    #
+    # output_obj = PolyData(geometry_filter.GetOutput())
+    # conn_obj = connect_dots(output_obj)
 
     return conn_obj
 

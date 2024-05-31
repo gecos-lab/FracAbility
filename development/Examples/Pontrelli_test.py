@@ -18,6 +18,8 @@ fracture_net.add_boundaries(boundary)
 
 fracture_net.calculate_topology()
 
+fracture_net.vtk_plot()
+
 fitter = Statistics.NetworkFitter(fracture_net)
 
 fitter.fit('lognorm')

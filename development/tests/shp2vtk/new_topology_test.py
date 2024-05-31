@@ -3,7 +3,11 @@ import pyvista as pv
 import geopandas as gpd
 from pandas import concat
 import numpy as np
-from vtkmodules.vtkFiltersCore import vtkCleanPolyData, vtkAppendPolyData
+from vtkmodules.vtkCommonDataModel import vtkPolyData
+from vtkmodules.vtkFiltersCore import vtkCleanPolyData, vtkAppendPolyData, vtkIdFilter
+import time
+import itertools
+from vtk.util import numpy_support
 
 
 def shp2vtk(df: gpd.GeoDataFrame, nodes=False) -> pv.PolyData:
@@ -72,10 +76,12 @@ def shp2vtk(df: gpd.GeoDataFrame, nodes=False) -> pv.PolyData:
     return output_obj
 
 
-fractures = gpd.read_file('Data/Salza/output/shp/Fractures.shp')
+# fractures = gpd.read_file('Data/Salza/output/shp/Fractures.shp')
+fractures = gpd.read_file('Data/Pontrelli/output/shp/Fractures_1.shp')
 # center = fractures.dissolve().centroid
 # fractures = fractures.translate(*-center.geometry.get_coordinates().values[0])
-boundary = gpd.read_file('Data/Salza/output/shp/Boundary.shp')
+# boundary = gpd.read_file('Data/Salza/output/shp/Boundary.shp')
+boundary = gpd.read_file('Data/Pontrelli/output/shp/Boundary_1.shp')
 # boundary = boundary.translate(*-center.geometry.get_coordinates().values[0])
 #
 #
@@ -86,6 +92,25 @@ boundary = gpd.read_file('Data/Salza/output/shp/Boundary.shp')
 fractures_vtk = shp2vtk(fractures)
 boundary_vtk = shp2vtk(boundary)
 
+
+ids = []
+c = 0
+start = time.time()
+
+for i, cell in enumerate(fractures_vtk.cell):
+    cell_ids = cell.point_ids
+    ids.append([cell_ids[0]])
+    ids.append([cell_ids[-1]])
+    ids.append(cell_ids)
+
+ids = list(itertools.chain.from_iterable(ids))
+
+u, c = np.unique(ids, return_counts=True)
+
+ids = u[c > 1]
+
+
+
 fracture_points = fractures_vtk.points
 boundary_points = boundary_vtk.points
 
@@ -93,25 +118,28 @@ boundary_points = boundary_vtk.points
 boundary_common = np.isin(np.round(fracture_points, 5), np.round(boundary_points, 5)).all(axis=1)
 boundary_index = np.where(boundary_common == 1)[0]
 
+print(boundary_index)
+
 # print(fracture_points[boundary_index])
 
 fractures_segm = fractures_vtk.extract_all_edges(use_all_points=True)
 fractures_vtk['origin'] = np.zeros(fractures_vtk.n_points, dtype=int)
 fractures_vtk['topology'] = np.zeros(fractures_vtk.n_points)
 
-check_values = fractures_vtk['_marker'][fractures_vtk['_marker'] > 0]
 
 for i in range(fractures_vtk.n_points):
     neigh = fracture_points[fractures_segm.point_neighbors(i)]
     if len(neigh) != 2:
         fractures_vtk['topology'][i] = len(neigh)
 
+end = time.time()
+
+print(end-start)
 
 fractures_vtk['topology'][boundary_index] = 5
 
-
 censored_lines = [fractures_vtk.point_cell_ids(idx) for idx in boundary_index]
-
+print(censored_lines)
 fractures_vtk['censored'][censored_lines] = 1
 
 
@@ -168,7 +196,7 @@ plotter.enable_image_style()
 plotter.view_xy()
 plotter.show()
 
-fractures_vtk.save('fractures.vtk')
+# fractures_vtk.save('fractures.vtk')
 
 # fractures_vtk.cell_data['f_set'] = fractures['f_set']
 # fractures_vtk.cell_data['type'] = fractures['type']
@@ -177,6 +205,3 @@ fractures_vtk.save('fractures.vtk')
 # boundary_vtk.cell_data['b_group'] = boundary['b_group']
 # boundary_vtk.cell_data['type'] = boundary['type']
 
-
-
-# plotter.show()

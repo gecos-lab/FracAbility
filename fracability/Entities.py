@@ -797,10 +797,9 @@ class FractureNetwork(BaseEntity):
         :param classes: List of node classes that are needed to be added. If none are provided all the classes are used [1, 3, 4, 5, 6]
         """
         if classes is None:
-            classes = [1, 3, 4, 5, 6]
-
+            classes = [1, 3, 4, 5]
         node_geometry = np.array(list(node_dict.keys()))
-        class_list, node_origin = zip(*node_dict.values())
+        class_list = list(node_dict.values())
         for c in classes:
 
             node_index = np.where(np.array(class_list) == c)[0]
@@ -809,11 +808,8 @@ class FractureNetwork(BaseEntity):
 
                 node_geometry_set = node_geometry[node_index]
                 class_list_set = np.array(class_list)[node_index]
-                node_origin_set = np.array(node_origin)[node_index]
-                if node_origin_set.size == 0:
-                    node_origin_set = np.zeros_like(node_index)
 
-                entity_df = GeoDataFrame({'type': 'node', 'n_type': class_list_set, 'n_origin': node_origin_set,
+                entity_df = GeoDataFrame({'type': 'node', 'n_type': class_list_set,
                                           'geometry': node_geometry_set}, crs=self.crs)
 
                 nodes = Nodes(gdf=entity_df, node_type=c)
@@ -1323,8 +1319,8 @@ class FractureNetwork(BaseEntity):
         if clean_network is True:
             self.clean_network()
 
-        node_dict = Topology.nodes_conn(self)
-        self.add_nodes_from_dict(node_dict)
+        nodes_dict = Topology.nodes_conn(self)
+        self.add_nodes_from_dict(nodes_dict,classes=None)
 
     @property
     def fraction_censored(self) -> float:
