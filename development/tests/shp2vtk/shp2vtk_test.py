@@ -55,6 +55,9 @@ def shp2vtk(df: gpd.GeoDataFrame, nodes=False) -> pv.PolyData:
     for array in arrays:
         vtk_obj[array] = df[array].values
 
+
+    # Use CleanPolyData to collapse double points in one
+
     p = 100000  # Scaling factor needed for the vtk function to work properly
     vtk_obj.points *= p
     clean = vtkCleanPolyData()

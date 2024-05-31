@@ -1,17 +1,14 @@
-import os
-import sys
+from fracability.examples import data  # import the path of the sample data
+from fracability import Entities, Statistics  # import the Entities class
 
-cwd = os.path.dirname(os.getcwd())
-sys.path.append(cwd)
+salza_data = data.Salza()
+data_dict = salza_data.data_dict  # Get dict of paths for the data
 
-from fracability import Entities
-from fracability import DATADIR
+# Create the fractures and boundary objects.
+fracture_set1 = Entities.Fractures(shp=data_dict['Set_1.shp'], set_n=1)  # to add your data put the absolute path of the shp file
+fracture_set2 = Entities.Fractures(shp=data_dict['Set_2.shp'], set_n=2)  # to add your data put the absolute path of the shp file
 
-# Salza
-fracture_set1 = Entities.Fractures(shp=f'{DATADIR}/laghetto_salza/Set_1.shp', set_n=1)
-fracture_set2 = Entities.Fractures(shp=f'{DATADIR}/laghetto_salza/Set_2.shp', set_n=2)
-boundary = Entities.Boundary(shp=f'{DATADIR}/laghetto_salza/Interpretation_boundary.shp', group_n=1)
-
+boundary = Entities.Boundary(shp=data_dict['Interpretation_boundary.shp'], group_n=1)
 
 fracture_net = Entities.FractureNetwork()
 
@@ -19,40 +16,36 @@ fracture_net.add_fractures(fracture_set1)
 fracture_net.add_fractures(fracture_set2)
 
 fracture_net.add_boundaries(boundary)
-
-# print('ciao')
 fracture_net.calculate_topology()
 
-# fracture_net.save_shp('Salza')
-fracture_net.deactivate_fractures([2])
-fracture_net.fractures.save_csv('Salza')
+fracture_net.save_shp('Salza')
+fracture_net.save_csv('Salza')
 
-# fitter = Statistics.NetworkFitter(fracture_net)
-#
-# fitter.fit('lognorm')
-# fitter.fit('expon')
-# fitter.fit('norm')
-# fitter.fit('gamma')
-# fitter.fit('gengamma')
-# fitter.fit('logistic')
-# fitter.fit('weibull_min')
-#
-# Plotters.matplot_stats_table(fitter)
-# # Plotters.matplot_stats_uniform(fitter)
-# # Plotters.matplot_stats_ranks(fitter)
-#
-fracture_net.deactivate_fractures([1])
-fracture_net.fractures.save_csv('Salza')
-# fitter = Statistics.NetworkFitter(fracture_net)
-#
-# fitter.fit('lognorm')
-# fitter.fit('expon')
-# fitter.fit('norm')
-# fitter.fit('gamma')
-# fitter.fit('gengamma')
-# fitter.fit('logistic')
-# fitter.fit('weibull_min')
-#
-# Plotters.matplot_stats_table(fitter)
-# # Plotters.matplot_stats_uniform(fitter)
-# # Plotters.matplot_stats_ranks(fitter)
+fracture_net.activate_fractures([1])
+fitter = Statistics.NetworkFitter(fracture_net)
+
+fitter.fit('lognorm')
+fitter.fit('expon')
+fitter.fit('norm')
+fitter.fit('gamma')
+fitter.fit('powerlaw')
+fitter.fit('weibull_min')
+
+fitter.fit_result_to_clipboard()
+fitter.plot_PIT(bw=True)
+fitter.plot_summary(position=[1], sort_by='Mean_rank')
+
+fracture_net.activate_fractures([2])
+fitter = Statistics.NetworkFitter(fracture_net)
+
+fitter.fit('lognorm')
+fitter.fit('expon')
+fitter.fit('norm')
+fitter.fit('gamma')
+fitter.fit('powerlaw')
+fitter.fit('weibull_min')
+
+# fitter.fit_result_to_clipboard()
+fitter.plot_PIT(bw=True, n_ticks=11)
+fitter.plot_summary(position=[1], sort_by='Mean_rank')
+# fitter.tick_plot(n_ticks=5)

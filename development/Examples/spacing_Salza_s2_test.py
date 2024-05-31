@@ -1,15 +1,8 @@
 """
 Python code to calculate the spacing distribution of a given linear fracture set.
 """
-import os
-import sys
-
-cwd = os.path.dirname(os.getcwd())
-sys.path.append(cwd)
-
-
-from fracability import DATADIR
-from fracability import Entities
+from fracability.examples import data  # import the path of the sample data
+from fracability import Entities, Statistics  # import the Entities class
 import geopandas as gpd
 import numpy as np
 from shapely.ops import split
@@ -69,8 +62,11 @@ def center_points(center_coords, lengths, dir, resolution=10):
     return xyz
 
 
-data_path = f'{DATADIR}/laghetto_salza/Set_2.shp'
-boundary_path = f'{DATADIR}/laghetto_salza/Interpretation_boundary.shp'
+salza_data = data.Salza()
+data_dict = salza_data.data_dict  # Get dict of paths for the data
+
+data_path = data_dict['Set_2.shp']
+boundary_path = data_dict['Interpretation_boundary.shp']
 
 df = gpd.read_file(data_path)
 boundary_df = gpd.read_file(boundary_path)
@@ -139,20 +135,15 @@ frac_net.add_fractures(valid_scanlines)
 frac_net.add_boundaries(boundary)
 
 frac_net.calculate_topology()
-frac_net.vtk_plot()
 
-frac_net.fractures.save_csv('Spacing_Salza_S2')
+fitter = Statistics.NetworkFitter(frac_net)
+fitter.fit('lognorm')
+fitter.fit('expon')
+fitter.fit('norm')
+fitter.fit('gamma')
+fitter.fit('powerlaw')
+fitter.fit('weibull_min')
 
-# fitter = Statistics.NetworkFitter(frac_net)
-# fitter.fit('lognorm')
-# fitter.fit('expon')
-# fitter.fit('weibull_min')
-# fitter.fit('gamma')
-# fitter.fit('norm')
-# fitter.fit('powerlaw')
-#
-# matplot_stats_table(fitter)
-#
-# matplot_stats_uniform(fitter)
-
-# print(fitter.fit_records)
+# fitter.fit_result_to_clipboard()
+fitter.plot_PIT(bw=True, n_ticks=8)
+fitter.plot_summary(position=[1], sort_by='Mean_rank')

@@ -80,7 +80,6 @@ def KM(z_values, Z, delta_list):
 
     G = np.ones_like(z_values)
     n = len(Z)
-
     for i, z in enumerate(z_values):
         if z < Z_sort[0]:
             G[i] = 0
@@ -91,6 +90,31 @@ def KM(z_values, Z, delta_list):
             G[i] = 1
 
     return G
+
+
+def ecdf_find_x(samples: np.ndarray, ecdf_prob: np.ndarray, y_values: np.ndarray) -> list:
+    """
+    Find the corresponding sample value of the ecdf given an array of y values
+    :param samples: Array of samples
+    :param ecdf_prob: Array of ecdf values
+    :param y_values: Array of y values to find the corresponding x
+    :return: list of x values
+    """
+
+    x_values = []
+    for y in y_values:
+        mask = ecdf_prob < y
+        last_true = np.count_nonzero(mask) - 1
+        first_false = last_true + 1
+        if last_true < 0:
+            int_x = samples[0]
+        elif first_false == len(ecdf_prob):
+            int_x = samples[-1]
+        else:
+            int_x = np.mean([samples[last_true], samples[first_false]])
+
+        x_values.append(np.round(int_x, 2))
+    return x_values
 
 
 def setAxLinesBW(ax):

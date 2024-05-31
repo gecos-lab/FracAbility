@@ -30,7 +30,7 @@ class NetworkData:
         self._lengths: np.ndarray  # array of all the lengths (both complete and censored)
         self._non_censored_lengths: np.ndarray  # array of only complete lengths
         self._censored_lengths: np.ndarray  # array of only censored lengths
-
+        self._ecdf: np.ndarray
         self._function_list: list = ['pdf', 'cdf', 'sf', 'hf', 'chf']  # list of possible functions
 
         self.use_survival = use_survival
@@ -49,6 +49,7 @@ class NetworkData:
             self._lengths = entity_df['length'].values
             self._non_censored_lengths = entity_df.loc[entity_df['censored'] == 0, 'length'].values
             self._censored_lengths = entity_df.loc[entity_df['censored'] == 1, 'length'].values
+            self._ecdf = KM(self._lengths, self._lengths, self.delta)
 
             if self.use_survival:
                 self.data = ss.CensoredData(uncensored=self._non_censored_lengths, right=self._censored_lengths)
@@ -178,7 +179,7 @@ class NetworkData:
         Property that returns the empirical CDF of the input data (it ignores the complete_only flag but ) using Kaplan-Meier.
         :return: Numpy array of the calculated CDF values using KM
         """
-        return KM(self.lengths, self.lengths, self.delta)
+        return self._ecdf
 
     @property
     def esf(self) -> np.ndarray:
@@ -316,7 +317,7 @@ class NetworkDistribution:
         return self.distribution.ppf(0.95)
 
     def cdf(self, x_values: np.array = None):
-        if x_values:
+        if x_values is not None:
             return self.distribution.cdf(x_values)
         else:
             return self.distribution.cdf(self.fit_data.lengths)
@@ -510,6 +511,7 @@ class NetworkDistribution:
         Kim 2019, Tests based on EDF statistics for randomly censored normal
         distributions when parameters are unknown
         """
+        smallest_number = np.finfo(np.float64).tiny
         Z = self.distribution.cdf(self.fit_data.lengths)
         G_n = self.fit_data.ecdf
         tot_n = self.fit_data.total_n_fractures
@@ -517,8 +519,13 @@ class NetworkDistribution:
         sum1 = 0  # First sum
         sum2 = 0  # Second sum
         if Z[-1] == 1:
-            Z[-1] -= 10 ** -10  # this is to avoid 0 in ln(1 - Z[-1]) and similar
+            Z[-1] -= smallest_number  # this is to avoid 0 in ln(1 - Z[-1])
         for j in range(tot_n - 1):
+            if Z[j + 1] == 0:
+                Z[j + 1] += smallest_number  # this is to avoid 0 in ln(Z[j + 1])
+            if Z[j] == 0:
+                Z[j] += smallest_number  # this is to avoid 0 in ln(Z[j])
+
             sum1 += (G_n[j] ** 2) * (-ln(1 - Z[j + 1]) + ln(Z[j + 1]) + ln(1 - Z[j]) - ln(Z[j]))
             sum2 += G_n[j] * (-ln(1 - Z[j + 1]) + ln(1 - Z[j]))
 
@@ -590,6 +597,7 @@ class NetworkFitter:
         :param distribution_name: Name of the distribution to fit
         :return:
         """
+        print(f'Fitting {distribution_name} on data')
         last_pos = len(self._fit_dataframe)  # The position of a new entry in the dataframe will be the last (i.e. the length of the dataframe)
 
         self._fit_dataframe.loc[last_pos, 'name'] = distribution_name
@@ -731,18 +739,36 @@ class NetworkFitter:
 
     def plot_PIT(self,  show_plot: bool = True,
                  position: list = None, sort_by: str = 'Akaike',
-                 bw: bool = False):
+                 bw: bool = False,
+                 second_axis: bool = True,
+                 n_ticks: int = 5):
         """
         Method to plot the uniform comparison plot for the fitted models.
+
         :param show_plot: Bool. If True, show the plot if False do not show. Default is True.
         :param position: List. Plot the models at the given position in the ordered fit_records dataframe. If None (default) plot all models.
         :param sort_by: String. Column name to sort the fit_records dataframe. Default is Akaike
         :param bw: Bool. If true turn the plot color-blind friendly (black lines with different patterns). Max 7 lines (i.e. models). Default is False
-
+        :param second_axis: Add the secondary x-axis to the PIT plot
+        :param n_ticks: Number of ticks for the secondary x-axis
         :return:
         """
 
-        plotter.matplot_stats_uniform(self, show_plot, position, sort_by, bw)
+        plotter.matplot_stats_uniform(self, show_plot, position, sort_by, bw, second_axis, n_ticks)
+
+    def tick_plot(self, show_plot: bool = True,
+                  position: list = None, n_ticks: int = 5,
+                  sort_by: str = 'Akaike'):
+        """
+        Method used to plot the tick plot of the given fitted model(s)
+        :param show_plot: Bool. If True, show the plot if False do not show. Default is True.
+        :param position: List. Plot the models at the given position in the ordered fit_records dataframe. If None (default) plot all models.
+        :param n_ticks: Number of ticks per bar
+        :param sort_by: String. Column name to sort the fit_records dataframe. Default is Akaike
+        :return:
+        """
+
+        plotter.matplot_tick_plot(self, show_plot=show_plot, position=position, n_ticks=n_ticks, sort_by=sort_by)
 
     def plot_summary(self, show_plot:bool = True, position: list = None, sort_by: str = 'Akaike'):
         """

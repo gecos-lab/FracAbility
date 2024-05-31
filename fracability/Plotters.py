@@ -51,7 +51,7 @@ import ternary
 from vtkmodules.vtkFiltersCore import vtkConnectivityFilter
 
 from fracability.Statistics import NetworkDistribution, NetworkFitter
-from fracability.utils.general_use import KM, setFigLinesBW
+from fracability.utils.general_use import KM, setFigLinesBW, ecdf_find_x
 
 import numpy as np
 from scipy.stats import uniform
@@ -643,7 +643,7 @@ def matplot_stats_pdf(network_distribution: NetworkDistribution,
     show_plot: Bool. If true show the plot. By default, is True
 
     """
-    sns.set_theme()
+
     distribution = network_distribution.distribution
     name = network_distribution.distribution_name
 
@@ -663,7 +663,7 @@ def matplot_stats_pdf(network_distribution: NetworkDistribution,
 
     plt.xlabel('length [m]')
     plt.title('PDF')
-    plt.grid(True)
+    plt.grid(False)
     plt.legend()
 
     if show_plot:
@@ -685,7 +685,6 @@ def matplot_stats_cdf(network_distribution: NetworkDistribution,
     show_plot: Bool. If true show the plot. By default, is True
 
     """
-    sns.set_theme()
 
     distribution = network_distribution.distribution
     name = network_distribution.distribution_name
@@ -729,7 +728,6 @@ def matplot_stats_sf(network_distribution: NetworkDistribution,
     show_plot: Bool. If true show the plot. By default, is True
 
     """
-    sns.set_theme()
     distribution = network_distribution.distribution
     name = network_distribution.distribution_name
 
@@ -891,7 +889,6 @@ def matplot_stats_summary(fitter: NetworkFitter,
     sort_by: str. If best is True, show the best fit using the indicated column name. By default is Akaike
 
     """
-    sns.set_theme()
 
     # This distribution selection process could be probably optimized
     names = []
@@ -936,7 +933,9 @@ def matplot_stats_uniform(fitter: NetworkFitter,
                           show_plot: bool = True,
                           position: list = None,
                           sort_by: str = 'Akaike',
-                          bw: bool = False):
+                          bw: bool = False,
+                          second_axis: bool = True,
+                          n_ticks: int = 5):
     """
     Confront the fitted data with the standard uniform 0,1. Following Kim 2019
 
@@ -952,10 +951,18 @@ def matplot_stats_uniform(fitter: NetworkFitter,
 
     bw: Bool. If true turn the plot color-blind friendly (black lines with different patterns). Max 7 lines (i.e. models). Default is False
 
+    second_axis: Bool. If true plot the secondary X axis representing the corresponding values of the cumulative in meters. Default is True
+
+    n_ticks: int. Number of ticks on the second axis.
+
+    todo add custom second axis values
     """
 
-    # This distribution selection process could be probably optimized
+    delta = fitter.network_data.delta
+    ecdf = fitter.network_data.ecdf
+    samples = fitter.network_data.lengths
 
+    # This distribution selection process could be probably optimized
     names = []
     if position:
         for pos in position:
@@ -964,24 +971,101 @@ def matplot_stats_uniform(fitter: NetworkFitter,
         names = fitter.get_fitted_distribution_names(sort_by)
 
     fig = plt.figure(num=f'Comparison plot', figsize=(13, 7))
-
-    uniform_list = np.linspace(0, 1, num=10)
-    uniform_cdf = uniform.cdf(uniform_list)
+    ax = plt.subplot(111)
+    figManager = plt.get_current_fig_manager()
+    figManager.window.showMaximized()
 
     for name in names:
         network_distribution = fitter.get_fitted_distribution(name)
         Z = network_distribution.cdf()
-        delta = network_distribution.fit_data.delta
-        G_n = KM(Z, Z, delta)
-        plt.plot(Z, G_n, label=f'G_n {name}') # plot the Kaplan-Meier curves with steps
+        G_n = KM(Z, Z, delta)  # not sure about this!
+        ax.plot(Z, G_n, label=f'{name}')
 
     if bw:
         setFigLinesBW(fig)
 
+    if second_axis:
+        x_ticks = np.linspace(0, 1, n_ticks)
+
+        xticks_labels = ecdf_find_x(samples=samples, ecdf_prob=ecdf, y_values=x_ticks)
+
+        ax2 = ax.twiny()
+        ax2.plot(x_ticks, [0] * len(x_ticks), visible=False)
+        ax2.spines['top'].set_position(('axes', -0.11))
+        ax2.spines['top'].set_visible(False)
+        ax2.spines['bottom'].set_position(('axes', -0.05))
+        ax2.spines['bottom'].set_visible(True)
+        ax2.set_xticks(x_ticks)
+        ax2.set_xticklabels(xticks_labels)
+
+        ax2.annotate(f'Reference length [m]', (-0.01, 0.5), ha='right', va='center', xycoords=ax2.spines['bottom'])
+
+        plt.tick_params(which='both', direction='inout', bottom=True, top=False, length=6)
+
     if show_plot:
-        plt.plot(uniform_list, uniform_cdf, 'r', label='U(0, 1)')
+        ax.plot([0, 1], [0, 1], color='r', label='U (0,1)')
+        ax.grid(False)
+        ax.legend()
         plt.title('Distance to Uniform comparison')
-        plt.grid(False)
-        plt.legend()
         plt.show()
 
+
+def matplot_tick_plot(fitter: NetworkFitter,
+                      show_plot: bool = True,
+                      position: list = None,
+                      n_ticks: int = 5,
+                      sort_by: str = 'Akaike'):
+    """
+    Plot the tick plot of the fitted models. (Describe the tick plot).
+    :param position:
+    :param n_ticks:
+    :param fitter:
+    :param show_plot:
+    :param sort_by:
+    :return:
+    """
+
+    names = []
+    if position:
+        for pos in position:
+            names.append(fitter.get_fitted_distribution_names(sort_by)[pos-1])
+    else:
+        names = fitter.get_fitted_distribution_names(sort_by)
+
+    fig = plt.figure(num=f'Tick plot', figsize=(13, 7))
+    ax = plt.subplot(111)
+
+    figManager = plt.get_current_fig_manager()
+    figManager.window.showMaximized()
+
+    samples = fitter.network_data.lengths
+    ecdf = fitter.network_data.ecdf
+
+    x_ticks = np.linspace(0, 1, n_ticks)
+
+    xticks_labels = ecdf_find_x(samples=samples, ecdf_prob=ecdf, y_values=x_ticks)
+
+    for i, name in enumerate(names):
+        network_distribution = fitter.get_fitted_distribution(name)
+        y = i
+        plt.axhline(y=y, color='k')
+        values_labels = network_distribution.cdf(xticks_labels)
+        for value, x in zip(values_labels, xticks_labels):
+            point = ax.plot(value, y, 'k|', markersize=12, linewidth=1)
+            ax.annotate(xy=(0.5, -1.1), text=f'{x}', ha='center', va='center', xycoords=point[0], annotation_clip=True)
+
+    ax.set_xlim(-0.1, 1.1)
+    ax.set_ylim(bottom=-0.5)
+    ax.set_yticks(range(len(names)))
+    ax.set_yticklabels(names)
+    ax.set_xticks(x_ticks)
+    ax.set_xticklabels(xticks_labels)
+    ax.set_xlabel('Length[m]')
+    ax.annotate(f'Kaplan-Meier', (-0.01, 0.5), ha='right', va='center', xycoords=ax.spines['bottom'])
+
+    ax.grid('y')
+    ax.spines[['left', 'top', 'right']].set_visible(False)
+
+    if show_plot:
+        plt.title('Tick plot')
+        plt.show()
