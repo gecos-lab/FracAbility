@@ -31,14 +31,15 @@ classifiers = [
 ]
 dependencies = [
     'pyvista',
-    'networkx',  # minimum typing support
+    'networkx',
     'geopandas',
     'scipy',
     'python-ternary',
     'pyperclip',
     'pyqt5',
     'openpyxl',
-    'seaborn'
+    'seaborn',
+    'trame'
 ]
 
 dynamic = ['version']

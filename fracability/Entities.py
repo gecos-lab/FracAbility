@@ -202,7 +202,7 @@ class Nodes(BaseEntity):
         """
         plts.matplot_nodes(self, markersize, return_plot, show_plot)
 
-    def vtk_plot(self, markersize=7, return_plot=False, show_plot=True):
+    def vtk_plot(self, markersize=7, return_plot=False, show_plot=True, notebook=True):
         """
         Plot Nodes object with VTK
         :param markersize:
@@ -211,7 +211,7 @@ class Nodes(BaseEntity):
         :return:
         """
 
-        plts.vtkplot_nodes(self, markersize, return_plot, show_plot)
+        plts.vtkplot_nodes(self, markersize, return_plot, show_plot, notebook=notebook)
 
     def ternary_plot(self):
         plts.matplot_ternary(self)
@@ -396,7 +396,8 @@ class Fractures(BaseEntity):
                  color_set=False,
                  return_plot=False,
                  show_plot=True,
-                 display_property: str = None):
+                 display_property: str = None,
+                 notebook=True):
         """
         Plot fracture object with VTK
         :param linewidth:
@@ -408,12 +409,13 @@ class Fractures(BaseEntity):
         :return:
         """
         plts.vtkplot_fractures(self,
-                               linewidth,
-                               color,
-                               color_set,
-                               return_plot,
-                               show_plot,
-                               display_property)
+                               linewidth=linewidth,
+                               color=color,
+                               color_set=color_set,
+                               return_plot=return_plot,
+                               show_plot=show_plot,
+                               display_property=display_property,
+                               notebook=notebook)
 
 
 class Boundary(BaseEntity):
@@ -584,7 +586,8 @@ class Boundary(BaseEntity):
                  color='red',
                  color_set=False,
                  return_plot=False,
-                 show_plot=True):
+                 show_plot=True,
+                 notebook=True):
         """
         Plot Boundary object with vtk
         :param linewidth:
@@ -595,10 +598,11 @@ class Boundary(BaseEntity):
         :return:
         """
         plts.vtkplot_boundaries(self,
-                                linewidth,
-                                color,
-                                return_plot,
-                                show_plot)
+                                linewidth=linewidth,
+                                color=color,
+                                return_plot=return_plot,
+                                show_plot=show_plot,
+                                notebook=notebook)
 
 
 class Backbone(Fractures):
@@ -837,19 +841,6 @@ class FractureNetwork(BaseEntity):
             for t in node_type:
                 self.entity_df.loc[self.entity_df['n_type'] == t, 'active'] = 1
 
-    def deactivate_nodes(self, node_type: list = None):
-        """
-        Method that activates the nodes provided in the node_type list.
-        :param node_type: List of node types to be activated
-        """
-
-        if node_type is None:
-            self.entity_df.loc[self.entity_df['type'] == 'nodes', 'active'] = 0
-        else:
-            self.entity_df.loc[self.entity_df['type'] == 'nodes', 'active'] = 1
-            for t in node_type:
-                self.entity_df.loc[self.entity_df['n_type'] == t, 'active'] = 0
-
     def is_type_active(self, node_type: int) -> bool:
         """
         Method used to return if a given node type is active in the fracture network
@@ -971,21 +962,9 @@ class FractureNetwork(BaseEntity):
             self.entity_df.loc[self.entity_df['type'] == 'fractures', 'active'] = 1
         else:
             self.entity_df.loc[self.entity_df['type'] == 'fractures', 'active'] = 0
-            for n in set_n:
-                self.entity_df.loc[self.entity_df['f_set'] == n, 'active'] = 1
-
-    def deactivate_fractures(self, set_n: list = None):
-        """
-        Method that activates the fractures provided in the set_n list.
-        :param set_n: List of sets to be activated
-        """
-
-        if set_n is None:
-            self.entity_df.loc[self.entity_df['type'] == 'fractures', 'active'] = 0
-        else:
-            self.entity_df.loc[self.entity_df['type'] == 'fractures', 'active'] = 1
-            for n in set_n:
-                self.entity_df.loc[self.entity_df['f_set'] == n, 'active'] = 0
+            if len(set_n) > 0:
+                for n in set_n:
+                    self.entity_df.loc[self.entity_df['f_set'] == n, 'active'] = 1
 
     def is_set_active(self, set_n: int) -> bool:
         """
@@ -1112,24 +1091,6 @@ class FractureNetwork(BaseEntity):
             self.entity_df.loc[self.entity_df['type'] == 'boundary', 'active'] = 0
             for n in group_n:
                 self.entity_df.loc[self.entity_df['b_group'] == n, 'active'] = 1
-
-    def deactivate_boundaries(self, group_n: list = None):
-
-        """
-        Method that deactivates the boundary provided in the group_n list.
-        :param group_n: List of groups to be deactivated
-
-        Note
-        -------
-        If group_n is none then all boundaries groups are deactivated
-        """
-
-        if group_n is None:
-            self.entity_df.loc[self.entity_df['type'] == 'boundary', 'active'] = 0
-        else:
-            self.entity_df.loc[self.entity_df['type'] == 'boundary', 'active'] = 1
-            for n in group_n:
-                self.entity_df.loc[self.entity_df['b_group'] == n, 'active'] = 0
 
     def is_group_active(self, group_n: int) -> bool:
         """
@@ -1342,7 +1303,8 @@ class FractureNetwork(BaseEntity):
                  boundary_color='red',
                  color_set=False,
                  show_plot=True,
-                 return_plot=False):
+                 return_plot=False,
+                 notebook=True):
         """
         Method used to plot the fracture network using vtk
         :param markersize:
@@ -1357,14 +1319,15 @@ class FractureNetwork(BaseEntity):
         """
 
         plts.vtkplot_frac_net(self,
-                              markersize,
-                              fracture_linewidth,
-                              boundary_linewidth,
-                              fracture_color,
-                              boundary_color,
-                              color_set,
-                              show_plot,
-                              return_plot)
+                              markersize=markersize,
+                              fracture_linewidth=fracture_linewidth,
+                              boundary_linewidth=boundary_linewidth,
+                              fracture_color=fracture_color,
+                              boundary_color=boundary_color,
+                              color_set=color_set,
+                              show_plot=show_plot,
+                              return_plot=return_plot,
+                              notebook=notebook)
 
     def backbone_plot(self,
                       method='vtk',
@@ -1373,19 +1336,21 @@ class FractureNetwork(BaseEntity):
                       fracture_color='black',
                       boundary_color='red',
                       return_plot=False,
-                      show_plot=True):
+                      show_plot=True,
+                      notebook=True):
         """
         Method used to plot the fracture network using vtk
         :return:
         """
         if method == 'vtk':
             plts.vtkplot_backbone(self,
-                                  fracture_linewidth,
-                                  boundary_linewidth,
-                                  fracture_color,
-                                  boundary_color,
-                                  return_plot,
-                                  show_plot)
+                                  fracture_linewidth=fracture_linewidth,
+                                  boundary_linewidth=boundary_linewidth,
+                                  fracture_color=fracture_color,
+                                  boundary_color=boundary_color,
+                                  return_plot=return_plot,
+                                  show_plot=show_plot,
+                                  notebook=notebook)
         elif method == 'matplot':
             plts.matplot_backbone(self,
                                   fracture_linewidth,

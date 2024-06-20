@@ -47,14 +47,11 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 from pyvista import Plotter
+import pyvista as pv
 import ternary
-from vtkmodules.vtkFiltersCore import vtkConnectivityFilter
-
 from fracability.Statistics import NetworkDistribution, NetworkFitter
 from fracability.utils.general_use import KM, setFigLinesBW, ecdf_find_x
-
 import numpy as np
-from scipy.stats import uniform
 
 
 def matplot_nodes(entity,
@@ -359,7 +356,8 @@ def matplot_backbone(entity,
 def vtkplot_nodes(entity,
                   markersize=7,
                   return_plot=False,
-                  show_plot=True):
+                  show_plot=True,
+                  notebook=True):
     """
     Plot a fracability Nodes entity using vtk.
 
@@ -367,10 +365,11 @@ def vtkplot_nodes(entity,
     :param markersize: Size of the nodes
     :param return_plot: Bool. If true the plot is returned. By default, False
     :param show_plot: Bool. If true the plot is shown. By default, True
+    :param notebook: Bool. if true plot using jupyter. By default, True
     :return: If return_plot is true a matplotlib axis is returned
 
     """
-    plotter = Plotter(notebook=False)
+    plotter = Plotter(notebook=notebook)
     plotter.background_color = 'white'
     plotter.view_xy()
     plotter.add_camera_orientation_widget()
@@ -428,7 +427,8 @@ def vtkplot_fractures(entity,
                       color_set=False,
                       return_plot=False,
                       show_plot=True,
-                      display_property: str = None):
+                      display_property: str = None,
+                      notebook=True):
 
     """
     Plot a fracability Fracture entity using vtk.
@@ -439,11 +439,14 @@ def vtkplot_fractures(entity,
     :param color_set: Bool. If true the fractures are colored using the set.
     :param return_plot: Bool. If true the plot is returned. By default, False
     :param show_plot: Bool. If true the plot is shown. By default, True
+    :param display_property: str. Indicate which property to show. By default, None
+    :param notebook: Bool. if true plot using jupyter. By default, True
+
     :return: If return_plot is true a matplotlib axis is returned
 
     """
 
-    plotter = Plotter(notebook=False)
+    plotter = Plotter(notebook=notebook)
     plotter.background_color = 'white'
     plotter.view_xy()
     plotter.add_camera_orientation_widget()
@@ -484,7 +487,8 @@ def vtkplot_boundaries(entity,
                        linewidth=1,
                        color='red',
                        return_plot=False,
-                       show_plot=True):
+                       show_plot=True,
+                       notebook=True):
     """
     Plot a fracability Boundary entity using vtk.
 
@@ -493,9 +497,11 @@ def vtkplot_boundaries(entity,
     :param color: General color of the lines as str.
     :param return_plot: Bool. If true the plot is returned. By default, False
     :param show_plot: Bool. If true the plot is shown. By default, True
+    :param notebook: Bool. if true plot using jupyter. By default, True
+
     :return: If return_plot is true a matplotlib axis is returned
     """
-    plotter = Plotter(notebook=False)
+    plotter = Plotter(notebook=notebook)
     plotter.background_color = 'white'
     plotter.view_xy()
     plotter.add_camera_orientation_widget()
@@ -522,7 +528,8 @@ def vtkplot_frac_net(entity,
                      boundary_color='red',
                      color_set=False,
                      show_plot=True,
-                     return_plot=False):
+                     return_plot=False,
+                     notebook=True):
     """
     Plot a fracability FractureNetwork entity using Pyvista.
 
@@ -537,10 +544,12 @@ def vtkplot_frac_net(entity,
     :param color_set: Bool. If true the lines are based on the set values.
     :param return_plot: Bool. If true the plot is returned. By default, False
     :param show_plot: Bool. If true the plot is shown. By default, True
+    :param notebook: Bool. if true plot using jupyter. By default, True
+
     :return: If return_plot is true a matplotlib axis is returned
 
     """
-    plotter = Plotter(notebook=False)
+    plotter = Plotter(notebook=notebook)
     plotter.background_color = 'white'
     plotter.view_xy()
     plotter.add_camera_orientation_widget()
@@ -579,7 +588,8 @@ def vtkplot_backbone(entity,
                      fracture_color='black',
                      boundary_color='red',
                      return_plot=False,
-                     show_plot=True):
+                     show_plot=True,
+                     notebook=True):
     """
     Plot a fracability FractureNetwork backbone entity using pyvista.
 
@@ -592,10 +602,12 @@ def vtkplot_backbone(entity,
     :param color_set: Bool. If true the lines are based on the set values.
     :param return_plot: Bool. If true the plot is returned. By default, False
     :param show_plot: Bool. If true the plot is shown. By default, True
+    :param notebook: Bool. if true plot using jupyter. By default, True
+
     :return: If return_plot is true a matplotlib axis is returned
 
     """
-    plotter = Plotter(notebook=False)
+    plotter = Plotter(notebook=notebook)
     plotter.background_color = 'white'
     plotter.view_xy()
     plotter.add_camera_orientation_widget()
