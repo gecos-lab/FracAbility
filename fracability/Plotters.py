@@ -984,8 +984,6 @@ def matplot_stats_uniform(fitter: NetworkFitter,
 
     fig = plt.figure(num=f'Comparison plot', figsize=(13, 7))
     ax = plt.subplot(111)
-    figManager = plt.get_current_fig_manager()
-    figManager.window.showMaximized()
 
     for name in names:
         network_distribution = fitter.get_fitted_distribution(name)

@@ -1281,7 +1281,7 @@ class FractureNetwork(BaseEntity):
             self.clean_network()
 
         nodes_dict = Topology.nodes_conn(self)
-        self.add_nodes_from_dict(nodes_dict,classes=None)
+        self.add_nodes_from_dict(nodes_dict, classes=None)
 
     @property
     def fraction_censored(self) -> float:

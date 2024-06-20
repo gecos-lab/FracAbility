@@ -511,7 +511,7 @@ class NetworkDistribution:
         Kim 2019, Tests based on EDF statistics for randomly censored normal
         distributions when parameters are unknown
         """
-        smallest_number = np.finfo(np.float64).tiny
+        smallest_number = 10**-10
         Z = self.distribution.cdf(self.fit_data.lengths)
         G_n = self.fit_data.ecdf
         tot_n = self.fit_data.total_n_fractures
@@ -520,11 +520,19 @@ class NetworkDistribution:
         sum2 = 0  # Second sum
         if Z[-1] == 1:
             Z[-1] -= smallest_number  # this is to avoid 0 in ln(1 - Z[-1])
+        elif Z[-1] == 0:
+            Z[-1] += smallest_number  # this is to avoid 0 in ln(Z[-1])
         for j in range(tot_n - 1):
+
             if Z[j + 1] == 0:
                 Z[j + 1] += smallest_number  # this is to avoid 0 in ln(Z[j + 1])
+            elif Z[j + 1] == 1:
+                Z[j + 1] -= smallest_number  # this is to avoid 0 in ln(1 - Z[j + 1])
+
             if Z[j] == 0:
                 Z[j] += smallest_number  # this is to avoid 0 in ln(Z[j])
+            elif Z[j] == 1:
+                Z[j] -= smallest_number  # this is to avoid 0 in ln(1 - Z[j])
 
             sum1 += (G_n[j] ** 2) * (-ln(1 - Z[j + 1]) + ln(Z[j + 1]) + ln(1 - Z[j]) - ln(Z[j]))
             sum2 += G_n[j] * (-ln(1 - Z[j + 1]) + ln(1 - Z[j]))
@@ -636,10 +644,10 @@ class NetworkFitter:
         self._fit_dataframe.loc[last_pos, 'KG_distance'] = distribution.KG_distance
         self._fit_dataframe.loc[last_pos, 'AD_distance'] = distribution.AD_distance
 
-        self._fit_dataframe['Akaike_rank'] = ss.rankdata(self._fit_dataframe['Akaike'], nan_policy='omit').astype(int)
-        self._fit_dataframe['KS_rank'] = ss.rankdata(self._fit_dataframe['KS_distance'], nan_policy='omit').astype(int)
-        self._fit_dataframe['KG_rank'] = ss.rankdata(self._fit_dataframe['KG_distance'], nan_policy='omit').astype(int)
-        self._fit_dataframe['AD_rank'] = ss.rankdata(self._fit_dataframe['AD_distance'], nan_policy='omit').astype(int)
+        self._fit_dataframe['Akaike_rank'] = ss.rankdata(self._fit_dataframe['Akaike']).astype(int)
+        self._fit_dataframe['KS_rank'] = ss.rankdata(self._fit_dataframe['KS_distance']).astype(int)
+        self._fit_dataframe['KG_rank'] = ss.rankdata(self._fit_dataframe['KG_distance']).astype(int)
+        self._fit_dataframe['AD_rank'] = ss.rankdata(self._fit_dataframe['AD_distance']).astype(int)
         self._fit_dataframe['Mean_rank'] = self._fit_dataframe.iloc[:, 8:12].mean(axis=1)
 
         self._fit_dataframe.loc[last_pos, 'distribution'] = distribution

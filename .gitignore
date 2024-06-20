@@ -2,3 +2,5 @@ development/**/*.svg
 fracability/**/*.svg
 docs/_build
 .ipynb_checkpoints/
+build
+FracAbility.egg-info

@@ -21,6 +21,7 @@ def nodes_conn(obj):
 
     fractures_vtk = obj.fractures.vtk_object
     boundary_vtk = obj.boundaries.vtk_object
+    entity_df_obj = obj.fracture_network_to_components_df()
     point_dict = dict()
     ids = []
 
@@ -57,7 +58,8 @@ def nodes_conn(obj):
         point_dict[point] = 5
 
     censored_lines = [fractures_vtk.point_cell_ids(idx)[0] for idx in boundary_index]
-    obj.fractures.entity_df.loc[censored_lines, 'censored'] = 1
+    entity_df_obj.loc[censored_lines, 'censored'] = 1
+    obj.entity_df = entity_df_obj
     fracture_nodes = PolyData(fractures_vtk.points)
     fracture_nodes['topology'] = fractures_vtk['topology']
 
