@@ -21,31 +21,31 @@ fracture_net.calculate_topology()
 fracture_net.save_shp('Salza')
 fracture_net.save_csv('Salza')
 
-fracture_net.activate_fractures([1])
-fitter = Statistics.NetworkFitter(fracture_net)
-
-fitter.fit('lognorm')
-fitter.fit('expon')
-fitter.fit('norm')
-fitter.fit('gamma')
-fitter.fit('powerlaw')
-fitter.fit('weibull_min')
-
-fitter.fit_result_to_clipboard()
-fitter.plot_PIT(bw=True)
-fitter.plot_summary(position=[1], sort_by='Mean_rank')
-
-fracture_net.activate_fractures([2])
-fitter = Statistics.NetworkFitter(fracture_net)
-
-fitter.fit('lognorm')
-fitter.fit('expon')
-fitter.fit('norm')
-fitter.fit('gamma')
-fitter.fit('powerlaw')
-fitter.fit('weibull_min')
-
+# fracture_net.activate_fractures([1])
+# fitter = Statistics.NetworkFitter(fracture_net)
+#
+# fitter.fit('lognorm')
+# fitter.fit('expon')
+# fitter.fit('norm')
+# fitter.fit('gamma')
+# fitter.fit('powerlaw')
+# fitter.fit('weibull_min')
+#
 # fitter.fit_result_to_clipboard()
-fitter.plot_PIT(bw=True, n_ticks=11)
-fitter.plot_summary(position=[1], sort_by='Mean_rank')
-# fitter.tick_plot(n_ticks=5)
+# fitter.plot_PIT(bw=True)
+# fitter.plot_summary(position=[1], sort_by='Mean_rank')
+#
+# fracture_net.activate_fractures([2])
+# fitter = Statistics.NetworkFitter(fracture_net)
+#
+# fitter.fit('lognorm')
+# fitter.fit('expon')
+# fitter.fit('norm')
+# fitter.fit('gamma')
+# fitter.fit('powerlaw')
+# fitter.fit('weibull_min')
+#
+# # fitter.fit_result_to_clipboard()
+# fitter.plot_PIT(bw=True, n_ticks=11)
+# fitter.plot_summary(position=[1], sort_by='Mean_rank')
+# # fitter.tick_plot(n_ticks=5)

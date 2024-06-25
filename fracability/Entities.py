@@ -67,8 +67,8 @@ class Nodes(BaseEntity):
 
         self._df = gdf
         columns = self._df.columns
-        if 'original_line_id' not in columns:
-            self._df['original_line_id'] = np.array(gdf.index.values+1)
+        if 'og_line_id' not in columns:
+            self._df['og_line_id'] = np.array(gdf.index.values+1)
         if 'type' not in columns:
             self._df['type'] = 'node'
         if 'n_type' not in columns:
@@ -291,8 +291,8 @@ class Fractures(BaseEntity):
         self._df = gdf.copy()
         self._df.reset_index(inplace=True, drop=True)
         columns = self._df.columns
-        if 'original_line_id' not in columns:
-            self._df['original_line_id'] = np.array(gdf.index.values+1)
+        if 'og_line_id' not in columns:
+            self._df['og_line_id'] = np.array(gdf.index.values+1)
         if 'type' not in columns:
             self._df['type'] = 'fracture'
         if 'censored' not in columns:
@@ -362,7 +362,7 @@ class Fractures(BaseEntity):
                 print(f"\n\nWarning, empty geometry at line {line+1}, fix in GIS\n\n")
             overlaps = self.entity_df.overlaps(geom)
             if overlaps.any():
-                overlaps_list.append(self.entity_df.loc[line, 'original_line_id'])
+                overlaps_list.append(self.entity_df.loc[line, 'og_line_id'])
         if len(overlaps_list) > 0:
             print(f'\n\nDetected overlaps for set {self._set_n}: {overlaps_list}. Check geometries in gis and fix.\n\n')
 
@@ -511,8 +511,8 @@ class Boundary(BaseEntity):
         # Remove up to here
 
         columns = self._df.columns
-        if 'original_line_id' not in columns:
-            self._df['original_line_id'] = np.array(gdf.index.values+1)
+        if 'og_line_id' not in columns:
+            self._df['og_line_id'] = np.array(gdf.index.values+1)
         if 'type' not in columns:
             self._df['type'] = 'boundary'
         if 'b_group' not in columns:
@@ -794,31 +794,24 @@ class FractureNetwork(BaseEntity):
             else:
                 self._df.loc[self._df['n_type'] == node_type, 'object'] = nodes_group
 
-    def add_nodes_from_dict(self, node_dict, classes=None):
+    def add_nodes_from_dict(self, node_dict, classes=None, origin_dict: dict = None):
         """Add nodes a dict of shapely geometry (key), classes and optionally node origin (value).
 
-        :param node_dict: Dict of shapely node geometries as keys and a tuple (class, origin). If origin is empty it will be set to 0.
+        :param node_dict: Dict of shapely node geometries as keys and a list (class, node_index).
         :param classes: List of node classes that are needed to be added. If none are provided all the classes are used [1, 3, 4, 5, 6]
+        :param origin_dict: Dict of shapely node geometries as keys and a list of node origin.
         """
-        if classes is None:
-            classes = [1, 3, 4, 5]
+
         node_geometry = np.array(list(node_dict.keys()))
-        class_list = list(node_dict.values())
-        for c in classes:
+        class_list = np.array(list(node_dict.values()))
+        origin_list = list(origin_dict.values())
 
-            node_index = np.where(np.array(class_list) == c)[0]
+        entity_df = GeoDataFrame({'type': 'node', 'n_type': class_list[:, 0], 'n_index': class_list[:, 1],
+                                  'n_origin': origin_list, 'geometry': node_geometry}, crs=self.crs)
 
-            if node_index.any():
+        nodes = Nodes(gdf=entity_df)
 
-                node_geometry_set = node_geometry[node_index]
-                class_list_set = np.array(class_list)[node_index]
-
-                entity_df = GeoDataFrame({'type': 'node', 'n_type': class_list_set,
-                                          'geometry': node_geometry_set}, crs=self.crs)
-
-                nodes = Nodes(gdf=entity_df, node_type=c)
-
-                self.add_nodes(nodes)
+        self.add_nodes(nodes)
 
     def nodes_object(self, node_type: int) -> Nodes:
         """
@@ -1232,18 +1225,18 @@ class FractureNetwork(BaseEntity):
                     filtered_df = sub_df[xor]
                     for n in set(filtered_df['f_set']):
                         int_dict = dict()
-                        int_dict['boundary_int'] = list(filtered_df.loc[filtered_df['f_set'] == n, 'original_line_id'].values)
+                        int_dict['boundary_int'] = list(filtered_df.loc[filtered_df['f_set'] == n, 'og_line_id'].values)
                         overlaps_list_dict[n].append(int_dict)
-                    intersections_list = filtered_df['original_line_id'].values
+                    intersections_list = filtered_df['og_line_id'].values
                     intersections_geometry_list = filtered_df['geometry'].values
 
             else:
                 overlaps = df.overlaps(geom)
                 if overlaps.any():
-                    overlaps_list.append(df.loc[line, 'original_line_id'])
+                    overlaps_list.append(df.loc[line, 'og_line_id'])
                     overlaps_geometry_list.append(df.loc[line, 'geometry'])
                     set_n = df.loc[line, 'f_set']
-                    overlaps_list_dict[set_n].append(df.loc[line, 'original_line_id'])
+                    overlaps_list_dict[set_n].append(df.loc[line, 'og_line_id'])
 
         if save_shp:
             path_frac = os.path.join(save_shp, 'frac_corr.shp')
@@ -1280,8 +1273,13 @@ class FractureNetwork(BaseEntity):
         if clean_network is True:
             self.clean_network()
 
-        nodes_dict = Topology.nodes_conn(self)
-        self.add_nodes_from_dict(nodes_dict, classes=None)
+        nodes_dict, origin_dict = Topology.nodes_conn(self)
+        self.add_nodes_from_dict(nodes_dict,origin_dict=origin_dict, classes=None)
+
+
+
+
+
 
     @property
     def fraction_censored(self) -> float:
