@@ -714,7 +714,7 @@ def matplot_stats_cdf(network_distribution: NetworkDistribution,
     plt.plot(x_vals, y_vals, color='r', label=f'{name} CDF')
     if plot_ecdf:
         ecdf = network_data.ecdf
-        plt.step(x=x_vals, y=ecdf, color='b', label='Empirical CDF')
+        plt.step(x=x_vals, y=ecdf, color='b', label='Empirical CDF', where='post')
 
     plt.xlabel('length [m]')
     plt.title('CDF')
@@ -756,7 +756,7 @@ def matplot_stats_sf(network_distribution: NetworkDistribution,
     plt.plot(x_vals, y_vals, color='r', label=f'{name} SF')
     if plot_esf:
         esf = network_data.esf
-        plt.step(x=x_vals, y=esf, color='b', label='Empirical SF')
+        plt.step(x=x_vals, y=esf, color='b', label='Empirical SF', where='post')
 
     plt.xlabel('length [m]')
     plt.title('SF')

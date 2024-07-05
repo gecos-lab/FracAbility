@@ -69,7 +69,7 @@ def KM(z_values, Z, delta_list):
 
         for j in j_index:  # for each index in the index list
             d = d_list[j]
-            real_j = j + 1
+            real_j = j+1
             p = ((n - real_j) / (n - real_j + 1)) ** d
             product *= p
 

@@ -70,8 +70,6 @@ def nodes_conn(obj):
         u_sets, f_sets = np.unique(sets, return_counts=True)
         sorting_index = np.argsort(f_sets)
 
-        print(u_sets[sorting_index])
-
         if len(cells) >= 3:
             print(f'\n\nInvalid point for lines: {fractures_vtk["og_line_id"][cells]} '
                   f'\n\nsets: {fractures_vtk["f_set"][cells]}, \n\nThe node will be classified accordingly'
