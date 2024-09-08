@@ -73,7 +73,6 @@ def matplot_nodes(entity,
 
     1. I nodes: blue red circle
     2. Y nodes: green triangle
-    3. Y2 nodes: cyan triangle
     4. X nodes: blue square
     5. U nodes: yellow pentagon
     """
@@ -91,12 +90,10 @@ def matplot_nodes(entity,
     Y = np.where(node_types == 3)
     X = np.where(node_types == 4)
     U = np.where(node_types == 5)
-    Y2 = np.where(node_types == 6)
 
     # todo change the colors to reflect the pallete of the paper
     ax.plot(points[I][:, 0], points[I][:, 1], 'or', markersize=markersize)
     ax.plot(points[Y][:, 0], points[Y][:, 1], '^g', markersize=markersize)
-    ax.plot(points[Y2][:, 0], points[Y2][:, 1], '^c', markersize=markersize)
     ax.plot(points[X][:, 0], points[X][:, 1], 'sb', markersize=markersize)
     ax.plot(points[U][:, 0], points[U][:, 1], 'py', markersize=markersize)
 
@@ -381,12 +378,10 @@ def vtkplot_nodes(entity,
         3: 'Y',
         4: 'X',
         5: 'U',
-        6: 'Y2'
     }
     cmap_dict = {
         'I': 'Blue',
         'Y': 'Green',
-        'Y2': 'Cyan',
         'X': 'Red',
         'U': 'Yellow'
     }
@@ -407,7 +402,7 @@ def vtkplot_nodes(entity,
 
     actor = plotter.add_mesh(nodes,
                              scalars=class_names,
-                             render_points_as_spheres=True,
+                             render_points_as_spheres=False,
                              point_size=markersize,
                              show_scalar_bar=True,
                              scalar_bar_args=sargs,
@@ -559,10 +554,6 @@ def vtkplot_frac_net(entity,
     fractures = entity.fractures
     boundaries = entity.boundaries
 
-    if nodes is not None:
-        node_actor = vtkplot_nodes(nodes, markersize=markersize, return_plot=True)
-        plotter.add_actor(node_actor)
-
     if fractures is not None:
         fractures_actor = vtkplot_fractures(fractures, linewidth=fracture_linewidth,
                                             color=fracture_color, color_set=color_set, return_plot=True)
@@ -572,6 +563,11 @@ def vtkplot_frac_net(entity,
         boundary_actor = vtkplot_boundaries(boundaries, linewidth=boundary_linewidth,
                                             color=boundary_color, return_plot=True)
         plotter.add_actor(boundary_actor)
+
+    if nodes is not None:
+        node_actor = vtkplot_nodes(nodes, markersize=markersize, return_plot=True)
+
+        plotter.add_actor(node_actor)
 
     if return_plot:
         actors = plotter.actors

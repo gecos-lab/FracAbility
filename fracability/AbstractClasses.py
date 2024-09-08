@@ -298,17 +298,17 @@ class BaseEntity(ABC):
                 for f_set in set_n:
                     final_path = os.path.join(output_path, f'{self.name}_{f_set}.shp')
                     entity_df = self.entity_df.loc[self.entity_df['f_set'] == f_set, :]
-                    entity_df.to_file(final_path, crs=self.crs)
+                    entity_df.to_file(final_path, crs=self.crs, engine='fiona')
             elif self.name == 'Boundary':
                 group_n = list(set(self.entity_df['b_group']))
                 for b_group in group_n:
                     final_path = os.path.join(output_path, f'{self.name}_{b_group}.shp')
                     entity_df = self.entity_df.loc[self.entity_df['b_group'] == b_group, :]
-                    entity_df.to_file(final_path, crs=self.crs)
+                    entity_df.to_file(final_path, crs=self.crs, engine='fiona')
             elif self.name == 'Nodes':
                 final_path = os.path.join(output_path, f'{self.name}.shp')
                 entity_df = self.entity_df
-                entity_df.to_file(final_path, crs=self.crs)
+                entity_df.to_file(final_path, crs=self.crs, engine='fiona')
 
             qgis_style_paths = QgisStyle().available_paths
 

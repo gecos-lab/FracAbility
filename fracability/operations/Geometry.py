@@ -62,6 +62,51 @@ def tidy_intersections(obj, buffer=0.05, inplace: bool = True):
             line1 = gdf.loc[
                 idx_line1, 'geometry']  # Use as the reference line (in the int_node function) the new geometry.
 
+    print('\n\n')
+
+    if inplace:
+        obj.entity_df = gdf
+    else:
+        copy_obj = deepcopy(obj)
+        copy_obj.entity_df = gdf
+        return copy_obj
+
+def tidy_intersections_boundary_only(obj, buffer=0.05, inplace: bool = True):
+    """Method used to tidy shapefile intersections with the boundary of a fracture or fracture network object."""
+    if obj.name == 'FractureNetwork':
+        gdf = obj.fracture_network_to_components_df()
+        gdf = gdf.loc[gdf['type'] != 'node']
+    elif obj.name == 'Fractures':
+        gdf = obj.entity_df.copy()
+    else:
+        print('Cannot tidy intersection for nodes or only boundaries')
+        return
+    df_buffer = gdf.buffer(buffer)
+    print('\n\n')
+    for idx_line1, line in gdf.iterrows():
+        print(f'Calculating intersections on fracture: {idx_line1+1}/{len(gdf.index)}', end='\r')
+
+        if line['type'] == 'boundary':
+            continue
+
+        line1 = line['geometry']
+
+        idx_list = df_buffer.index[df_buffer.intersects(line1) == True]  # Subset the intersecting lines
+        idx_list = idx_list[idx_list != idx_line1]  # Exclude the reference line index to avoid self intersection
+
+        intersections = gdf.loc[idx_list]
+        for line2, idx_line2 in zip(intersections['geometry'], idx_list):  # for each intersecting line:
+            if intersections['type'][idx_line2] == 'boundary':
+                new_geom = int_node(line1, line2, [idx_line1, idx_line2], gdf)  # Calculate and add the intersection node.
+
+                for key, value in new_geom.items():
+                    gdf.loc[key, 'geometry'] = value  # substitute the original geometry with the new geometry
+
+                line1 = gdf.loc[
+                    idx_line1, 'geometry']  # Use as the reference line (in the int_node function) the new geometry.
+            else:
+                continue
+    print('\n\n')
     if inplace:
         obj.entity_df = gdf
     else:

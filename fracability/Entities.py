@@ -1250,28 +1250,36 @@ class FractureNetwork(BaseEntity):
         else:
             print(overlaps_list_dict)
 
-    def clean_network(self, buffer = 0.05, inplace=True):
+    def clean_network(self, buffer = 0.05, inplace=True, only_boundary=False):
         """Tidy the intersection of the active entities in the fracture network. A buffer is applied to all the
         geometries to ensure intersection in a given radius.
 
+        :param only_boundary: Apply cleaning only on the fractures intersecting the boundary
         :param buffer: Applied buffer to the geometries of the entity.
         :param inplace: If true automatically replace the network with the clean one, if false then return the clean
          geopandas dataframe. Default is True
          """
 
         if inplace:
-            Geometry.tidy_intersections(self)
+            if only_boundary:
+                Geometry.tidy_intersections_boundary_only(self)
+            else:
+                Geometry.tidy_intersections(self)
         else:
-            return Geometry.tidy_intersections(self, inplace=False)
+            if only_boundary:
+                Geometry.tidy_intersections_boundary_only(self, inplace=False)
+            else:
+                Geometry.tidy_intersections(self, inplace=False)
 
-    def calculate_topology(self, clean_network=True):
+    def calculate_topology(self, clean_network=True, only_boundary=False):
         """
         Calculate the topology of the network and add the calculated nodes to the network.
 
         :param clean_network: If true, before calculating the topology the network is cleaned with the clean_network. Default is True
+        :param only_boundary: Apply cleaning only on the fractures intersecting the boundary
         """
         if clean_network is True:
-            self.clean_network()
+            self.clean_network(only_boundary=only_boundary)
 
         nodes_dict, origin_dict = Topology.nodes_conn(self)
         self.add_nodes_from_dict(nodes_dict,origin_dict=origin_dict, classes=None)
