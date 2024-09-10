@@ -130,10 +130,10 @@ def int_node(line1, line2, idx_list, gdf):
         mask = np.isin(element, test_element)
 
         if len(element[mask]) == 4:
-            print('Single point overlap. Geometry is correct, continuing. Shp files could contain invalid geometries, run the check_network method to perform a network wide check.')
+            print('Single point overlap. Geometry is correct, continuing. Shp files could contain invalid geometries.')
             pass
         else:
-            print('Multiple point overlap. Check and fix geometry, stopping. Shp files could contain invalid geometries, run the check_network method to perform a network wide check.')
+            print('Multiple point overlap. Check and fix geometries on GIS, stopping.')
             exit()
 
         # print(gdf.loc[idx_list[0]-5:idx_list[1]+5])
