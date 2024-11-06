@@ -3,8 +3,8 @@ from vtk2shp import shp2vtk
 
 
 
-fractures = gpd.read_file('Data/Salza/output/shp/Fractures.shp')
-boundary = gpd.read_file('Data/Salza/output/shp/Boundary.shp')
+fractures = gpd.read_file('../../Shapefiles/Salza_in/Set_1.shp')
+boundary = gpd.read_file('../../Shapefiles/Salza_in/Interpretation_boundary.shp')
 
 get_coord_df_fracs = fractures.geometry.get_coordinates(ignore_index=False, index_parts=True)
 

@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 sns.set_theme()
 
-data = pd.read_csv('data.csv', index_col=0)
+data = pd.read_csv('data/data.csv', index_col=0)
 complete_data = data['length'].values
 
 print(complete_data.mean())

@@ -123,10 +123,10 @@ def int_node(line1, line2, idx_list):
 # data = 'test_bounds_net.shp'
 # bound_data = 'test_bounds.shp'
 #
-data = 'rerobe/Fracture_network.shp'
+data = '../../Shapefiles/Pontrelli_in/Set_a.shp'
 # data = 'attachments/Set_2.shp'
 
-bound_data = 'rerobe/Interpretation_boundary_laghettoSalza.shp'
+bound_data = '../../Shapefiles/Pontrelli_in/Interpretation_boundary.shp'
 # data = 'Betta_01_Fracture_mapping/Fracture_network_tot_no_dup.shp'
 # bound_data = 'Betta_01_Fracture_mapping/Interpretation_boundary_tot.shp'
 # bound_data = ''

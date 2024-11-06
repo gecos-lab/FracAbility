@@ -100,12 +100,12 @@ def setFigLinesBW(fig):
         setAxLinesBW(ax)
 
 
-# data = pd.read_csv('Pontrelli/output/csv/Fractures_1.csv', index_col=0)
-# data = pd.read_csv('Salza/output/csv/Fractures_1.csv', index_col=0)
-# data = pd.read_csv('Salza/output/csv/Fractures_2.csv', index_col=0)
+data = pd.read_csv('data/Pontrelli/output/csv/Fractures_1.csv', index_col=0, sep=';')
+# data = pd.read_csv('data/Salza/output/csv/Fractures_1.csv', index_col=0, sep=';')
+# data = pd.read_csv('data/Salza/output/csv/Fractures_2.csv', index_col=0, sep=';')
 
-# data = pd.read_csv('Spacing_Salza_S1/output/csv/Fractures_1.csv', index_col=0)  # Read the data
-data = pd.read_csv('Spacing_Salza_S2/output/csv/Fractures_2.csv', index_col=0)  # Read the data
+# data = pd.read_csv('data/Spacing_Salza_S1_out/output/csv/Fractures_1.csv', index_col=0, sep=';')  # Read the data
+# data = pd.read_csv('data/Spacing_Salza_S2_out/output/csv/Fractures_2.csv', index_col=0, sep=';')  # Read the data
 
 data = data.sort_values(by='length')  # sort the data by length
 

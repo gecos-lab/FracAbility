@@ -95,7 +95,7 @@ def vtk2shp(vtk_repr: pv.PolyData, input_type:str=None) -> gpd.GeoDataFrame:
 if __name__=='__main__':
     # shp_points = gpd.read_file('shp/points.shp')
 
-    shp_lines = gpd.read_file('Data/Pontrelli/output/shp/Fractures_1.shp')
+    shp_lines = gpd.read_file('../../Shapefiles/Pontrelli_in/Set_a.shp')
 
     print(shp_lines)
 

@@ -3,7 +3,7 @@ from reliability.Nonparametric import KaplanMeier
 import matplotlib.pyplot as plt
 
 
-data = pd.read_csv('Pontrelli_esf_test/output/csv/Fractures_1.csv', sep=';')
+data = pd.read_csv('data/Pontrelli/output/csv/Fractures_1.csv', sep=';')
 
 data = data.sort_values(by='length')
 
