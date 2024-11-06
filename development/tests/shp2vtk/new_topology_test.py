@@ -7,81 +7,81 @@ from vtkmodules.vtkCommonDataModel import vtkPolyData
 from vtkmodules.vtkFiltersCore import vtkCleanPolyData, vtkAppendPolyData, vtkIdFilter
 import time
 import itertools
-from vtk.util import numpy_support
+from vtk2shp import shp2vtk
 
 
-def shp2vtk(df: gpd.GeoDataFrame, nodes=False) -> pv.PolyData:
-    """
-    Quickly convert a GeoDataFrame to a PolyData
-    :param df: input GeoDataFrame
-    :param nodes: the input GeoDataFrame have Point type geometries set this to True
-    :return: PolyData.
-    """
-    get_coord_df = df.geometry.get_coordinates(ignore_index=False, index_parts=True)
-    get_coord_df.reset_index(inplace=True)
-    get_coord_df.columns = ['parts', 'indexes', 'x', 'y']
-    get_coord_df['indexes'] = range(0, len(get_coord_df))
-    get_coord_df['parts'] += 1
+# def shp2vtk(df: gpd.GeoDataFrame, nodes=False) -> pv.PolyData:
+#     """
+#     Quickly convert a GeoDataFrame to a PolyData
+#     :param df: input GeoDataFrame
+#     :param nodes: the input GeoDataFrame have Point type geometries set this to True
+#     :return: PolyData.
+#     """
+#     get_coord_df = df.geometry.get_coordinates(ignore_index=False, index_parts=True)
+#     get_coord_df.reset_index(inplace=True)
+#     get_coord_df.columns = ['parts', 'indexes', 'x', 'y']
+#     get_coord_df['indexes'] = range(0, len(get_coord_df))
+#     get_coord_df['parts'] += 1
+#
+#     get_coord_df['z'] = np.zeros(len(get_coord_df['x']))
+#     get_coord_df['points'] = get_coord_df.loc[:, ['x', 'y', 'z']].values.tolist()
+#     get_coord_df['points'] = get_coord_df['points'].map(tuple)
+#     duplicate_mask_first = get_coord_df.duplicated(subset=['x', 'y', 'z'], keep='last')
+#     first_repeats = get_coord_df[duplicate_mask_first]
+#
+#     keys = first_repeats['points'].values
+#     values = first_repeats['indexes'].values
+#
+#     unique_values_dict = dict(zip(keys, values))
+#
+#     # to change the indexes as the ones that are in the dict we get the values from the dict with apply(get)
+#     # and fill the na with the index column (i.e. the indexes that are not in common).
+#     get_coord_df['indexes'] = get_coord_df['points'].apply(func=lambda x: unique_values_dict.get(x)).fillna(
+#         get_coord_df['indexes']).astype(int)
+#
+#     mem = 0
+#     conn = list()
+#     for part, index in zip(get_coord_df['parts'], get_coord_df.index):
+#         if part != mem:
+#             nparts = len(get_coord_df[get_coord_df['parts'] == part])
+#             conn.append(nparts)
+#         conn.append(get_coord_df.loc[index, 'indexes'])
+#         mem = part
+#
+#     points = np.array(get_coord_df.loc[:, ['x', 'y', 'z']].values.tolist())
+#
+#     if nodes:
+#         vtk_obj = pv.PolyData(points)
+#     else:
+#         vtk_obj = pv.PolyData(points, lines=conn)
+#
+#     arrays = list(df.columns)
+#     arrays.remove('geometry')
+#     for array in arrays:
+#         vtk_obj[array] = df[array].values
+#
+#     p = 100000  # Scaling factor needed for the vtk function to work properly
+#     vtk_obj.points *= p
+#     clean = vtkCleanPolyData()
+#     clean.AddInputData(vtk_obj)
+#     clean.ToleranceIsAbsoluteOn()
+#     clean.ConvertLinesToPointsOff()
+#     clean.ConvertPolysToLinesOff()
+#     clean.ConvertStripsToPolysOff()
+#     clean.Update()
+#
+#     output_obj = pv.PolyData(clean.GetOutput())
+#     output_obj.points /= p  # Rescale back the points
+#
+#     return output_obj
 
-    get_coord_df['z'] = np.zeros(len(get_coord_df['x']))
-    get_coord_df['points'] = get_coord_df.loc[:, ['x', 'y', 'z']].values.tolist()
-    get_coord_df['points'] = get_coord_df['points'].map(tuple)
-    duplicate_mask_first = get_coord_df.duplicated(subset=['x', 'y', 'z'], keep='last')
-    first_repeats = get_coord_df[duplicate_mask_first]
 
-    keys = first_repeats['points'].values
-    values = first_repeats['indexes'].values
-
-    unique_values_dict = dict(zip(keys, values))
-
-    # to change the indexes as the ones that are in the dict we get the values from the dict with apply(get)
-    # and fill the na with the index column (i.e. the indexes that are not in common).
-    get_coord_df['indexes'] = get_coord_df['points'].apply(func=lambda x: unique_values_dict.get(x)).fillna(
-        get_coord_df['indexes']).astype(int)
-
-    mem = 0
-    conn = list()
-    for part, index in zip(get_coord_df['parts'], get_coord_df.index):
-        if part != mem:
-            nparts = len(get_coord_df[get_coord_df['parts'] == part])
-            conn.append(nparts)
-        conn.append(get_coord_df.loc[index, 'indexes'])
-        mem = part
-
-    points = np.array(get_coord_df.loc[:, ['x', 'y', 'z']].values.tolist())
-
-    if nodes:
-        vtk_obj = pv.PolyData(points)
-    else:
-        vtk_obj = pv.PolyData(points, lines=conn)
-
-    arrays = list(df.columns)
-    arrays.remove('geometry')
-    for array in arrays:
-        vtk_obj[array] = df[array].values
-
-    p = 100000  # Scaling factor needed for the vtk function to work properly
-    vtk_obj.points *= p
-    clean = vtkCleanPolyData()
-    clean.AddInputData(vtk_obj)
-    clean.ToleranceIsAbsoluteOn()
-    clean.ConvertLinesToPointsOff()
-    clean.ConvertPolysToLinesOff()
-    clean.ConvertStripsToPolysOff()
-    clean.Update()
-
-    output_obj = pv.PolyData(clean.GetOutput())
-    output_obj.points /= p  # Rescale back the points
-
-    return output_obj
-
-
-# fractures = gpd.read_file('Data/Salza/output/shp/Fractures.shp')
-fractures = gpd.read_file('Data/Pontrelli/output/shp/Fractures_1.shp')
+fractures = gpd.read_file('Data/Salza/output/shp/Fractures.shp')
+# fractures = gpd.read_file('Data/Pontrelli/output/shp/Fractures_1.shp')
 # center = fractures.dissolve().centroid
 # fractures = fractures.translate(*-center.geometry.get_coordinates().values[0])
-# boundary = gpd.read_file('Data/Salza/output/shp/Boundary.shp')
-boundary = gpd.read_file('Data/Pontrelli/output/shp/Boundary_1.shp')
+boundary = gpd.read_file('Data/Salza/output/shp/Boundary.shp')
+# boundary = gpd.read_file('Data/Pontrelli/output/shp/Boundary_1.shp')
 # boundary = boundary.translate(*-center.geometry.get_coordinates().values[0])
 #
 #

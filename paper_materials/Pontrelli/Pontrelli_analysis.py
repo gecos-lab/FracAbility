@@ -35,7 +35,7 @@ fitter.fit('powerlaw')
 fitter.fit('weibull_min')
 
 
-fitter.plot_PIT(bw=True)
+fitter.plot_PIT(bw=True, n_ticks=6)
 fitter.plot_summary(position=[1], sort_by='Mean_rank')
 # fitter.fit_result_to_clipboard()
 # Plotters.matplot_stats_ranks(fitter)
