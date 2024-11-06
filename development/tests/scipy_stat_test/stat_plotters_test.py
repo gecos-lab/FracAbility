@@ -51,7 +51,7 @@ def ecdf_find_x(ecdf_prob, y_values):
 
 
 number_of_samples = 1000
-samples = np.genfromtxt('samples.csv')
+samples = np.genfromtxt('data/samples.csv')
 delta = np.ones(len(samples))
 samples.sort()
 mu = np.arange(-2, 3, 2)

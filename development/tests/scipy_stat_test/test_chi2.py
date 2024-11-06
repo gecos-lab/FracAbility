@@ -8,7 +8,7 @@ import seaborn as sns
 
 sns.set_theme()
 
-data = pd.read_csv('data.csv', index_col=0)
+data = pd.read_csv('data/data.csv', index_col=0)
 
 tot_n = len(data)
 

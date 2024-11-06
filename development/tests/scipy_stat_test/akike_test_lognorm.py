@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 
-data = pd.read_csv('Fractures_test.csv', index_col=0)  # Read the data
+data = pd.read_csv('data/Fractures_test.csv', index_col=0)  # Read the data
 
 data = data.sort_values(by='length')  # sort the data by length
 
