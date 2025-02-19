@@ -36,29 +36,35 @@ class NetworkData:
         self.use_survival = use_survival
         self.complete_only = complete_only
 
-        if obj is not None:
+
+        if isinstance(obj, DataFrame):
+            entity_df = obj
+        elif obj is not None:
             if self._obj.name == 'FractureNetwork':
                 frac_obj = self._obj.fractures
             else:
                 frac_obj = self._obj
 
             entity_df = frac_obj.entity_df
-            entity_df = entity_df.sort_values(by='length')
+        else:
+            raise ValueError("Object can be only Fracture/FractureNetwork objects or pandas DataFrame")
 
-            self.delta = 1-entity_df['censored'].values
-            self._lengths = entity_df['length'].values
-            self._non_censored_lengths = entity_df.loc[entity_df['censored'] == 0, 'length'].values
-            self._censored_lengths = entity_df.loc[entity_df['censored'] == 1, 'length'].values
-            self._ecdf = KM(self._lengths, self._lengths, self.delta)
+        entity_df = entity_df.sort_values(by='length')
 
-            if self.use_survival:
-                self.data = ss.CensoredData(uncensored=self._non_censored_lengths, right=self._censored_lengths)
+        self.delta = 1-entity_df['censored'].values
+        self._lengths = entity_df['length'].values
+        self._non_censored_lengths = entity_df.loc[entity_df['censored'] == 0, 'length'].values
+        self._censored_lengths = entity_df.loc[entity_df['censored'] == 1, 'length'].values
+        self._ecdf = KM(self._lengths, self._lengths, self.delta)
+
+        if self.use_survival:
+            self.data = ss.CensoredData(uncensored=self._non_censored_lengths, right=self._censored_lengths)
+        else:
+            if self.complete_only:
+                self.data = self.non_censored_lengths
             else:
-                if self.complete_only:
-                    self.data = self.non_censored_lengths
-                else:
-                    self.delta[:] = 1
-                    self.data = self.lengths
+                self.delta[:] = 1
+                self.data = self.lengths
 
     @property
     def data(self):
