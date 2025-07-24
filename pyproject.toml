@@ -40,7 +40,8 @@ dependencies = [
     'openpyxl',
     'seaborn',
     'trame',
-    'jupyter'
+    'jupyter',
+    'fiona'
 ]
 
 dynamic = ['version']
